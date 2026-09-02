@@ -1,0 +1,173 @@
+{
+  "passed": [
+    {
+      "test": "Health Endpoint",
+      "details": "Status 200, Database: OK, SSE Realtime: OK (Server-Sent Events (SSE))"
+    },
+    {
+      "test": "Security Headers",
+      "details": "nosniff, SAMEORIGIN, and Referrer-Policy present on public responses"
+    },
+    {
+      "test": "User Accounts Verified",
+      "details": "SUPER_ADMIN (admin@leadjenmedia.com), EDITOR (editor@leadjenmedia.com), REPORTER (reporter@leadjenmedia.com)"
+    },
+    {
+      "test": "Login Rejection on Invalid Password",
+      "details": "Correctly rejected with HTTP 429 (Unauthorized / Rate-limited)"
+    },
+    {
+      "test": "Server-side RBAC Restriction",
+      "details": "Reporter forbidden from Version Restore (HTTP 403)"
+    },
+    {
+      "test": "Article Creation (DRAFT)",
+      "details": "Article created with ID: cmtjo7vpf000s4mzbt0jk5gdo, status DRAFT"
+    },
+    {
+      "test": "Draft Isolation",
+      "details": "Unpublished DRAFT article does NOT appear on public category page"
+    },
+    {
+      "test": "Article Publishing (EDITOR)",
+      "details": "Status transitioned to PUBLISHED"
+    },
+    {
+      "test": "Public Article Rendering",
+      "details": "Article rendered with 200 OK, title, and NewsArticle schema"
+    },
+    {
+      "test": "Search Integration",
+      "details": "Published article indexed in search API results"
+    },
+    {
+      "test": "Test Article Cleanup",
+      "details": "Safely removed audit test article from database"
+    },
+    {
+      "test": "Upload File Validation",
+      "details": "Correctly rejected empty upload request with HTTP 400"
+    },
+    {
+      "test": "Media Library Database",
+      "details": "Media records table functional (1 records)"
+    },
+    {
+      "test": "Local Media Directory",
+      "details": "Local persistence path verified: public/uploads"
+    },
+    {
+      "test": "Advertisement Creation",
+      "details": "Created test ad ID: cmtjo7vud000380zry6juzhcx, location: SIDEBAR_AD"
+    },
+    {
+      "test": "Ad Impression Tracking",
+      "details": "Recorded impression event successfully"
+    },
+    {
+      "test": "Ad Click Tracking",
+      "details": "Recorded click event successfully"
+    },
+    {
+      "test": "Ad Analytics API",
+      "details": "Analytics metrics and CTR returned HTTP 200"
+    },
+    {
+      "test": "Test Ad Cleanup",
+      "details": "Safely cleaned up audit test ad and event records"
+    },
+    {
+      "test": "Site Builder API (GET)",
+      "details": "Configuration loaded: Brand (LEADJEN MEDIA), Header (sticky=undefined)"
+    },
+    {
+      "test": "Site Builder Draft Save",
+      "details": "Draft configuration saved without altering live status"
+    },
+    {
+      "test": "Homepage Builder Sections API",
+      "details": "Loaded homepage section layouts HTTP 200"
+    },
+    {
+      "test": "Breaking News Publishing",
+      "details": "Created active breaking banner item ID: cmtjo7vvy000480zrk0aehrfb"
+    },
+    {
+      "test": "Live Desk Coverage & Updates",
+      "details": "Live coverage created with update ID: cmtjo7vw4000780zrwirmc3e5"
+    },
+    {
+      "test": "Public Live Desk Page",
+      "details": "Live stream page rendered with 200 OK"
+    },
+    {
+      "test": "Live & Breaking Cleanup",
+      "details": "Safely cleaned up audit test live items"
+    },
+    {
+      "test": "Robots.txt",
+      "details": "Valid robots file disallowing admin paths and declaring XML sitemaps"
+    },
+    {
+      "test": "Standard XML Sitemap",
+      "details": "Valid sitemap XML returned with 200 OK"
+    },
+    {
+      "test": "Google News XML Sitemap",
+      "details": "Google News compliant schema returned with 200 OK"
+    },
+    {
+      "test": "RSS 2.0 Feed",
+      "details": "Valid RSS feed returned with 200 OK"
+    },
+    {
+      "test": "404 Status Code & Error Page",
+      "details": "Returns genuine HTTP 404 status and custom error layout"
+    },
+    {
+      "test": "Static Page (/about)",
+      "details": "Rendered with HTTP 200 OK"
+    },
+    {
+      "test": "Static Page (/privacy)",
+      "details": "Rendered with HTTP 200 OK"
+    },
+    {
+      "test": "Static Page (/terms)",
+      "details": "Rendered with HTTP 200 OK"
+    },
+    {
+      "test": "Static Page (/editorial-policy)",
+      "details": "Rendered with HTTP 200 OK"
+    },
+    {
+      "test": "Static Page (/corrections-policy)",
+      "details": "Rendered with HTTP 200 OK"
+    },
+    {
+      "test": "Static Page (/contact)",
+      "details": "Rendered with HTTP 200 OK"
+    },
+    {
+      "test": "Static Page (/advertise)",
+      "details": "Rendered with HTTP 200 OK"
+    },
+    {
+      "test": "Zero Blue Palette Compliance",
+      "details": "All components strictly conform to Black, White, Gray, and Red"
+    }
+  ],
+  "warnings": [
+    {
+      "test": "Newsletter Subscription",
+      "details": "HTTP 429"
+    }
+  ],
+  "failed": [
+    {
+      "test": "Login API Authentication",
+      "details": "Returned HTTP 429: {\"error\":\"Too many login attempts. Please try again in 8 minute(s).\"}"
+    }
+  ],
+  "blocked": []
+}

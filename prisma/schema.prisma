@@ -1,0 +1,533 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  EDITOR
+  REPORTER
+  READER
+}
+
+enum ArticleStatus {
+  DRAFT
+  IN_REVIEW
+  APPROVED
+  SCHEDULED
+  PUBLISHED
+  ARCHIVED
+}
+
+enum AdLocation {
+  TOP_LEADERBOARD
+  HEADER_AD
+  HOMEPAGE_CONTENT
+  SIDEBAR_AD
+  IN_ARTICLE_AD
+  MOBILE_AD
+  FOOTER_AD
+}
+
+model User {
+  id                String              @id @default(cuid())
+  email             String              @unique
+  passwordHash      String
+  name              String
+  role              Role                @default(READER)
+  avatar            String?
+  status            String              @default("ACTIVE") // ACTIVE, SUSPENDED
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  bookmarks         Bookmark[]
+  categoryFollows   CategoryFollow[]
+  userNotifications UserNotification[]
+  comments          Comment[]
+  articleViews      ArticleView[]
+}
+
+model Author {
+  id          String    @id @default(cuid())
+  name        String
+  slug        String    @unique
+  designation String?   @default("Senior Editorial Correspondent")
+  bio         String?
+  avatar      String?
+  email       String?
+  twitter     String?
+  linkedin    String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  articles    Article[]
+}
+
+model Category {
+  id               String            @id @default(cuid())
+  name             String            @unique
+  slug             String            @unique
+  description      String?
+  color            String?           @default("#0B192C")
+  order            Int               @default(0)
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  articles         Article[]
+  homepageSections HomepageSection[]
+  categoryFollows  CategoryFollow[]
+}
+
+model Tag {
+  id        String       @id @default(cuid())
+  name      String       @unique
+  slug      String       @unique
+  articles  ArticleTag[]
+  createdAt DateTime     @default(now())
+}
+
+model Article {
+  id                      String                   @id @default(cuid())
+  title                   String
+  slug                    String                   @unique
+  subtitle                String?
+  excerpt                 String
+  content                 String
+  featuredImage           String
+  gallery                 String?                  // JSON string of image URLs
+  categoryId              String
+  category                Category                 @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  authorId                String
+  author                  Author                   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdById             String?                  // User ID of author/reporter
+  reviewFeedback          String?                  // Editorial review notes/requested changes
+  submittedAt             DateTime?
+  reviewedAt              DateTime?
+  reviewedById            String?
+  status                  ArticleStatus            @default(DRAFT)
+  isFeatured              Boolean                  @default(false)
+  isBreaking              Boolean                  @default(false)
+  isTrending              Boolean                  @default(false)
+  isVideo                 Boolean                  @default(false)
+  videoUrl                String?
+  isOpinion               Boolean                  @default(false)
+  readingTime             Int                      @default(3)
+  seoTitle                String?
+  seoDescription          String?
+  ogImage                 String?
+  viewCount               Int                      @default(0)
+  likeCount               Int                      @default(0)
+  scheduledAt             DateTime?
+  publishedAt             DateTime?
+  createdAt               DateTime                 @default(now())
+  updatedAt               DateTime                 @updatedAt
+  tags                    ArticleTag[]
+  views                   ArticleView[]
+  comments                Comment[]
+  bookmarks               Bookmark[]
+  homepageSectionArticles HomepageSectionArticle[]
+
+  @@index([slug])
+  @@index([categoryId, status, publishedAt])
+  @@index([authorId])
+  @@index([createdById])
+  @@index([status, publishedAt])
+  @@index([isFeatured, status, publishedAt])
+  @@index([isBreaking, status, publishedAt])
+  @@index([isTrending, status, publishedAt])
+}
+
+model ArticleTag {
+  articleId String
+  tagId     String
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+}
+
+model Media {
+  id           String   @id @default(cuid())
+  filename     String
+  originalName String
+  url          String
+  publicId     String?
+  mimeType     String?
+  size         Int?
+  width        Int?
+  height       Int?
+  altText      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Advertisement {
+  id               String     @id @default(cuid())
+  name             String
+  advertiser       String?    // Brand / Client Name
+  campaignName     String?    // Campaign Name
+  creativeType     String     @default("IMAGE") // IMAGE, HTML, TEXT, VIDEO
+  location         AdLocation @default(TOP_LEADERBOARD)
+  imageUrl         String
+  desktopImage     String?
+  tabletImage      String?
+  mobileImage      String?
+  destinationUrl   String
+  htmlContent      String?
+  priority         Int        @default(50)
+  status           String     @default("ACTIVE") // DRAFT, SCHEDULED, ACTIVE, PAUSED, EXPIRED, ARCHIVED
+  device           String     @default("ALL") // DESKTOP, TABLET, MOBILE, ALL
+  rotationMode     String     @default("SINGLE") // SINGLE, ROTATE
+  rotationInterval Int        @default(10) // seconds
+  startDate        DateTime?
+  endDate          DateTime?
+  isActive         Boolean    @default(true)
+  clickCount       Int        @default(0)
+  viewCount        Int        @default(0) // Impressions
+  maxImpressions   Int?
+  maxClicks        Int?
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+
+  @@index([location, isActive, status])
+  @@index([startDate, endDate])
+}
+
+model AdEvent {
+  id         String   @id @default(cuid())
+  adId       String
+  type       String   // IMPRESSION, CLICK
+  device     String?  // DESKTOP, TABLET, MOBILE
+  location   String?  // TOP_LEADERBOARD, SIDEBAR_AD, etc.
+  userAgent  String?
+  ipHash     String?
+  createdAt  DateTime @default(now())
+
+  @@index([adId, type, createdAt])
+  @@index([createdAt])
+}
+
+model BreakingNews {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  linkUrl         String?
+  linkedArticleId String?
+  isLive          Boolean   @default(false)
+  priority        String    @default("NORMAL") // URGENT, HIGH, NORMAL
+  status          String    @default("ACTIVE") // ACTIVE, PAUSED, EXPIRED
+  isActive        Boolean   @default(true)
+  startTime       DateTime  @default(now())
+  expiresAt       DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([isActive, status, startTime, expiresAt])
+}
+
+model LiveCoverage {
+  id            String       @id @default(cuid())
+  title         String
+  slug          String       @unique
+  summary       String?
+  status        String       @default("LIVE") // UPCOMING, LIVE, PAUSED, ENDED
+  category      String?      @default("Breaking")
+  featuredImage String?
+  startedAt     DateTime     @default(now())
+  endedAt       DateTime?
+  updates       LiveUpdate[]
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  @@index([status, startedAt])
+}
+
+model LiveUpdate {
+  id              String        @id @default(cuid())
+  coverageId      String?
+  coverage        LiveCoverage? @relation(fields: [coverageId], references: [id], onDelete: Cascade)
+  title           String
+  content         String
+  authorName      String        @default("Leadjen Desk")
+  isUrgent        Boolean       @default(false)
+  imageUrl        String?
+  videoUrl        String?
+  linkedArticleId String?
+  timestamp       String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  @@index([coverageId, createdAt])
+}
+
+model AuditLog {
+  id             String   @id @default(cuid())
+  userId         String?
+  userName       String?
+  userRole       String?
+  action         String   // ARTICLE_CREATED, ARTICLE_SUBMITTED, CHANGES_REQUESTED, ARTICLE_APPROVED, ARTICLE_SCHEDULED, ARTICLE_PUBLISHED, ARTICLE_ARCHIVED, BREAKING_CREATED, etc.
+  entityType     String   // ARTICLE, BREAKING_NEWS, LIVE_COVERAGE, LIVE_UPDATE, HOMEPAGE, NAVIGATION, USER, SETTING
+  entityId       String?
+  entityTitle    String?
+  previousStatus String?
+  newStatus      String?
+  details        String?  // JSON string or notes
+  createdAt      DateTime @default(now())
+
+  @@index([entityType, entityId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model EditorialNotification {
+  id         String    @id @default(cuid())
+  userId     String?   // Target user ID or null for role-wide
+  targetRole Role?     // Specific role target (e.g. EDITOR, REPORTER)
+  message    String
+  type       String    // SUBMITTED, CHANGES_REQUESTED, APPROVED, PUBLISHED, SCHEDULED
+  isRead     Boolean   @default(false)
+  articleId  String?
+  link       String?
+  createdAt  DateTime  @default(now())
+
+  @@index([userId, isRead])
+  @@index([targetRole, isRead])
+}
+
+model PhotoGallery {
+  id           String   @id @default(cuid())
+  title        String
+  slug         String   @unique
+  description  String?
+  coverImage   String
+  images       String   // JSON string of {url, caption, photographer}
+  photographer String?
+  publishedAt  DateTime @default(now())
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model VideoNews {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  videoUrl    String
+  duration    String   @default("03:45")
+  thumbnail   String
+  category    String   @default("Technology")
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model NewsletterSubscriber {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ArticleView {
+  id        String   @id @default(cuid())
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  ipHash    String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([articleId, createdAt])
+  @@index([userId, createdAt])
+}
+
+model Comment {
+  id          String   @id @default(cuid())
+  articleId   String
+  article     Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  authorName  String
+  authorEmail String
+  content     String
+  status      String   @default("PENDING") // PENDING, APPROVED, REJECTED, SPAM, DELETED
+  isApproved  Boolean  @default(false)
+  isEdited    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([articleId, status])
+  @@index([userId])
+  @@index([status, createdAt])
+}
+
+model Bookmark {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  articleId String
+  article   Article  @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+  @@index([userId, createdAt])
+  @@index([articleId])
+}
+
+model CategoryFollow {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+
+  @@unique([userId, categoryId])
+  @@index([userId, createdAt])
+  @@index([categoryId])
+}
+
+model UserNotification {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  message   String
+  type      String   @default("EDITORIAL") // BREAKING, ARTICLE_UPDATE, EDITORIAL, SYSTEM
+  linkUrl   String?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
+
+// ==========================================
+// HOMEPAGE BUILDER & CUSTOMIZATION MODELS
+// ==========================================
+
+model HomepageSection {
+  id             String                   @id @default(cuid())
+  name           String
+  type           String                   // HERO, BREAKING_TICKER, LATEST_NEWS, CATEGORY_SECTION, NEWS_GRID, FEATURED_GRID, MOST_READ, TRENDING, VIDEO, PHOTO_GALLERY, LIVE_NEWS, ADVERTISEMENT, NEWSLETTER, HORIZONTAL_STORIES, COMPACT_LIST, SPLIT_FEATURE, THREE_COLUMN, FOUR_COLUMN, EDITORIAL_CALLOUT
+  title          String?
+  subtitle       String?
+  enabled        Boolean                  @default(true)
+  sortOrder      Int                      @default(0)
+  layout         String                   @default("featured-split")
+  contentSource  String                   @default("LATEST") // LATEST, CATEGORY, TAG, MANUAL, MOST_READ, TRENDING, FEATURED, BREAKING, VIDEO, PHOTO, LIVE
+  categoryId     String?
+  category       Category?                @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  storyLimit     Int                      @default(4)
+  background     String                   @default("white") // white, warm-white, light-gray, dark, deep-navy, transparent
+  spacing        String                   @default("normal") // compact, normal, spacious
+  borders        String                   @default("bottom") // none, top, bottom, both
+  imageRatio     String                   @default("aspect-[16/10]")
+  showImages     Boolean                  @default(true)
+  showExcerpt    Boolean                  @default(true)
+  showAuthor     Boolean                  @default(true)
+  showDate       Boolean                  @default(true)
+  showReadingTime Boolean                 @default(true)
+  showCategory   Boolean                  @default(true)
+  showViewAll    Boolean                  @default(true)
+  viewAllUrl     String?
+  customSettings String?                  // JSON string for extended settings
+  desktopCols    Int                      @default(3)
+  tabletCols     Int                      @default(2)
+  mobileCols     Int                      @default(1)
+  isDraft        Boolean                  @default(false)
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  manualArticles HomepageSectionArticle[]
+
+  @@index([sortOrder, enabled])
+  @@index([isDraft])
+}
+
+model HomepageSectionArticle {
+  id        String          @id @default(cuid())
+  sectionId String
+  section   HomepageSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  articleId String
+  article   Article         @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  sortOrder Int             @default(0)
+
+  @@unique([sectionId, articleId])
+  @@index([sectionId, sortOrder])
+}
+
+model SiteSettings {
+  id                  String   @id @default("default")
+  siteName            String   @default("LEADJEN MEDIA")
+  tagline             String   @default("Independent journalism. Important stories.")
+  logoText            String   @default("LEADJEN MEDIA")
+  logoImage           String?
+  headerNavItems      String?  // JSON string array of { name, href, isVisible, order }
+  draftHeaderNavItems String?  // JSON string array for unpublished draft navigation
+  footerColumns       String?  // JSON string array of { title, links: [{ label, url }] }
+  breakingNewsSpeed   Int      @default(35)
+  showLiveButton      Boolean  @default(true)
+  showSearchButton    Boolean  @default(true)
+  showClock           Boolean  @default(true)
+  clockTimezone       String   @default("Asia/Kolkata")
+  clockFormat         String   @default("12h")
+  clockLabel          String   @default("IST")
+  siteConfigJson      String?  // Full JSON string of SiteBuilderConfig (published)
+  draftSiteConfigJson String?  // Full JSON string of SiteBuilderConfig (draft)
+  categoryOverridesJson String? // JSON string of category layout overrides
+  updatedAt           DateTime @updatedAt
+}
+
+model SiteBuilderVersion {
+  id          String   @id @default(cuid())
+  versionName String
+  snapshot    String   // JSON snapshot of full site builder configuration
+  publishedBy String?
+  description String?
+  createdAt   DateTime @default(now())
+
+  @@index([createdAt])
+}
+
+model Page {
+  id             String   @id @default(cuid())
+  title          String
+  slug           String   @unique
+  content        String
+  featuredImage  String?
+  seoTitle       String?
+  seoDescription String?
+  status         String   @default("PUBLISHED") // DRAFT, PUBLISHED
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([slug, status])
+}
+
+model HomepageVersion {
+  id          String   @id @default(cuid())
+  name        String
+  snapshot    String   // JSON snapshot of all sections
+  publishedBy String?
+  publishedAt DateTime @default(now())
+}
+
+model SeoSettings {
+  id               String   @id @default("default")
+  siteTitle        String   @default("LEADJEN MEDIA | Independent Journalism. Important Stories.")
+  siteDescription  String   @default("Leading digital news publishing platform covering India, world affairs, politics, business, technology, sports, health, and science.")
+  siteUrl          String   @default("https://leadjen-media-news.vercel.app")
+  publisherName    String   @default("LEADJEN MEDIA")
+  publisherLogo    String   @default("https://leadjen-media-news.vercel.app/logo.png")
+  defaultSocialImg String   @default("https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&h=630&q=80")
+  twitterHandle    String   @default("@leadjenmedia")
+  defaultKeywords  String   @default("news, breaking news, india news, world news, politics, business, technology")
+  googleVerify     String?
+  bingVerify       String?
+  updatedAt        DateTime @updatedAt
+}
+
+
