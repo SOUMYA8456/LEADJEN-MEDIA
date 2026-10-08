@@ -116,6 +116,13 @@ export default function AuditLogsPage() {
             className="px-3 py-2 text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white font-mono uppercase focus:outline-none"
           >
             <option value="ALL">ALL ACTIONS</option>
+            <option value="LOGIN_SUCCESS">LOGIN SUCCESS</option>
+            <option value="LOGIN_FAILED">LOGIN FAILED</option>
+            <option value="USER_CREATED">STAFF CREATED</option>
+            <option value="USER_UPDATED">STAFF UPDATED</option>
+            <option value="USER_STATUS_CHANGED">STATUS CHANGED</option>
+            <option value="PASSWORD_RESET">PASSWORD RESET</option>
+            <option value="USER_ARCHIVED">STAFF ARCHIVED</option>
             <option value="ARTICLE_CREATED">ARTICLE CREATED</option>
             <option value="ARTICLE_SUBMITTED">ARTICLE SUBMITTED</option>
             <option value="CHANGES_REQUESTED">CHANGES REQUESTED</option>
@@ -140,11 +147,12 @@ export default function AuditLogsPage() {
             className="px-3 py-2 text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white font-mono uppercase focus:outline-none"
           >
             <option value="ALL">ALL ENTITIES</option>
+            <option value="USER">USER / STAFF</option>
+            <option value="SECURITY">SECURITY</option>
             <option value="ARTICLE">ARTICLE</option>
             <option value="BREAKING_NEWS">BREAKING NEWS</option>
             <option value="HOMEPAGE">HOMEPAGE</option>
             <option value="NAVIGATION">NAVIGATION</option>
-            <option value="USER">USER</option>
           </select>
         </div>
       </div>
