@@ -19,6 +19,7 @@ import {
   Megaphone,
   AlertTriangle,
   Palette,
+  Sparkles,
 } from "lucide-react";
 
 export const SITE_BUILDER_TABS = [
@@ -27,6 +28,8 @@ export const SITE_BUILDER_TABS = [
   { label: "Design & Typography", href: "/admin/site-builder/design", icon: Palette },
   { label: "Header", href: "/admin/site-builder/header", icon: Columns },
   { label: "Navigation", href: "/admin/site-builder/navigation", icon: Navigation },
+  { label: "Company Services", href: "/admin/site-builder/services", icon: Sparkles },
+  { label: "Advertising Studio", href: "/admin/site-builder/advertising", icon: Megaphone },
   { label: "Homepage", href: "/admin/homepage", icon: Layers },
   { label: "Categories", href: "/admin/site-builder/categories", icon: Columns },
   { label: "Article Layout", href: "/admin/site-builder/article", icon: FileText },

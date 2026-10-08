@@ -22,11 +22,13 @@ import {
   ExternalLink,
   Flame,
   Globe,
+  Megaphone,
   Briefcase,
   Sparkles,
   BookOpen,
 } from "lucide-react";
 import { useTheme } from "@/components/layout/ThemeProvider";
+import { DEFAULT_SERVICES, ServiceItemConfig } from "@/lib/site-builder-defaults";
 import { SearchModal } from "./SearchModal";
 import { LiveClock } from "./LiveClock";
 
@@ -74,11 +76,21 @@ export function Header() {
   const [siteLogo, setSiteLogo] = useState("");
   const [tagline, setTagline] = useState("INDEPENDENT JOURNALISM • INSIGHT • IMPACT");
 
-  const { theme, toggleTheme } = useTheme();
+  const { theme, toggleTheme, siteConfig } = useTheme();
   const pathname = usePathname();
   const moreMenuRef = useRef<HTMLDivElement>(null);
   const moreButtonRef = useRef<HTMLButtonElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+
+  const servicesList: ServiceItemConfig[] = (
+    siteConfig?.services?.items && siteConfig.services.items.length > 0
+      ? siteConfig.services.items
+      : DEFAULT_SERVICES
+  )
+    .filter((s) => s.isVisible !== false)
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  const adConfig = siteConfig?.advertising;
 
   const handleSignOut = async () => {
     try {
@@ -657,9 +669,27 @@ export function Header() {
                         <Link
                           href="/about"
                           onClick={() => setMoreMenuOpen(false)}
-                          className="hover:text-[#1E1B1A] dark:hover:text-white hover:underline block py-0.5"
+                          className="hover:text-[#1E1B1A] dark:hover:text-white hover:underline block py-0.5 font-medium"
                         >
                           About the Organization
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href={adConfig?.ctaDestination || "/advertise"}
+                          onClick={() => setMoreMenuOpen(false)}
+                          className="hover:text-[#1E1B1A] dark:hover:text-white hover:underline block py-0.5 text-red-600 dark:text-red-400 font-bold"
+                        >
+                          ★ Advertise With Us
+                        </Link>
+                      </li>
+                      <li>
+                        <Link
+                          href="/services"
+                          onClick={() => setMoreMenuOpen(false)}
+                          className="hover:text-[#1E1B1A] dark:hover:text-white hover:underline block py-0.5 font-medium"
+                        >
+                          Creative &amp; Agency Services
                         </Link>
                       </li>
                       <li>
@@ -669,15 +699,6 @@ export function Header() {
                           className="hover:text-[#1E1B1A] dark:hover:text-white hover:underline block py-0.5"
                         >
                           Contact Newsroom
-                        </Link>
-                      </li>
-                      <li>
-                        <Link
-                          href="/advertise"
-                          onClick={() => setMoreMenuOpen(false)}
-                          className="hover:text-[#1E1B1A] dark:hover:text-white hover:underline block py-0.5"
-                        >
-                          Advertise With Us
                         </Link>
                       </li>
                     </ul>
@@ -741,6 +762,30 @@ export function Header() {
               </button>
             </div>
 
+            {/* TOP-LEVEL HIGHLIGHT: ADVERTISE WITH LEADJEN MEDIA */}
+            <div className="mt-4">
+              <Link
+                href={adConfig?.ctaDestination || "/advertise"}
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1E1B1A] text-white dark:bg-white dark:text-black shadow-lg hover:opacity-95 transition group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-red-600 text-white flex items-center justify-center flex-shrink-0">
+                    <Megaphone className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <div className="text-xs font-mono font-black uppercase tracking-wider">
+                      ADVERTISE WITH LEADJEN MEDIA
+                    </div>
+                    <div className="text-[10px] text-neutral-300 dark:text-neutral-600 font-sans">
+                      Rate Card, Media Kit &amp; Partnerships
+                    </div>
+                  </div>
+                </div>
+                <ChevronRight className="w-4 h-4 text-neutral-400 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+
             {/* Drawer Navigation Desks */}
             <div className="mt-6 space-y-6">
               {/* Main Desks */}
@@ -766,6 +811,49 @@ export function Header() {
                     </Link>
                   );
                 })}
+              </div>
+
+              {/* ABOUT LEADJEN MEDIA (11 Services) */}
+              <div className="space-y-1 pt-4 border-t border-gray-100 dark:border-gray-800">
+                <div className="flex items-center justify-between px-3 mb-1">
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-[#1E1B1A] dark:text-white">
+                    ABOUT LEADJEN MEDIA
+                  </span>
+                  <span className="text-[9px] font-mono uppercase bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 px-1.5 py-0.5 rounded font-bold">
+                    SERVICES
+                  </span>
+                </div>
+
+                <div className="space-y-0.5">
+                  {servicesList.map((service) => {
+                    const sHref = service.url || `/services/${service.slug}`;
+                    const active = isLinkActive(sHref);
+                    return (
+                      <Link
+                        key={service.id || service.slug}
+                        href={sHref}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`flex items-center justify-between px-3 py-2 rounded-lg text-xs font-mono font-bold transition ${
+                          active
+                            ? "bg-[#1E1B1A]/10 dark:bg-neutral-800 text-[#1E1B1A] dark:text-white font-extrabold"
+                            : "text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-900"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="w-1.5 h-1.5 rounded-full bg-red-600 flex-shrink-0" />
+                          <span className="truncate">{service.title}</span>
+                        </div>
+                        {service.badge ? (
+                          <span className="text-[9px] font-mono bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 px-1.5 py-0.5 rounded font-bold flex-shrink-0 ml-2">
+                            {service.badge}
+                          </span>
+                        ) : (
+                          <ChevronRight className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 ml-2" />
+                        )}
+                      </Link>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Multimedia & Audio */}
@@ -852,6 +940,13 @@ export function Header() {
                   About Leadjen Media
                 </Link>
                 <Link
+                  href="/services"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-[#1E1B1A]"
+                >
+                  Creative &amp; Enterprise Services
+                </Link>
+                <Link
                   href="/contact"
                   onClick={() => setMobileMenuOpen(false)}
                   className="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-[#1E1B1A]"
@@ -883,8 +978,18 @@ export function Header() {
                 </button>
               </div>
 
-              <div className="text-center text-[10px] text-gray-400 font-mono pt-2">
-                © 2026 LEADJEN MEDIA • ALL RIGHTS RESERVED
+              <div className="text-center space-y-1 text-gray-400 font-mono pt-2">
+                <img
+                  src="/images/leadjen-bottom-logo.png"
+                  alt="LEADJEN MEDIA"
+                  className="h-7 w-auto object-contain mx-auto mb-2 opacity-90"
+                />
+                <p className="text-[10px] text-neutral-400 font-medium">
+                  © 2026 LEADJEN MEDIA. All rights reserved.
+                </p>
+                <p className="text-[9px] text-neutral-500">
+                  Registered Digital News Publisher.
+                </p>
               </div>
             </div>
           </div>

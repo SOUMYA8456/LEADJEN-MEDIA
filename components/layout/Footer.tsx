@@ -155,11 +155,27 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom Copyright Strip */}
-      <div className="border-t border-neutral-900 bg-black/50 py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-500 font-mono">
-          <p>{footer.copyrightText || global.copyrightText || `© ${new Date().getFullYear()} LEADJEN MEDIA NEWS. All rights reserved.`}</p>
-          <p className="text-[11px]">Independent Digital Newsroom Architecture.</p>
+      {/* Bottom Copyright & Branding Strip */}
+      <div className="border-t border-neutral-900 bg-black/80 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center space-y-4">
+          {/* Centered Transparent Brand Logo */}
+          <Link href="/" className="inline-block group focus:outline-none select-none transition-transform hover:scale-[1.03] duration-200">
+            <img
+              src="/images/leadjen-bottom-logo.png"
+              alt="LEADJEN MEDIA"
+              className="h-10 sm:h-12 md:h-14 w-auto object-contain mx-auto"
+            />
+          </Link>
+
+          {/* Centered Copyright & Registration Details */}
+          <div className="space-y-1.5 max-w-2xl px-2">
+            <p className="text-xs sm:text-sm text-neutral-300 font-mono font-medium tracking-wide">
+              © {new Date().getFullYear()} LEADJEN MEDIA. All rights reserved. Registered Digital News Publisher.
+            </p>
+            <p className="text-[11px] sm:text-xs text-neutral-500 font-mono tracking-wider">
+              Designed with Editorial Precision &amp; Fast Next.js Architecture.
+            </p>
+          </div>
         </div>
       </div>
     </footer>

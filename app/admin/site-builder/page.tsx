@@ -17,6 +17,7 @@ import {
   Megaphone,
   AlertTriangle,
   Palette,
+  Sparkles,
   Save,
   Send,
   Eye,
@@ -163,6 +164,18 @@ export default function SiteBuilderDashboard() {
       href: "/admin/site-builder/navigation",
       icon: Navigation,
       desc: "Primary menu items, category links, mega menu content, reordering, and visibility toggles.",
+    },
+    {
+      title: "About Leadjen Services",
+      href: "/admin/site-builder/services",
+      icon: Sparkles,
+      desc: "Manage the 11 About Leadjen Media service items, hamburger drawer links, landing pages, and deliverables.",
+    },
+    {
+      title: "Advertising Hub Studio",
+      href: "/admin/site-builder/advertising",
+      icon: Megaphone,
+      desc: "Manage the /advertise portal, 9 commercial advertising formats, media kit download, and conversion CTAs.",
     },
     {
       title: "Homepage Layout Builder",
