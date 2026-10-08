@@ -31,6 +31,7 @@ import {
   ArrowRight,
   Shield,
   UserCheck,
+  AlertTriangle,
 } from "lucide-react";
 
 interface Category {
@@ -132,6 +133,10 @@ export default function NewsDeskPage() {
   const [reviewActionLoading, setReviewActionLoading] = useState<boolean>(false);
   const [scheduleDateTime, setScheduleDateTime] = useState<string>("");
   const [showScheduleInput, setShowScheduleInput] = useState<boolean>(false);
+
+  // Delete Article Modal State
+  const [deleteModalArticle, setDeleteModalArticle] = useState<Article | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   // Quick Breaking Modal
   const [isQuickBreakingOpen, setIsQuickBreakingOpen] = useState(false);
@@ -354,6 +359,54 @@ export default function NewsDeskPage() {
     } catch {}
   };
 
+  // Delete Article Action
+  const handleConfirmDelete = async () => {
+    if (!deleteModalArticle) return;
+    try {
+      setIsDeleting(true);
+      const res = await fetch(`/api/articles/${deleteModalArticle.id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        const deletedTitle = deleteModalArticle.title;
+        setArticles((prev) => prev.filter((a) => a.id !== deleteModalArticle.id));
+        setStats((prev) => ({
+          ...prev,
+          totalArticles: Math.max(0, prev.totalArticles - 1),
+          drafts: deleteModalArticle.status === "DRAFT" ? Math.max(0, prev.drafts - 1) : prev.drafts,
+          inReview: deleteModalArticle.status === "IN_REVIEW" ? Math.max(0, prev.inReview - 1) : prev.inReview,
+          approved: deleteModalArticle.status === "APPROVED" ? Math.max(0, prev.approved - 1) : prev.approved,
+          scheduled: deleteModalArticle.status === "SCHEDULED" ? Math.max(0, prev.scheduled - 1) : prev.scheduled,
+        }));
+
+        if (reviewArticle?.id === deleteModalArticle.id) {
+          setReviewArticle(null);
+        }
+
+        setDeleteModalArticle(null);
+        setMessage({
+          text: `✓ Article "${deletedTitle}" was permanently deleted.`,
+          type: "success",
+        });
+      } else {
+        const err = await res.json();
+        setMessage({
+          text: err.error || "Failed to delete article",
+          type: "error",
+        });
+      }
+    } catch (e: any) {
+      console.error("Delete article failed:", e);
+      setMessage({
+        text: "An error occurred while deleting the article.",
+        type: "error",
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const handleCreateQuickBreaking = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newBreakingTitle.trim()) return;
@@ -389,37 +442,37 @@ export default function NewsDeskPage() {
   const isEditorOrAdmin = session?.role === "EDITOR" || session?.role === "SUPER_ADMIN";
 
   return (
-    <div className="w-full max-w-[1720px] mx-auto px-2 sm:px-4 lg:px-6 pb-20 space-y-6">
+    <div className="w-full max-w-[1720px] mx-auto px-1 sm:px-4 lg:px-6 pb-20 space-y-5">
       {/* Top Header & Newsroom Identity Bar */}
-      <div className="bg-black border border-neutral-800 rounded-2xl p-5 sm:p-6 text-white shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+      <div className="bg-black border border-neutral-800 rounded-2xl p-4 sm:p-6 text-white shadow-sm flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         <div>
-          <div className="flex flex-wrap items-center gap-3">
-            <span className="p-2 bg-red-600/20 text-red-500 rounded-xl">
-              <Radio className="w-5 h-5 animate-pulse" />
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-3">
+            <span className="p-2 bg-red-600/20 text-red-500 rounded-xl flex-shrink-0">
+              <Radio className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
             </span>
-            <div>
-              <span className="text-[10px] font-mono uppercase tracking-widest text-red-500 font-bold block">
+            <div className="min-w-0">
+              <span className="text-[9px] sm:text-[10px] font-mono uppercase tracking-widest text-red-500 font-bold block">
                 LEADJEN MEDIA NEWSROOM
               </span>
-              <h1 className="font-serif font-black text-2xl sm:text-3xl text-white tracking-tight">
+              <h1 className="font-serif font-black text-xl sm:text-2xl md:text-3xl text-white tracking-tight truncate">
                 EDITORIAL NEWS DESK
               </h1>
             </div>
-            <span className="px-2.5 py-0.5 bg-neutral-900 text-neutral-300 text-[11px] font-mono font-bold rounded-full border border-neutral-700 flex items-center gap-1.5 ml-2">
+            <span className="px-2.5 py-0.5 bg-neutral-900 text-neutral-300 text-[10px] sm:text-[11px] font-mono font-bold rounded-full border border-neutral-700 flex items-center gap-1.5 ml-auto sm:ml-2">
               <Shield className="w-3 h-3 text-red-500" />
               {session?.role || "EDITORIAL"}
             </span>
           </div>
-          <p className="text-xs text-neutral-400 font-sans mt-2 max-w-2xl">
+          <p className="text-xs text-neutral-400 font-sans mt-2 max-w-2xl hidden sm:block">
             Real-time daily editorial operations: review reporter submissions, approve investigative stories, schedule wire updates, manage urgent breaking alerts, and monitor publication queues.
           </p>
         </div>
 
         {/* Quick Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
           <Link
             href="/admin/articles/create"
-            className="flex items-center gap-1.5 px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-md shadow-red-950 font-sans"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3.5 sm:px-4 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-md shadow-red-950 font-sans whitespace-nowrap"
           >
             <Plus className="w-4 h-4" />
             <span>Create Article</span>
@@ -430,28 +483,28 @@ export default function NewsDeskPage() {
               <button
                 type="button"
                 onClick={() => setIsQuickBreakingOpen(true)}
-                className="flex items-center gap-1.5 px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-red-400 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition border border-neutral-800 font-sans"
+                className="flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-red-400 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition border border-neutral-800 font-sans whitespace-nowrap"
               >
                 <Radio className="w-3.5 h-3.5 text-red-500 animate-pulse" />
-                <span>Breaking News</span>
+                <span>Breaking</span>
               </button>
 
               <Link
                 href="/admin/editorial-calendar"
-                className="flex items-center gap-1.5 px-3.5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition border border-neutral-800"
+                className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition border border-neutral-800"
                 title="Editorial Calendar"
               >
                 <Calendar className="w-4 h-4" />
-                <span className="hidden sm:inline">Calendar</span>
+                <span className="hidden md:inline">Calendar</span>
               </Link>
 
               <Link
                 href="/admin/homepage"
-                className="flex items-center gap-1.5 px-3.5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition border border-neutral-800"
+                className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2.5 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white rounded-xl text-xs font-bold uppercase tracking-wider transition border border-neutral-800"
                 title="Homepage Builder"
               >
                 <Layers className="w-4 h-4" />
-                <span className="hidden sm:inline">Homepage</span>
+                <span className="hidden md:inline">Homepage</span>
               </Link>
             </>
           )}
@@ -476,15 +529,15 @@ export default function NewsDeskPage() {
               : "bg-red-950 text-red-300 border border-red-800"
           }`}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 min-w-0">
             {message.type === "success" ? (
               <CheckCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
             ) : (
               <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
             )}
-            <span>{message.text}</span>
+            <span className="truncate">{message.text}</span>
           </div>
-          <button type="button" onClick={() => setMessage(null)} className="hover:text-white ml-2">
+          <button type="button" onClick={() => setMessage(null)} className="hover:text-white ml-2 flex-shrink-0">
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -493,7 +546,7 @@ export default function NewsDeskPage() {
       {/* ========================================================================= */}
       {/* 1. NEWS DESK SUMMARY METRIC CARDS (8 CARDS)                               */}
       {/* ========================================================================= */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 sm:gap-3">
         {[
           { label: "TOTAL ARTICLES", value: stats.totalArticles, tab: "ALL", alert: false },
           { label: "DRAFTS", value: stats.drafts, tab: "DRAFT", alert: false },
@@ -507,7 +560,7 @@ export default function NewsDeskPage() {
           <div
             key={i}
             onClick={() => card.tab && handleTabChange(card.tab)}
-            className={`p-3.5 rounded-xl border transition flex flex-col justify-between ${
+            className={`p-3 rounded-xl border transition flex flex-col justify-between ${
               card.tab ? "cursor-pointer hover:border-black dark:hover:border-neutral-500" : ""
             } ${
               card.alert
@@ -516,13 +569,13 @@ export default function NewsDeskPage() {
             }`}
           >
             <div className="flex items-center justify-between gap-1">
-              <span className="font-mono text-[9px] sm:text-[10px] font-bold text-neutral-500 uppercase truncate">
+              <span className="font-mono text-[9px] font-bold text-neutral-500 uppercase truncate">
                 {card.label}
               </span>
-              {card.alert && <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>}
+              {card.alert && <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse flex-shrink-0"></span>}
             </div>
             <div
-              className={`text-xl sm:text-2xl font-serif font-black mt-2 ${
+              className={`text-lg sm:text-2xl font-serif font-black mt-2 truncate ${
                 card.alert
                   ? "text-red-600 dark:text-red-500"
                   : "text-neutral-900 dark:text-white"
@@ -537,11 +590,11 @@ export default function NewsDeskPage() {
       {/* ========================================================================= */}
       {/* 2. URGENT / BREAKING LIVE ALERT STRIP                                     */}
       {/* ========================================================================= */}
-      <div className="bg-black text-white rounded-xl p-3 sm:p-4 border border-neutral-800 flex flex-col md:flex-row md:items-center justify-between gap-3">
+      <div className="bg-black text-white rounded-xl p-3 sm:p-4 border border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
         <div className="flex items-center gap-2.5 min-w-0">
           <span className="px-2 py-0.5 bg-red-600 text-white font-mono text-[10px] font-bold uppercase rounded flex items-center gap-1.5 flex-shrink-0">
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
-            URGENT / BREAKING
+            BREAKING
           </span>
           {breakingNews.length > 0 ? (
             <div className="text-xs font-sans truncate text-neutral-200">
@@ -563,7 +616,7 @@ export default function NewsDeskPage() {
               href="/admin/breaking"
               className="text-[11px] font-mono font-bold uppercase text-red-400 hover:text-red-300 hover:underline flex items-center gap-1"
             >
-              <span>Manage Breaking ({breakingNews.length})</span>
+              <span>Manage ({breakingNews.length})</span>
               <ArrowRight className="w-3 h-3" />
             </Link>
           )}
@@ -573,25 +626,25 @@ export default function NewsDeskPage() {
       {/* ========================================================================= */}
       {/* 3. EDITORIAL QUEUE & FILTER CONTROLS                                      */}
       {/* ========================================================================= */}
-      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-4 sm:p-6 space-y-5 shadow-sm">
+      <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl p-3 sm:p-6 space-y-4 sm:space-y-5 shadow-xs">
         {/* Editorial Pipeline Status Tabs */}
-        <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto pb-2 no-scrollbar">
+        <div className="flex items-center gap-1.5 border-b border-neutral-200 dark:border-neutral-800 overflow-x-auto pb-2 no-scrollbar touch-pan-x">
           {[
             { id: "ALL", label: "ALL STORIES", count: stats.totalArticles },
             { id: "DRAFT", label: "DRAFT", count: stats.drafts },
             { id: "IN_REVIEW", label: "IN REVIEW", count: stats.inReview, urgent: stats.inReview > 0 },
             { id: "APPROVED", label: "APPROVED", count: stats.approved },
             { id: "SCHEDULED", label: "SCHEDULED", count: stats.scheduled },
-            { id: "PUBLISHED", label: "PUBLISHED", count: stats.totalArticles - stats.drafts - stats.inReview - stats.approved - stats.scheduled },
+            { id: "PUBLISHED", label: "PUBLISHED", count: Math.max(0, stats.totalArticles - stats.drafts - stats.inReview - stats.approved - stats.scheduled) },
             { id: "ARCHIVED", label: "ARCHIVED", count: 0 },
           ].map((tab) => (
             <button
               key={tab.id}
               type="button"
               onClick={() => handleTabChange(tab.id)}
-              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-mono font-bold uppercase transition flex-shrink-0 ${
+              className={`flex items-center gap-1.5 sm:gap-2 px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl text-xs font-mono font-bold uppercase transition flex-shrink-0 ${
                 activeTab === tab.id
-                  ? "bg-black text-white dark:bg-white dark:text-black shadow-sm"
+                  ? "bg-black text-white dark:bg-white dark:text-black shadow-xs"
                   : "text-neutral-500 hover:text-black dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800"
               }`}
             >
@@ -611,14 +664,14 @@ export default function NewsDeskPage() {
           ))}
         </div>
 
-        {/* Filter Bar (Category, Author, Search) */}
-        <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center">
+        {/* Filter Bar (Category, Search, Submit) */}
+        <form onSubmit={handleSearchSubmit} className="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-center">
           {/* Search Box */}
           <div className="sm:col-span-6 relative">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
             <input
               type="text"
-              placeholder="Search editorial queue by title, slug, tag, author..."
+              placeholder="Search by headline, slug, tag..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pl-9 pr-4 py-2 text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white font-sans"
@@ -670,8 +723,137 @@ export default function NewsDeskPage() {
           </div>
         </form>
 
-        {/* Editorial Queue Table */}
-        <div className="overflow-x-auto border border-neutral-200 dark:border-neutral-800 rounded-xl">
+        {/* ========================================================================= */}
+        {/* MOBILE CARD VIEW (< md screens)                                           */}
+        {/* ========================================================================= */}
+        <div className="block md:hidden space-y-3">
+          {articles.length === 0 ? (
+            <div className="p-8 text-center text-neutral-400 italic bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800">
+              No articles found in this queue.
+            </div>
+          ) : (
+            articles.map((art) => {
+              const statusBg =
+                art.status === "PUBLISHED"
+                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  : art.status === "APPROVED"
+                  ? "bg-neutral-900 text-white dark:bg-neutral-100 dark:text-black font-bold"
+                  : art.status === "IN_REVIEW"
+                  ? "bg-red-600 text-white font-bold"
+                  : art.status === "SCHEDULED"
+                  ? "bg-neutral-200 text-neutral-800 dark:bg-neutral-800 dark:text-neutral-300"
+                  : "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-400";
+
+              return (
+                <div
+                  key={art.id}
+                  className="bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl p-3.5 space-y-3"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="space-y-1 flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className={`px-2 py-0.5 rounded text-[9px] font-mono uppercase font-bold ${statusBg}`}>
+                          {art.status.replace("_", " ")}
+                        </span>
+                        <span className="px-2 py-0.5 rounded text-[9px] font-mono uppercase font-bold bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-300">
+                          {art.category?.name || "General"}
+                        </span>
+                        {art.isBreaking && (
+                          <span className="text-red-600 text-[9px] font-mono font-bold uppercase">🔴 BREAKING</span>
+                        )}
+                      </div>
+
+                      <Link
+                        href={`/admin/articles/${art.id}/edit`}
+                        className="font-serif font-bold text-sm text-black dark:text-white hover:text-red-600 dark:hover:text-red-500 block leading-snug pt-1"
+                      >
+                        {art.title}
+                      </Link>
+                    </div>
+
+                    {art.featuredImage && (
+                      <img
+                        src={art.featuredImage}
+                        alt=""
+                        className="w-14 h-14 object-cover rounded-lg bg-neutral-200 flex-shrink-0"
+                      />
+                    )}
+                  </div>
+
+                  <div className="flex items-center justify-between text-[10px] font-mono text-neutral-400 pt-1 border-t border-neutral-200 dark:border-neutral-800">
+                    <span>By {art.author?.name || "Desk"}</span>
+                    <span>{art.readingTime}m read • {art.viewCount} views</span>
+                  </div>
+
+                  {art.reviewFeedback && art.status === "DRAFT" && (
+                    <div className="p-2 bg-red-950/10 border border-red-600/30 rounded text-[11px] text-red-600 dark:text-red-400 font-mono">
+                      Feedback: &quot;{art.reviewFeedback}&quot;
+                    </div>
+                  )}
+
+                  {/* Mobile Actions Bar */}
+                  <div className="grid grid-cols-4 gap-1.5 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => handleOpenReview(art)}
+                      className="flex items-center justify-center gap-1 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white rounded-lg text-xs font-mono font-bold uppercase"
+                      title="Review / Inspect"
+                    >
+                      <Eye className="w-3.5 h-3.5" />
+                      <span>Review</span>
+                    </button>
+
+                    <Link
+                      href={`/admin/articles/${art.id}/edit`}
+                      className="flex items-center justify-center gap-1 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-black dark:text-white rounded-lg text-xs font-mono font-bold uppercase"
+                      title="Edit Article"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                      <span>Edit</span>
+                    </Link>
+
+                    {art.status === "DRAFT" ? (
+                      <button
+                        type="button"
+                        onClick={() => handleDirectSubmitForReview(art)}
+                        className="flex items-center justify-center gap-1 py-2 bg-black text-white dark:bg-white dark:text-black rounded-lg text-xs font-mono font-bold uppercase"
+                        title="Submit for Review"
+                      >
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Submit</span>
+                      </button>
+                    ) : (
+                      <Link
+                        href={`/${art.category?.slug}/${art.slug}`}
+                        target="_blank"
+                        className="flex items-center justify-center gap-1 py-2 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 rounded-lg text-xs font-mono uppercase"
+                        title="View Live"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>Live</span>
+                      </Link>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={() => setDeleteModalArticle(art)}
+                      className="flex items-center justify-center gap-1 py-2 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 text-red-600 dark:text-red-400 rounded-lg text-xs font-mono font-bold uppercase hover:bg-red-600 hover:text-white transition"
+                      title="Delete Article"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Delete</span>
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+
+        {/* ========================================================================= */}
+        {/* DESKTOP EDITORIAL QUEUE TABLE (>= md screens)                             */}
+        {/* ========================================================================= */}
+        <div className="hidden md:block overflow-x-auto border border-neutral-200 dark:border-neutral-800 rounded-xl">
           <table className="w-full text-left text-xs font-sans">
             <thead className="bg-neutral-100 dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 font-mono text-[10px] uppercase font-bold text-neutral-600 dark:text-neutral-400">
               <tr>
@@ -802,6 +984,16 @@ export default function NewsDeskPage() {
                             Submit
                           </button>
                         )}
+
+                        {/* Delete Button */}
+                        <button
+                          type="button"
+                          onClick={() => setDeleteModalArticle(art)}
+                          className="p-1.5 text-neutral-400 hover:text-red-600 dark:hover:text-red-400 rounded hover:bg-red-50 dark:hover:bg-red-950/40 transition"
+                          title="Delete Article"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
                       </td>
                     </tr>
                   );
@@ -817,10 +1009,10 @@ export default function NewsDeskPage() {
       {/* ========================================================================= */}
       {reviewArticle && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-3 sm:p-6 overflow-y-auto">
-          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl max-w-4xl w-full p-6 space-y-6 shadow-2xl my-8 max-h-[92vh] overflow-y-auto">
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl max-w-4xl w-full p-4 sm:p-6 space-y-5 shadow-2xl my-8 max-h-[92vh] overflow-y-auto">
             {/* Modal Top Bar */}
-            <div className="flex items-center justify-between pb-4 border-b border-neutral-200 dark:border-neutral-800">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between pb-3 sm:pb-4 border-b border-neutral-200 dark:border-neutral-800">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="px-2.5 py-0.5 bg-black text-white dark:bg-white dark:text-black font-mono text-[10px] font-bold uppercase rounded">
                   {reviewArticle.status.replace("_", " ")}
                 </span>
@@ -838,8 +1030,8 @@ export default function NewsDeskPage() {
             </div>
 
             {/* Article Content Inspection */}
-            <div className="space-y-4">
-              <h2 className="font-serif font-black text-2xl text-black dark:text-white leading-tight">
+            <div className="space-y-3 sm:space-y-4">
+              <h2 className="font-serif font-black text-xl sm:text-2xl text-black dark:text-white leading-tight">
                 {reviewArticle.title}
               </h2>
               {reviewArticle.subtitle && (
@@ -858,147 +1050,192 @@ export default function NewsDeskPage() {
                 {reviewArticle.content}
               </div>
 
-              {/* Active / Previous Feedback Box */}
-              {reviewArticle.reviewFeedback && (
-                <div className="p-3 bg-red-950/10 border border-red-600/40 rounded-xl text-xs text-red-600 dark:text-red-400 space-y-1 font-mono">
-                  <div className="font-bold uppercase flex items-center gap-1.5">
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    PREVIOUS EDITORIAL FEEDBACK:
-                  </div>
-                  <div>&quot;{reviewArticle.reviewFeedback}&quot;</div>
-                </div>
-              )}
-
-              {/* Editor Feedback Input (for Request Changes) */}
-              {isEditorOrAdmin && (
-                <div className="space-y-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
-                  <label className="block text-xs font-mono font-bold uppercase text-black dark:text-white">
-                    Editorial Review Feedback (Notes for Reporter):
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="e.g. Please verify the statistics in paragraph 2 and include quotes from the primary source."
-                    value={feedbackText}
-                    onChange={(e) => setFeedbackText(e.target.value)}
-                    className="w-full p-3 text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white focus:outline-none font-sans"
+              {reviewArticle.featuredImage && (
+                <div className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                  <img
+                    src={reviewArticle.featuredImage}
+                    alt="Lead Image"
+                    className="w-16 h-12 object-cover rounded"
                   />
-                </div>
-              )}
-
-              {/* Schedule Date Time Input */}
-              {showScheduleInput && isEditorOrAdmin && (
-                <div className="p-4 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl space-y-2">
-                  <label className="block text-xs font-mono font-bold uppercase text-black dark:text-white">
-                    Set Scheduled Publication Date & Time (IST):
-                  </label>
-                  <input
-                    type="datetime-local"
-                    value={scheduleDateTime}
-                    onChange={(e) => setScheduleDateTime(e.target.value)}
-                    className="p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-xs font-mono text-black dark:text-white"
-                  />
-                  <div className="pt-2">
-                    <button
-                      type="button"
-                      onClick={handleScheduleArticle}
-                      disabled={reviewActionLoading}
-                      className="px-4 py-2 bg-black hover:bg-neutral-800 text-white dark:bg-white dark:text-black rounded-lg text-xs font-mono font-bold uppercase transition"
-                    >
-                      Confirm Schedule
-                    </button>
+                  <div className="text-[11px] font-mono text-neutral-500 truncate">
+                    Lead Image: <span className="text-black dark:text-white">{reviewArticle.featuredImage}</span>
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Modal Bottom Action Controls */}
-            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-neutral-200 dark:border-neutral-800">
+            {/* Feedback / Changes Input */}
+            <div className="space-y-2 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+              <label className="block text-xs font-mono font-bold uppercase text-neutral-600 dark:text-neutral-400">
+                Editorial Review Feedback / Revision Notes
+              </label>
+              <textarea
+                rows={2}
+                placeholder="Write specific feedback if returning to reporter for revision..."
+                value={feedbackText}
+                onChange={(e) => setFeedbackText(e.target.value)}
+                className="w-full p-3 text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white focus:outline-none focus:border-black dark:focus:border-white font-sans"
+              />
+            </div>
+
+            {/* Schedule Input Box if active */}
+            {showScheduleInput && (
+              <div className="p-4 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl space-y-3 font-mono">
+                <div className="text-xs font-bold text-black dark:text-white uppercase flex items-center gap-1.5">
+                  <Clock className="w-4 h-4 text-red-500" />
+                  <span>Select Publication Date & Time (IST)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="datetime-local"
+                    value={scheduleDateTime}
+                    onChange={(e) => setScheduleDateTime(e.target.value)}
+                    className="flex-1 p-2 text-xs bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded text-black dark:text-white font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleScheduleArticle}
+                    disabled={reviewActionLoading}
+                    className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded text-xs font-bold uppercase"
+                  >
+                    Confirm Schedule
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Modal Bottom Actions */}
+            <div className="pt-4 border-t border-neutral-200 dark:border-neutral-800 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-center gap-2">
                 <Link
                   href={`/admin/articles/${reviewArticle.id}/edit`}
-                  className="px-3.5 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase transition"
+                  className="px-3.5 py-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase transition flex items-center gap-1.5"
                 >
-                  Full Edit
+                  <Edit className="w-3.5 h-3.5" />
+                  <span>Full Edit</span>
                 </Link>
-                {reviewArticle.status === "PUBLISHED" && (
-                  <Link
-                    href={`/${reviewArticle.category?.slug}/${reviewArticle.slug}`}
-                    target="_blank"
-                    className="px-3.5 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase flex items-center gap-1"
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDeleteModalArticle(reviewArticle);
+                  }}
+                  className="px-3.5 py-2 bg-red-50 dark:bg-red-950/40 hover:bg-red-600 hover:text-white text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 rounded-xl text-xs font-mono font-bold uppercase transition flex items-center gap-1.5"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete Article</span>
+                </button>
+              </div>
+
+              {isEditorOrAdmin && (
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleRequestChanges}
+                    disabled={reviewActionLoading}
+                    className="px-3.5 py-2 bg-neutral-200 dark:bg-neutral-800 hover:bg-neutral-300 text-neutral-800 dark:text-neutral-200 rounded-xl text-xs font-mono font-bold uppercase transition"
                   >
-                    <span>View Public</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
-                )}
-              </div>
+                    Request Changes
+                  </button>
 
-              {/* Action Buttons based on User Role */}
-              <div className="flex flex-wrap items-center gap-2">
-                {isEditorOrAdmin ? (
-                  <>
-                    <button
-                      type="button"
-                      onClick={handleRequestChanges}
-                      disabled={reviewActionLoading}
-                      className="px-4 py-2 bg-neutral-200 hover:bg-neutral-300 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase transition disabled:opacity-50"
-                    >
-                      Request Changes
-                    </button>
+                  <button
+                    type="button"
+                    onClick={handleApproveArticle}
+                    disabled={reviewActionLoading}
+                    className="px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 text-white rounded-xl text-xs font-mono font-bold uppercase transition border border-neutral-700"
+                  >
+                    Approve
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={handleApproveArticle}
-                      disabled={reviewActionLoading}
-                      className="px-4 py-2 bg-neutral-900 hover:bg-black text-white dark:bg-neutral-100 dark:text-black rounded-xl text-xs font-mono font-bold uppercase transition disabled:opacity-50"
-                    >
-                      Approve
-                    </button>
+                  <button
+                    type="button"
+                    onClick={() => setShowScheduleInput((prev) => !prev)}
+                    className="px-3.5 py-2 bg-neutral-900 hover:bg-neutral-800 text-neutral-200 rounded-xl text-xs font-mono font-bold uppercase transition border border-neutral-700"
+                  >
+                    Schedule...
+                  </button>
 
-                    <button
-                      type="button"
-                      onClick={() => setShowScheduleInput(!showScheduleInput)}
-                      className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase border border-neutral-300 dark:border-neutral-700 transition"
-                    >
-                      Schedule
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handlePublishNow}
-                      disabled={reviewActionLoading}
-                      className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition shadow-md shadow-red-950 disabled:opacity-50"
-                    >
-                      Publish Live
-                    </button>
-                  </>
-                ) : (
-                  // Reporter options
-                  reviewArticle.status === "DRAFT" && (
-                    <button
-                      type="button"
-                      onClick={() => handleDirectSubmitForReview(reviewArticle)}
-                      disabled={reviewActionLoading}
-                      className="px-5 py-2 bg-black hover:bg-neutral-800 text-white dark:bg-white dark:text-black rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition"
-                    >
-                      Submit for Review
-                    </button>
-                  )
-                )}
-              </div>
+                  <button
+                    type="button"
+                    onClick={handlePublishNow}
+                    disabled={reviewActionLoading}
+                    className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-mono font-bold uppercase transition shadow-md shadow-red-950"
+                  >
+                    Publish Live
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       )}
 
       {/* ========================================================================= */}
-      {/* 5. QUICK BREAKING NEWS MODAL                                              */}
+      {/* 5. DELETE CONFIRMATION MODAL                                              */}
+      {/* ========================================================================= */}
+      {deleteModalArticle && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-500">
+              <div className="p-3 bg-red-600/10 rounded-xl">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-serif font-black text-lg text-black dark:text-white">
+                  Delete Article
+                </h3>
+                <span className="text-[10px] font-mono text-red-600 uppercase font-bold">
+                  Permanent Action
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2 text-xs text-neutral-600 dark:text-neutral-300 font-sans">
+              <p>
+                Are you sure you want to permanently delete the following article?
+              </p>
+              <div className="p-3 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                <p className="font-serif font-bold text-black dark:text-white line-clamp-2">
+                  &ldquo;{deleteModalArticle.title}&rdquo;
+                </p>
+                <p className="text-[10px] font-mono text-neutral-400 mt-1 uppercase">
+                  {deleteModalArticle.category?.name} • By {deleteModalArticle.author?.name} • Status: {deleteModalArticle.status}
+                </p>
+              </div>
+              <p className="text-[11px] text-red-600 dark:text-red-400 font-mono">
+                ⚠️ This will permanently remove the article from the website, newsfeeds, and archives.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+              <button
+                type="button"
+                onClick={() => setDeleteModalArticle(null)}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleConfirmDelete}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-mono font-bold uppercase transition flex items-center gap-1.5 shadow-md shadow-red-950"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{isDeleting ? "Deleting..." : "Yes, Delete Permanently"}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 6. QUICK BREAKING NEWS MODAL                                              */}
       {/* ========================================================================= */}
       {isQuickBreakingOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
-          <form
-            onSubmit={handleCreateQuickBreaking}
-            className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl"
-          >
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-800">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-600 animate-pulse"></span>
@@ -1009,78 +1246,78 @@ export default function NewsDeskPage() {
               <button
                 type="button"
                 onClick={() => setIsQuickBreakingOpen(false)}
-                className="p-1.5 text-neutral-400 hover:text-black dark:hover:text-white"
+                className="p-1 text-neutral-400 hover:text-black dark:hover:text-white"
               >
-                <X className="w-4 h-4" />
+                <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-3 text-xs font-mono">
-              <div>
-                <label className="block font-bold uppercase text-neutral-600 dark:text-neutral-400 mb-1">
+            <form onSubmit={handleCreateQuickBreaking} className="space-y-4">
+              <div className="space-y-1">
+                <label className="block text-xs font-mono font-bold uppercase text-neutral-600 dark:text-neutral-400">
                   Breaking Headline
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. PARLIAMENT PASSES LANDMARK TELECOM BILL WITH FULL MAJORITY"
+                  required
+                  placeholder="e.g. Major Diplomatic Accord Signed at Global Climate Summit"
                   value={newBreakingTitle}
                   onChange={(e) => setNewBreakingTitle(e.target.value)}
-                  required
-                  className="w-full p-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white font-sans text-sm focus:outline-none"
+                  className="w-full p-3 text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white focus:outline-none focus:border-red-600 font-sans"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-bold uppercase text-neutral-600 dark:text-neutral-400 mb-1">
-                    Priority Level
+                <div className="space-y-1">
+                  <label className="block text-xs font-mono font-bold uppercase text-neutral-600 dark:text-neutral-400">
+                    Urgency Priority
                   </label>
                   <select
                     value={newBreakingPriority}
-                    onChange={(e) => setNewBreakingPriority(e.target.value as any)}
-                    className="w-full p-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white"
+                    onChange={(e: any) => setNewBreakingPriority(e.target.value)}
+                    className="w-full p-2.5 text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white font-mono uppercase"
                   >
-                    <option value="HIGH">🔴 HIGH PRIORITY</option>
-                    <option value="MEDIUM">MEDIUM PRIORITY</option>
-                    <option value="LOW">LOW PRIORITY</option>
+                    <option value="HIGH">🔴 URGENT / HIGH</option>
+                    <option value="MEDIUM">🟡 MEDIUM</option>
+                    <option value="LOW">⚪ NORMAL</option>
                   </select>
                 </div>
 
-                <div>
-                  <label className="block font-bold uppercase text-neutral-600 dark:text-neutral-400 mb-1">
-                    Auto-Expiry (Hours)
+                <div className="space-y-1">
+                  <label className="block text-xs font-mono font-bold uppercase text-neutral-600 dark:text-neutral-400">
+                    Expiry Hours
                   </label>
                   <select
                     value={newBreakingExpiryHours}
                     onChange={(e) => setNewBreakingExpiryHours(Number(e.target.value))}
-                    className="w-full p-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white"
+                    className="w-full p-2.5 text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white font-mono uppercase"
                   >
-                    <option value={1}>1 Hour</option>
                     <option value={2}>2 Hours</option>
-                    <option value={4}>4 Hours (Standard)</option>
+                    <option value={4}>4 Hours</option>
                     <option value={8}>8 Hours</option>
                     <option value={24}>24 Hours</option>
                   </select>
                 </div>
               </div>
-            </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-neutral-200 dark:border-neutral-800">
-              <button
-                type="button"
-                onClick={() => setIsQuickBreakingOpen(false)}
-                className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 rounded-xl text-xs font-mono font-bold uppercase"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                className="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition shadow"
-              >
-                Publish Live Ticker
-              </button>
-            </div>
-          </form>
+              <div className="flex items-center justify-end gap-2 pt-3 border-t border-neutral-200 dark:border-neutral-800">
+                <button
+                  type="button"
+                  onClick={() => setIsQuickBreakingOpen(false)}
+                  className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-mono font-bold uppercase transition flex items-center gap-1.5 shadow-md shadow-red-950"
+                >
+                  <Radio className="w-3.5 h-3.5 animate-pulse" />
+                  <span>Push to Live Ticker</span>
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

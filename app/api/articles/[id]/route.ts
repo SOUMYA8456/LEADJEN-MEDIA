@@ -312,13 +312,6 @@ export async function DELETE(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    if (user.role === "REPORTER") {
-      return NextResponse.json(
-        { error: "Reporters do not have permission to delete articles." },
-        { status: 403 }
-      );
-    }
-
     const article = await prisma.article.findUnique({
       where: { id: params.id },
       include: { category: true },
@@ -328,22 +321,46 @@ export async function DELETE(
       return NextResponse.json({ error: "Article not found" }, { status: 404 });
     }
 
-    await prisma.article.delete({
-      where: { id: params.id },
-    });
+    const isOwner = article.createdById === user.id;
+    const canDelete =
+      user.role === "SUPER_ADMIN" ||
+      user.role === "EDITOR" ||
+      (user.role === "REPORTER" && isOwner && article.status === "DRAFT");
+
+    if (!canDelete) {
+      return NextResponse.json(
+        { error: "You do not have permission to delete this article." },
+        { status: 403 }
+      );
+    }
+
+    // Delete related records in transaction to prevent foreign key errors
+    await prisma.$transaction([
+      prisma.homepageSectionArticle.deleteMany({ where: { articleId: params.id } }),
+      prisma.articleTag.deleteMany({ where: { articleId: params.id } }),
+      prisma.articleView.deleteMany({ where: { articleId: params.id } }),
+      prisma.comment.deleteMany({ where: { articleId: params.id } }),
+      prisma.bookmark.deleteMany({ where: { articleId: params.id } }),
+      prisma.editorialNotification.deleteMany({ where: { articleId: params.id } }),
+      prisma.article.delete({ where: { id: params.id } }),
+    ]);
 
     // Record audit log
-    await logAuditEvent({
-      userId: user.id,
-      userName: user.name,
-      userRole: user.role,
-      action: "ARTICLE_DELETED",
-      entityType: "ARTICLE",
-      entityId: params.id,
-      entityTitle: article.title,
-      previousStatus: article.status,
-      newStatus: "DELETED",
-    });
+    try {
+      await logAuditEvent({
+        userId: user.id,
+        userName: user.name,
+        userRole: user.role,
+        action: "ARTICLE_DELETED",
+        entityType: "ARTICLE",
+        entityId: params.id,
+        entityTitle: article.title,
+        previousStatus: article.status,
+        newStatus: "DELETED",
+      });
+    } catch (auditErr) {
+      console.warn("Audit log error on delete:", auditErr);
+    }
 
     try {
       revalidatePath("/");
@@ -351,7 +368,7 @@ export async function DELETE(
       revalidatePath("/search");
     } catch (e) {}
 
-    return NextResponse.json({ success: true, message: "Article deleted" });
+    return NextResponse.json({ success: true, message: "Article deleted successfully" });
   } catch (error) {
     console.error("Delete article error:", error);
     return NextResponse.json({ error: "Failed to delete article" }, { status: 500 });

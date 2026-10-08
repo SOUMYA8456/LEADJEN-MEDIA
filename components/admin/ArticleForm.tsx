@@ -30,6 +30,7 @@ import {
   Share2,
   AlertTriangle,
   CheckCircle2,
+  Trash2,
 } from "lucide-react";
 import { slugify } from "@/lib/utils";
 import { MediaLibraryModal } from "@/components/admin/MediaLibraryModal";
@@ -107,6 +108,8 @@ export function ArticleForm({
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     fetch("/api/auth/me")
@@ -275,6 +278,33 @@ export function ArticleForm({
     }
   };
 
+  const handleDeleteArticle = async () => {
+    if (!initialData?.id) return;
+    try {
+      setIsDeleting(true);
+      setError("");
+      const res = await fetch(`/api/articles/${initialData.id}`, {
+        method: "DELETE",
+      });
+
+      if (res.ok) {
+        setSuccess("Article deleted successfully. Redirecting to news desk...");
+        setTimeout(() => {
+          router.push("/admin/news-desk");
+          router.refresh();
+        }, 1000);
+      } else {
+        const d = await res.json();
+        setError(d.error || "Failed to delete article");
+      }
+    } catch (e) {
+      setError("Network error while deleting article");
+    } finally {
+      setIsDeleting(false);
+      setIsDeleteModalOpen(false);
+    }
+  };
+
   const selectedCategory = categories.find((c) => c.id === categoryId);
   const selectedAuthor = authors.find((a) => a.id === authorId);
 
@@ -373,6 +403,20 @@ export function ArticleForm({
                 <span>{saving ? "Publishing..." : "PUBLISH NOW"}</span>
               </button>
             </>
+          )}
+
+          {/* Delete Article Button when editing */}
+          {isEditing && (
+            <button
+              type="button"
+              disabled={saving || isDeleting}
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="flex items-center gap-1.5 px-3.5 py-2 bg-red-50 hover:bg-red-600 hover:text-white dark:bg-red-950/40 text-red-600 dark:text-red-400 rounded-xl text-xs font-mono font-bold uppercase tracking-wider transition border border-red-200 dark:border-red-900/50 disabled:opacity-50"
+              title="Permanently Delete Article"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete</span>
+            </button>
           )}
         </div>
       </div>
@@ -990,6 +1034,62 @@ export function ArticleForm({
 
             <div className="text-sm font-serif text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed">
               {content || "No body content entered yet."}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-red-600 dark:text-red-500">
+              <div className="p-3 bg-red-600/10 rounded-xl">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="font-serif font-black text-lg text-black dark:text-white">
+                  Delete Article
+                </h3>
+                <span className="text-[10px] font-mono text-red-600 uppercase font-bold">
+                  Permanent Action
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2 text-xs text-neutral-600 dark:text-neutral-300 font-sans">
+              <p>Are you sure you want to delete this article?</p>
+              <div className="p-3 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                <p className="font-serif font-bold text-black dark:text-white line-clamp-2">
+                  &ldquo;{title || initialData?.title}&rdquo;
+                </p>
+                <p className="text-[10px] font-mono text-neutral-400 mt-1 uppercase">
+                  Status: {status}
+                </p>
+              </div>
+              <p className="text-[11px] text-red-600 dark:text-red-400 font-mono">
+                ⚠️ This will permanently remove the dispatch from the live portal, search index, and archives.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-neutral-200 dark:border-neutral-800">
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase transition"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteArticle}
+                disabled={isDeleting}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-mono font-bold uppercase transition flex items-center gap-1.5 shadow-md shadow-red-950"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{isDeleting ? "Deleting..." : "Yes, Delete Permanently"}</span>
+              </button>
             </div>
           </div>
         </div>

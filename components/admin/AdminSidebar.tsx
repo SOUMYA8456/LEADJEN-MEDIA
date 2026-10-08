@@ -24,6 +24,7 @@ import {
   Globe,
   MessageSquare,
   Activity,
+  X,
 } from "lucide-react";
 import { SessionUser } from "@/lib/auth";
 
@@ -39,7 +40,12 @@ interface NavGroup {
   }[];
 }
 
-export function AdminSidebar({ user }: { user: SessionUser | null }) {
+interface AdminSidebarProps {
+  user: SessionUser | null;
+  onCloseMobile?: () => void;
+}
+
+export function AdminSidebar({ user, onCloseMobile }: AdminSidebarProps) {
   const pathname = usePathname();
 
   const navGroups: NavGroup[] = [
@@ -109,19 +115,33 @@ export function AdminSidebar({ user }: { user: SessionUser | null }) {
   ];
 
   return (
-    <aside className="w-64 bg-black text-neutral-300 min-h-screen flex flex-col border-r border-neutral-800 flex-shrink-0">
-      {/* Brand Header */}
-      <div className="p-6 border-b border-neutral-800">
-        <Link href="/admin/news-desk" className="block">
-          <img
-            src="/images/logo-white.png"
-            alt="LEADJEN MEDIA"
-            className="h-7 w-auto object-contain"
-          />
-        </Link>
-        <span className="text-[10px] font-mono tracking-widest text-neutral-400 uppercase mt-2.5 block">
-          Editorial Newsroom CMS
-        </span>
+    <aside className="w-72 sm:w-64 bg-black text-neutral-300 h-screen flex flex-col border-r border-neutral-800 flex-shrink-0 select-none">
+      {/* Brand Header with Mobile Close button */}
+      <div className="p-4 sm:p-6 border-b border-neutral-800 flex items-center justify-between">
+        <div>
+          <Link href="/admin/news-desk" onClick={onCloseMobile} className="block">
+            <img
+              src="/images/logo-white.png"
+              alt="LEADJEN MEDIA"
+              className="h-6 sm:h-7 w-auto object-contain"
+            />
+          </Link>
+          <span className="text-[9px] sm:text-[10px] font-mono tracking-widest text-neutral-400 uppercase mt-2 block">
+            Editorial Newsroom CMS
+          </span>
+        </div>
+
+        {/* Close Button on Mobile (< lg) */}
+        {onCloseMobile && (
+          <button
+            type="button"
+            onClick={onCloseMobile}
+            className="lg:hidden p-2 text-neutral-400 hover:text-white rounded-lg hover:bg-neutral-900 transition"
+            aria-label="Close Sidebar"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
       {/* Navigation Links Grouped */}
@@ -150,7 +170,8 @@ export function AdminSidebar({ user }: { user: SessionUser | null }) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`flex items-center justify-between px-3 py-2 rounded-xl text-xs font-mono font-bold tracking-wide transition relative ${
+                    onClick={onCloseMobile}
+                    className={`flex items-center justify-between px-3 py-2.5 sm:py-2 rounded-xl text-xs font-mono font-bold tracking-wide transition relative ${
                       isActive
                         ? "bg-neutral-900 text-white border-l-4 border-red-600 shadow-sm pl-2"
                         : item.highlight
@@ -178,8 +199,8 @@ export function AdminSidebar({ user }: { user: SessionUser | null }) {
       {/* Footer Info */}
       <div className="p-4 border-t border-neutral-800 text-[11px] text-neutral-500 font-mono space-y-1">
         <div className="flex items-center justify-between text-[10px]">
-          <span>Role: {user?.role || "GUEST"}</span>
-          <span className="text-red-500 font-bold">🔴 LIVE</span>
+          <span className="truncate mr-2">Role: {user?.role || "GUEST"}</span>
+          <span className="text-red-500 font-bold flex-shrink-0">🔴 LIVE</span>
         </div>
         <p className="text-[10px] text-neutral-400 flex items-center gap-1.5 pt-1">
           <span className="w-1.5 h-1.5 rounded-full bg-red-600 animate-pulse"></span>
