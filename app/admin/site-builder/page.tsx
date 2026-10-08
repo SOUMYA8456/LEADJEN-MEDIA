@@ -16,6 +16,7 @@ import {
   Columns,
   Megaphone,
   AlertTriangle,
+  Palette,
   Save,
   Send,
   Eye,
@@ -144,6 +145,12 @@ export default function SiteBuilderDashboard() {
       href: "/admin/site-builder/global",
       icon: Globe,
       desc: "Brand logo, site title, favicon, contact information, social links, and copyright text.",
+    },
+    {
+      title: "Design Tokens & Typography",
+      href: "/admin/site-builder/design",
+      icon: Palette,
+      desc: "Pixel-level control of newsroom colors, responsive font sizes, heading font families, and container spacing.",
     },
     {
       title: "Header & Top Bar",

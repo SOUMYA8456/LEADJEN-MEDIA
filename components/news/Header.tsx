@@ -69,6 +69,10 @@ export function Header() {
   const [clockTimezone, setClockTimezone] = useState("Asia/Kolkata");
   const [clockFormat, setClockFormat] = useState<"12h" | "24h">("12h");
   const [clockLabel, setClockLabel] = useState("IST");
+  const [showAnnouncement, setShowAnnouncement] = useState(false);
+  const [headerAnnouncement, setHeaderAnnouncement] = useState("");
+  const [siteLogo, setSiteLogo] = useState("");
+  const [tagline, setTagline] = useState("INDEPENDENT JOURNALISM • INSIGHT • IMPACT");
 
   const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
@@ -111,6 +115,10 @@ export function Header() {
           if (data.settings.clockTimezone) setClockTimezone(data.settings.clockTimezone);
           if (data.settings.clockFormat) setClockFormat(data.settings.clockFormat as any);
           if (data.settings.clockLabel) setClockLabel(data.settings.clockLabel);
+          if (data.settings.showAnnouncement !== undefined) setShowAnnouncement(data.settings.showAnnouncement);
+          if (data.settings.headerAnnouncement) setHeaderAnnouncement(data.settings.headerAnnouncement);
+          if (data.settings.siteConfig?.global?.siteLogo) setSiteLogo(data.settings.siteConfig.global.siteLogo);
+          if (data.settings.siteConfig?.global?.tagline) setTagline(data.settings.siteConfig.global.tagline);
         }
       })
       .catch(() => {});
@@ -171,6 +179,14 @@ export function Header() {
             : "bg-white dark:bg-gray-950 border-b border-gray-200 dark:border-gray-800"
         }`}
       >
+        {/* Editorial Top Announcement Banner */}
+        {showAnnouncement && headerAnnouncement && (
+          <div className="w-full bg-[#1E1B1A] text-white py-1.5 px-4 text-center text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 border-b border-neutral-800">
+            <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse" />
+            <span>{headerAnnouncement}</span>
+          </div>
+        )}
+
         {/* ======================================================================= */}
         {/* 1. PRIMARY MAIN HEADER                                                 */}
         {/* ======================================================================= */}

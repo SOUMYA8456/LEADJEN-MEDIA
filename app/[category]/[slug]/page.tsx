@@ -33,7 +33,7 @@ export async function generateMetadata({
     return { title: "Article Not Found | LEADJEN MEDIA" };
   }
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjen-media-news.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
   const articleUrl = `${siteUrl}/${params.category}/${params.slug}`;
 
   return {
@@ -100,10 +100,11 @@ export default async function ArticleDetailPage({
   } catch {}
 
   const articleConfig = siteConfig.article || DEFAULT_SITE_BUILDER_CONFIG.article;
+  const relatedLimit = articleConfig.relatedStoriesLimit || 3;
 
   // Fetch related articles in same category, trending stories, and advertisements
   const [relatedArticles, trendingArticles, topAd, inArticleAd, sidebarAd, bottomAd] = await Promise.all([
-    articleConfig.showRelatedStories
+    articleConfig.showRelatedStories !== false
       ? prisma.article.findMany({
           where: {
             categoryId: article.categoryId,
@@ -113,10 +114,10 @@ export default async function ArticleDetailPage({
           },
           include: { category: true, author: true },
           orderBy: { publishedAt: "desc" },
-          take: 3,
+          take: relatedLimit,
         })
       : Promise.resolve([]),
-    articleConfig.showMostReadSidebar
+    articleConfig.showMostReadSidebar !== false
       ? prisma.article.findMany({
           where: {
             status: "PUBLISHED",
@@ -127,7 +128,7 @@ export default async function ArticleDetailPage({
           take: 5,
         })
       : Promise.resolve([]),
-    articleConfig.topAdEnabled
+    articleConfig.topAdEnabled !== false
       ? prisma.advertisement.findFirst({
           where: {
             location: "TOP_LEADERBOARD",
@@ -136,7 +137,7 @@ export default async function ArticleDetailPage({
           },
         })
       : Promise.resolve(null),
-    articleConfig.middleAdEnabled
+    articleConfig.middleAdEnabled !== false
       ? prisma.advertisement.findFirst({
           where: {
             location: "IN_ARTICLE_AD",
@@ -146,7 +147,7 @@ export default async function ArticleDetailPage({
           orderBy: [{ priority: "desc" }, { updatedAt: "desc" }],
         })
       : Promise.resolve(null),
-    articleConfig.sidebarAdEnabled
+    articleConfig.sidebarAdEnabled !== false
       ? prisma.advertisement.findFirst({
           where: {
             location: "SIDEBAR_AD",
@@ -156,7 +157,7 @@ export default async function ArticleDetailPage({
           orderBy: [{ priority: "desc" }, { updatedAt: "desc" }],
         })
       : Promise.resolve(null),
-    articleConfig.bottomAdEnabled
+    articleConfig.bottomAdEnabled !== false
       ? prisma.advertisement.findFirst({
           where: {
             location: "HOMEPAGE_CONTENT",
@@ -167,7 +168,7 @@ export default async function ArticleDetailPage({
       : Promise.resolve(null),
   ]);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjen-media-news.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
   const articleUrl = `${siteUrl}/${params.category}/${params.slug}`;
   const categoryUrl = `${siteUrl}/${params.category}`;
   const authorUrl = `${siteUrl}/author/${article.author?.slug}`;
@@ -232,6 +233,8 @@ export default async function ArticleDetailPage({
     ],
   };
 
+  const hasSidebar = (articleConfig.showMostReadSidebar !== false) || (articleConfig.sidebarAdEnabled !== false && sidebarAd);
+
   return (
     <>
       <script
@@ -256,8 +259,8 @@ export default async function ArticleDetailPage({
           )}
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            {/* Main Article Column (8 cols) */}
-            <div className={`${articleConfig.showMostReadSidebar || sidebarAd ? "lg:col-span-8" : "lg:col-span-10 max-w-4xl mx-auto"}`}>
+            {/* Main Article Column */}
+            <div className={`${hasSidebar ? "lg:col-span-8" : "lg:col-span-10 max-w-4xl mx-auto"}`}>
               {/* Breadcrumb & Follow Category */}
               {articleConfig.showBreadcrumbs !== false && (
                 <div className="flex items-center justify-between gap-2 mb-3">
@@ -295,13 +298,15 @@ export default async function ArticleDetailPage({
               {/* Author, Date, Reading Time Bar */}
               <div className="mt-5 py-4 border-y border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <Link href={`/author/${article.author.slug}`} className="shrink-0">
-                    <img
-                      src={article.author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80"}
-                      alt={article.author.name}
-                      className="w-10 h-10 rounded-full object-cover bg-neutral-100"
-                    />
-                  </Link>
+                  {articleConfig.showAuthorAvatar !== false && (
+                    <Link href={`/author/${article.author.slug}`} className="shrink-0">
+                      <img
+                        src={article.author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80"}
+                        alt={article.author.name}
+                        className="w-10 h-10 rounded-full object-cover bg-neutral-100"
+                      />
+                    </Link>
+                  )}
                   <div>
                     <Link
                       href={`/author/${article.author.slug}`}
@@ -317,9 +322,11 @@ export default async function ArticleDetailPage({
 
                 <div className="text-xs text-neutral-500 dark:text-neutral-400 font-mono space-y-0.5 sm:text-right">
                   <div>Published: {formatArticleDate(article.publishedAt)}</div>
-                  <div className="text-[11px] text-neutral-400">
-                    {article.readingTime || 4} min read • Updated {formatTimeAgo(article.updatedAt)}
-                  </div>
+                  {articleConfig.showReadingTimeBadge !== false && (
+                    <div className="text-[11px] text-neutral-400">
+                      {article.readingTime || 4} min read • Updated {formatTimeAgo(article.updatedAt)}
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -381,7 +388,7 @@ export default async function ArticleDetailPage({
                   <h3 className="font-serif font-black text-xl text-black dark:text-white uppercase tracking-tight mb-6">
                     RELATED STORIES IN {article.category.name}
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                  <div className={`grid grid-cols-1 ${relatedLimit === 4 ? "sm:grid-cols-2 lg:grid-cols-4" : relatedLimit === 6 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-3"} gap-5`}>
                     {relatedArticles.map((rel) => (
                       <NewsCard key={rel.id} article={rel} showExcerpt={false} />
                     ))}
@@ -402,12 +409,12 @@ export default async function ArticleDetailPage({
             </div>
 
             {/* Right Column: Most Read & Sidebar Ad (4 cols) */}
-            {(articleConfig.showMostReadSidebar || (articleConfig.sidebarAdEnabled && sidebarAd)) && (
-              <div className="lg:col-span-4 space-y-6">
-                {articleConfig.showMostReadSidebar && (
+            {hasSidebar && (
+              <div className={`lg:col-span-4 space-y-6 ${articleConfig.enableStickySidebar !== false ? "sticky top-24" : ""}`}>
+                {articleConfig.showMostReadSidebar !== false && (
                   <MostRead articles={trendingArticles} title="MOST POPULAR STORIES" />
                 )}
-                {articleConfig.sidebarAdEnabled && sidebarAd && <SidebarAd ad={sidebarAd} />}
+                {articleConfig.sidebarAdEnabled !== false && sidebarAd && <SidebarAd ad={sidebarAd} />}
               </div>
             )}
           </div>

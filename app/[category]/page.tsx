@@ -7,6 +7,8 @@ import { SidebarAd } from "@/components/ads/AdBanner";
 import { NewsletterBox } from "@/components/news/NewsletterBox";
 import { DEFAULT_SITE_BUILDER_CONFIG, SiteBuilderConfig } from "@/lib/site-builder-defaults";
 import Link from "next/link";
+import { Clock, ChevronRight } from "lucide-react";
+import { formatArticleDate, formatTimeAgo } from "@/lib/utils";
 import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
@@ -16,7 +18,7 @@ export async function generateMetadata({
 }: {
   params: { category: string };
 }): Promise<Metadata> {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjen-media-news.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
   const slug = params.category;
 
   // 1. Check Category
@@ -71,7 +73,7 @@ export default async function DynamicCategoryOrStaticPage({
 }) {
   await syncScheduledArticles();
   const now = new Date();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjen-media-news.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
   const slug = params.category;
 
   // 1. Check if slug matches a Category
@@ -92,9 +94,11 @@ export default async function DynamicCategoryOrStaticPage({
     const catDefaults = siteConfig.categories || DEFAULT_SITE_BUILDER_CONFIG.categories;
     const override = catDefaults.categoryOverrides?.[slug] || {};
 
-    const showSidebar = override.showSidebar !== undefined ? override.showSidebar : catDefaults.showSidebar;
-    const showAdBanner = override.showAdBanner !== undefined ? override.showAdBanner : catDefaults.showAdBanner;
-    const showMostRead = override.showMostRead !== undefined ? override.showMostRead : catDefaults.showMostRead;
+    const layoutStyle = override.layoutStyle || catDefaults.layoutStyle || "split-hero";
+    const showSidebar = override.showSidebar !== undefined ? override.showSidebar : catDefaults.showSidebar !== false;
+    const showAdBanner = override.showAdBanner !== undefined ? override.showAdBanner : catDefaults.showAdBanner !== false;
+    const showMostRead = override.showMostRead !== undefined ? override.showMostRead : catDefaults.showMostRead !== false;
+    const gridCols = override.gridColumns || catDefaults.defaultGridColumns || 3;
 
     // Fetch articles & ads
     const [articles, trendingArticles, sidebarAd] = await Promise.all([
@@ -106,7 +110,7 @@ export default async function DynamicCategoryOrStaticPage({
         },
         include: { category: true, author: true },
         orderBy: { publishedAt: "desc" },
-        take: 25,
+        take: 30,
       }),
       prisma.article.findMany({
         where: {
@@ -124,8 +128,8 @@ export default async function DynamicCategoryOrStaticPage({
         : null,
     ]);
 
-    const leadStory = catDefaults.showFeaturedStory ? articles[0] : null;
-    const remainingStories = catDefaults.showFeaturedStory ? articles.slice(1) : articles;
+    const leadStory = (catDefaults.showFeaturedStory !== false && layoutStyle === "split-hero") ? articles[0] : null;
+    const remainingStories = leadStory ? articles.slice(1) : articles;
 
     const categoryUrl = `${siteUrl}/${slug}`;
     const categoryJsonLd = {
@@ -177,20 +181,71 @@ export default async function DynamicCategoryOrStaticPage({
                 </p>
               </div>
             ) : (
-              <div className={`grid grid-cols-1 ${showSidebar ? "lg:grid-cols-12" : "max-w-5xl mx-auto"} gap-8 items-start`}>
-                {/* Left Stream */}
+              <div className={`grid grid-cols-1 ${showSidebar ? "lg:grid-cols-12" : "max-w-7xl mx-auto"} gap-8 items-start`}>
+                {/* Main Content Area */}
                 <div className={`${showSidebar ? "lg:col-span-8" : "w-full"} space-y-8`}>
-                  {leadStory && (
-                    <div className="pb-8 border-b border-neutral-200 dark:border-neutral-800">
-                      <NewsCard article={leadStory} showExcerpt={true} aspectRatio="aspect-[16/9]" />
+                  {/* STYLE 1: Split Hero (Lead Story + Stream) */}
+                  {layoutStyle === "split-hero" && (
+                    <>
+                      {leadStory && (
+                        <div className="pb-8 border-b border-neutral-200 dark:border-neutral-800">
+                          <NewsCard article={leadStory} showExcerpt={true} aspectRatio="aspect-[16/9]" />
+                        </div>
+                      )}
+                      <div className="space-y-4">
+                        {remainingStories.map((story) => (
+                          <HorizontalNewsCard key={story.id} article={story} />
+                        ))}
+                      </div>
+                    </>
+                  )}
+
+                  {/* STYLE 2: Magazine Multi-Column Grid */}
+                  {layoutStyle === "magazine-grid" && (
+                    <div
+                      className={`grid grid-cols-1 sm:grid-cols-2 ${
+                        gridCols === 4 ? "lg:grid-cols-4" : gridCols === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"
+                      } gap-6`}
+                    >
+                      {articles.map((story) => (
+                        <NewsCard key={story.id} article={story} showExcerpt={true} />
+                      ))}
                     </div>
                   )}
 
-                  <div className="space-y-4">
-                    {remainingStories.map((story) => (
-                      <HorizontalNewsCard key={story.id} article={story} />
-                    ))}
-                  </div>
+                  {/* STYLE 3: Editorial List */}
+                  {layoutStyle === "editorial-list" && (
+                    <div className="space-y-4 divide-y divide-neutral-100 dark:divide-neutral-900">
+                      {articles.map((story) => (
+                        <div key={story.id} className="pt-4 first:pt-0">
+                          <HorizontalNewsCard article={story} />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* STYLE 4: Compact Headline Wire */}
+                  {layoutStyle === "compact-wire" && (
+                    <div className="space-y-3 divide-y divide-neutral-100 dark:divide-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+                      {articles.map((story) => (
+                        <div key={story.id} className="pt-3 first:pt-0 flex items-start justify-between gap-4">
+                          <div className="space-y-1">
+                            <span className="text-[10px] font-mono uppercase font-bold text-red-600 dark:text-red-400">
+                              {formatTimeAgo(story.publishedAt)}
+                            </span>
+                            <Link
+                              href={`/${slug}/${story.slug}`}
+                              className="font-serif font-bold text-base text-black dark:text-white hover:underline block"
+                            >
+                              {story.title}
+                            </Link>
+                            <p className="text-xs text-neutral-500 line-clamp-1">{story.excerpt}</p>
+                          </div>
+                          <ChevronRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Right Sidebar */}
@@ -198,7 +253,7 @@ export default async function DynamicCategoryOrStaticPage({
                   <div className="lg:col-span-4 space-y-6">
                     {showMostRead && <MostRead articles={trendingArticles} title={`TRENDING IN ${category.name}`} />}
                     {sidebarAd && <SidebarAd ad={sidebarAd} />}
-                    {catDefaults.showNewsletter && <NewsletterBox />}
+                    {catDefaults.showNewsletter !== false && <NewsletterBox />}
                   </div>
                 )}
               </div>

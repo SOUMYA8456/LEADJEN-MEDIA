@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { FileText, Save, Megaphone, CheckCircle } from "lucide-react";
+import { FileText, Save, Megaphone, CheckCircle, Sliders, Layout } from "lucide-react";
 import { SiteBuilderNav } from "@/components/admin/SiteBuilderNav";
 import { DEFAULT_SITE_BUILDER_CONFIG, SiteBuilderConfig } from "@/lib/site-builder-defaults";
 
@@ -15,7 +15,16 @@ export default function ArticlePageBuilder() {
     fetch("/api/site-builder?draft=true")
       .then((res) => res.json())
       .then((data) => {
-        if (data.config) setConfig(data.config);
+        if (data.config) {
+          setConfig({
+            ...DEFAULT_SITE_BUILDER_CONFIG,
+            ...data.config,
+            article: {
+              ...DEFAULT_SITE_BUILDER_CONFIG.article,
+              ...(data.config.article || {}),
+            },
+          });
+        }
       })
       .finally(() => setLoading(false));
   }, []);
@@ -29,7 +38,11 @@ export default function ArticlePageBuilder() {
         body: JSON.stringify({ config, isPublish }),
       });
       if (res.ok) {
-        setStatusMessage(isPublish ? "✓ Article page template published live!" : "✓ Article page template saved as draft.");
+        setStatusMessage(
+          isPublish
+            ? "✓ Article page template published live across all story URLs!"
+            : "✓ Article page template saved as draft."
+        );
         setTimeout(() => setStatusMessage(null), 3500);
       }
     } catch {
@@ -39,7 +52,7 @@ export default function ArticlePageBuilder() {
     }
   };
 
-  const updateArticle = (field: string, value: boolean) => {
+  const updateArticle = (field: string, value: any) => {
     setConfig({
       ...config,
       article: {
@@ -48,6 +61,8 @@ export default function ArticlePageBuilder() {
       },
     });
   };
+
+  const a = config.article || DEFAULT_SITE_BUILDER_CONFIG.article;
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-24 font-sans">
@@ -65,10 +80,10 @@ export default function ArticlePageBuilder() {
             </span>
           </div>
           <h1 className="font-serif font-black text-2xl text-black dark:text-white mt-1">
-            Article Layout &amp; Ad Placements
+            Article Layout, Reading Experience &amp; Ads
           </h1>
           <p className="text-xs text-neutral-500 font-mono mt-0.5">
-            Configure reading experience modules, author credits, comments, and in-article ad slots
+            Configure reading experience modules, author credits, comments, related stories, and in-article ad slots
           </p>
         </div>
 
@@ -116,7 +131,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.showBreadcrumbs}
+              checked={a.showBreadcrumbs !== false}
               onChange={(e) => updateArticle("showBreadcrumbs", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -129,7 +144,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.showReadingProgressBar}
+              checked={a.showReadingProgressBar !== false}
               onChange={(e) => updateArticle("showReadingProgressBar", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -142,7 +157,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.showAuthorBio}
+              checked={a.showAuthorBio !== false}
               onChange={(e) => updateArticle("showAuthorBio", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -155,7 +170,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.showSocialShare}
+              checked={a.showSocialShare !== false}
               onChange={(e) => updateArticle("showSocialShare", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -168,7 +183,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.showComments}
+              checked={a.showComments !== false}
               onChange={(e) => updateArticle("showComments", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -181,7 +196,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.showRelatedStories}
+              checked={a.showRelatedStories !== false}
               onChange={(e) => updateArticle("showRelatedStories", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -194,7 +209,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.showMostReadSidebar}
+              checked={a.showMostReadSidebar !== false}
               onChange={(e) => updateArticle("showMostReadSidebar", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -207,11 +222,53 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.showNewsletterBox}
+              checked={a.showNewsletterBox !== false}
               onChange={(e) => updateArticle("showNewsletterBox", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
           </label>
+
+          <label className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800 cursor-pointer">
+            <div>
+              <p className="font-bold text-xs text-black dark:text-white">Drop Cap</p>
+              <p className="text-[11px] text-neutral-500">Render enlarged drop cap initial letter</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={a.showDropCap !== false}
+              onChange={(e) => updateArticle("showDropCap", e.target.checked)}
+              className="w-4 h-4 accent-black dark:accent-white"
+            />
+          </label>
+
+          <label className="flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800 cursor-pointer">
+            <div>
+              <p className="font-bold text-xs text-black dark:text-white">Sticky Sidebar</p>
+              <p className="text-[11px] text-neutral-500">Keep trending &amp; ads sticky on long reads</p>
+            </div>
+            <input
+              type="checkbox"
+              checked={a.enableStickySidebar !== false}
+              onChange={(e) => updateArticle("enableStickySidebar", e.target.checked)}
+              className="w-4 h-4 accent-black dark:accent-white"
+            />
+          </label>
+        </div>
+
+        <div className="pt-2 flex items-center justify-between p-4 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800">
+          <div>
+            <p className="font-bold text-xs text-black dark:text-white">Related Stories Limit</p>
+            <p className="text-[11px] text-neutral-500">Number of related category stories to display at foot</p>
+          </div>
+          <select
+            value={a.relatedStoriesLimit || 3}
+            onChange={(e) => updateArticle("relatedStoriesLimit", Number(e.target.value))}
+            className="px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+          >
+            <option value={3}>3 Stories</option>
+            <option value={4}>4 Stories</option>
+            <option value={6}>6 Stories</option>
+          </select>
         </div>
       </div>
 
@@ -235,7 +292,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.topAdEnabled}
+              checked={a.topAdEnabled !== false}
               onChange={(e) => updateArticle("topAdEnabled", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -248,7 +305,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.middleAdEnabled}
+              checked={a.middleAdEnabled !== false}
               onChange={(e) => updateArticle("middleAdEnabled", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -261,7 +318,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.sidebarAdEnabled}
+              checked={a.sidebarAdEnabled !== false}
               onChange={(e) => updateArticle("sidebarAdEnabled", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />
@@ -274,7 +331,7 @@ export default function ArticlePageBuilder() {
             </div>
             <input
               type="checkbox"
-              checked={config.article.bottomAdEnabled}
+              checked={a.bottomAdEnabled !== false}
               onChange={(e) => updateArticle("bottomAdEnabled", e.target.checked)}
               className="w-4 h-4 accent-black dark:accent-white"
             />

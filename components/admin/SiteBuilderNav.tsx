@@ -18,11 +18,13 @@ import {
   Columns,
   Megaphone,
   AlertTriangle,
+  Palette,
 } from "lucide-react";
 
 export const SITE_BUILDER_TABS = [
   { label: "Overview", href: "/admin/site-builder", icon: Layout },
   { label: "Global Brand", href: "/admin/site-builder/global", icon: Globe },
+  { label: "Design & Typography", href: "/admin/site-builder/design", icon: Palette },
   { label: "Header", href: "/admin/site-builder/header", icon: Columns },
   { label: "Navigation", href: "/admin/site-builder/navigation", icon: Navigation },
   { label: "Homepage", href: "/admin/homepage", icon: Layers },

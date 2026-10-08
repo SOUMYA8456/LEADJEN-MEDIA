@@ -14,7 +14,90 @@ export interface NavItemConfig {
   openInNewTab?: boolean;
 }
 
+export interface DesignColorsConfig {
+  primary: string;
+  secondary: string;
+  accentRed: string;
+  background: string;
+  surface: string;
+  card: string;
+  textPrimary: string;
+  textSecondary: string;
+  mutedText: string;
+  borderColor: string;
+  darkBackground: string;
+  darkSurface: string;
+  darkCard: string;
+  darkTextPrimary: string;
+  darkTextSecondary: string;
+  darkBorderColor: string;
+}
+
+export interface DesignTypographyConfig {
+  headingFont: string;
+  bodyFont: string;
+  uiFont: string;
+  h1Desktop: number;
+  h1Tablet: number;
+  h1Mobile: number;
+  h1LineHeight: number;
+  h2Desktop: number;
+  h2Tablet: number;
+  h2Mobile: number;
+  h2LineHeight: number;
+  h3Desktop: number;
+  h3Tablet: number;
+  h3Mobile: number;
+  h3LineHeight: number;
+  h4Desktop: number;
+  h4Tablet: number;
+  h4Mobile: number;
+  h4LineHeight: number;
+  bodyDesktop: number;
+  bodyTablet: number;
+  bodyMobile: number;
+  bodyLineHeight: number;
+  metaSize: number;
+  dropCapEnabled: boolean;
+}
+
+export interface DesignSpacingConfig {
+  containerMaxWidth: number;
+  pagePaddingDesktop: number;
+  pagePaddingTablet: number;
+  pagePaddingMobile: number;
+  sectionGapDesktop: number;
+  sectionGapTablet: number;
+  sectionGapMobile: number;
+  cardGap: number;
+}
+
+export interface DesignBordersConfig {
+  borderWidth: number;
+  cardRadius: number;
+  imageRadius: number;
+  buttonRadius: number;
+}
+
+export interface DesignSystemConfig {
+  colors: DesignColorsConfig;
+  typography: DesignTypographyConfig;
+  spacing: DesignSpacingConfig;
+  borders: DesignBordersConfig;
+}
+
+export interface CategoryOverrideConfig {
+  layoutStyle?: "split-hero" | "magazine-grid" | "editorial-list" | "compact-wire";
+  heroLimit?: number;
+  latestLimit?: number;
+  gridColumns?: number;
+  showSidebar?: boolean;
+  showAdBanner?: boolean;
+  showMostRead?: boolean;
+}
+
 export interface SiteBuilderConfig {
+  design: DesignSystemConfig;
   global: {
     siteName: string;
     siteLogo: string;
@@ -52,6 +135,7 @@ export interface SiteBuilderConfig {
     items: NavItemConfig[];
   };
   categories: {
+    layoutStyle: "split-hero" | "magazine-grid" | "editorial-list" | "compact-wire";
     defaultHeroLimit: number;
     defaultGridColumns: number;
     showSidebar: boolean;
@@ -59,16 +143,7 @@ export interface SiteBuilderConfig {
     showMostRead: boolean;
     showAdBanner: boolean;
     showNewsletter: boolean;
-    categoryOverrides?: Record<
-      string,
-      {
-        heroLimit?: number;
-        latestLimit?: number;
-        showSidebar?: boolean;
-        showAdBanner?: boolean;
-        showMostRead?: boolean;
-      }
-    >;
+    categoryOverrides?: Record<string, CategoryOverrideConfig>;
   };
   article: {
     showBreadcrumbs: boolean;
@@ -80,6 +155,12 @@ export interface SiteBuilderConfig {
     showRelatedStories: boolean;
     showMostReadSidebar: boolean;
     showNewsletterBox: boolean;
+    showDropCap: boolean;
+    showReadingTimeBadge: boolean;
+    showCategoryTags: boolean;
+    showAuthorAvatar: boolean;
+    relatedStoriesLimit: number;
+    enableStickySidebar: boolean;
     topAdEnabled: boolean;
     middleAdEnabled: boolean;
     bottomAdEnabled: boolean;
@@ -141,7 +222,72 @@ export interface SiteBuilderConfig {
   };
 }
 
+export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
+  colors: {
+    primary: "#1E1B1A",
+    secondary: "#2d2726",
+    accentRed: "#cc0000",
+    background: "#ffffff",
+    surface: "#f8f9fa",
+    card: "#ffffff",
+    textPrimary: "#0a0a0a",
+    textSecondary: "#52525b",
+    mutedText: "#71717a",
+    borderColor: "#e4e4e7",
+    darkBackground: "#0a0a0a",
+    darkSurface: "#141414",
+    darkCard: "#18181b",
+    darkTextPrimary: "#f4f4f5",
+    darkTextSecondary: "#a1a1aa",
+    darkBorderColor: "#27272a",
+  },
+  typography: {
+    headingFont: "Georgia, Cambria, 'Times New Roman', Times, serif",
+    bodyFont: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
+    uiFont: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
+    h1Desktop: 44,
+    h1Tablet: 36,
+    h1Mobile: 28,
+    h1LineHeight: 1.15,
+    h2Desktop: 32,
+    h2Tablet: 26,
+    h2Mobile: 22,
+    h2LineHeight: 1.2,
+    h3Desktop: 22,
+    h3Tablet: 20,
+    h3Mobile: 18,
+    h3LineHeight: 1.3,
+    h4Desktop: 18,
+    h4Tablet: 16,
+    h4Mobile: 15,
+    h4LineHeight: 1.4,
+    bodyDesktop: 16,
+    bodyTablet: 15,
+    bodyMobile: 14,
+    bodyLineHeight: 1.6,
+    metaSize: 12,
+    dropCapEnabled: true,
+  },
+  spacing: {
+    containerMaxWidth: 1280,
+    pagePaddingDesktop: 24,
+    pagePaddingTablet: 16,
+    pagePaddingMobile: 12,
+    sectionGapDesktop: 48,
+    sectionGapTablet: 36,
+    sectionGapMobile: 24,
+    cardGap: 20,
+  },
+  borders: {
+    borderWidth: 1,
+    cardRadius: 12,
+    imageRadius: 10,
+    buttonRadius: 8,
+  },
+};
+
 export const DEFAULT_SITE_BUILDER_CONFIG: SiteBuilderConfig = {
+  design: DEFAULT_DESIGN_SYSTEM,
   global: {
     siteName: "LEADJEN MEDIA",
     siteLogo: "/images/logo-white.png",
@@ -162,8 +308,8 @@ export const DEFAULT_SITE_BUILDER_CONFIG: SiteBuilderConfig = {
     },
   },
   header: {
-    logoHeightDesktop: 32,
-    logoHeightMobile: 26,
+    logoHeightDesktop: 36,
+    logoHeightMobile: 28,
     stickyHeader: true,
     showLiveButton: true,
     showSearchButton: true,
@@ -190,6 +336,7 @@ export const DEFAULT_SITE_BUILDER_CONFIG: SiteBuilderConfig = {
     ],
   },
   categories: {
+    layoutStyle: "split-hero",
     defaultHeroLimit: 1,
     defaultGridColumns: 3,
     showSidebar: true,
@@ -209,6 +356,12 @@ export const DEFAULT_SITE_BUILDER_CONFIG: SiteBuilderConfig = {
     showRelatedStories: true,
     showMostReadSidebar: true,
     showNewsletterBox: true,
+    showDropCap: true,
+    showReadingTimeBadge: true,
+    showCategoryTags: true,
+    showAuthorAvatar: true,
+    relatedStoriesLimit: 3,
+    enableStickySidebar: true,
     topAdEnabled: true,
     middleAdEnabled: true,
     bottomAdEnabled: true,
@@ -305,3 +458,137 @@ export const DEFAULT_SITE_BUILDER_CONFIG: SiteBuilderConfig = {
     showSearchBox: true,
   },
 };
+
+/**
+ * Generate dynamic CSS custom properties from the active SiteBuilderConfig
+ */
+export function generateThemeCss(config?: Partial<SiteBuilderConfig>): string {
+  const d = config?.design || DEFAULT_DESIGN_SYSTEM;
+  const colors = d.colors || DEFAULT_DESIGN_SYSTEM.colors;
+  const typo = d.typography || DEFAULT_DESIGN_SYSTEM.typography;
+  const spacing = d.spacing || DEFAULT_DESIGN_SYSTEM.spacing;
+  const borders = d.borders || DEFAULT_DESIGN_SYSTEM.borders;
+
+  return `
+:root {
+  --bg-primary: ${colors.background || "#ffffff"};
+  --bg-secondary: ${colors.surface || "#f8f9fa"};
+  --bg-card: ${colors.card || "#ffffff"};
+  --text-primary: ${colors.textPrimary || "#0a0a0a"};
+  --text-secondary: ${colors.textSecondary || "#52525b"};
+  --text-muted: ${colors.mutedText || "#71717a"};
+  --border-color: ${colors.borderColor || "#e4e4e7"};
+  --leadjen-primary: ${colors.primary || "#1E1B1A"};
+  --leadjen-secondary: ${colors.secondary || "#2d2726"};
+  --leadjen-red: ${colors.accentRed || "#cc0000"};
+  --leadjen-black: ${colors.textPrimary || "#0a0a0a"};
+
+  --font-heading: ${typo.headingFont || "Georgia, serif"};
+  --font-body: ${typo.bodyFont || "inherit"};
+  --font-ui: ${typo.uiFont || "inherit"};
+
+  --h1-size: ${typo.h1Desktop || 44}px;
+  --h1-lh: ${typo.h1LineHeight || 1.15};
+  --h2-size: ${typo.h2Desktop || 32}px;
+  --h2-lh: ${typo.h2LineHeight || 1.2};
+  --h3-size: ${typo.h3Desktop || 22}px;
+  --h3-lh: ${typo.h3LineHeight || 1.3};
+  --h4-size: ${typo.h4Desktop || 18}px;
+  --h4-lh: ${typo.h4LineHeight || 1.4};
+  --body-size: ${typo.bodyDesktop || 16}px;
+  --body-lh: ${typo.bodyLineHeight || 1.6};
+  --meta-size: ${typo.metaSize || 12}px;
+
+  --container-max-width: ${spacing.containerMaxWidth || 1280}px;
+  --page-padding: ${spacing.pagePaddingDesktop || 24}px;
+  --section-gap: ${spacing.sectionGapDesktop || 48}px;
+  --card-gap: ${spacing.cardGap || 20}px;
+
+  --border-width: ${borders.borderWidth || 1}px;
+  --radius-card: ${borders.cardRadius || 12}px;
+  --radius-image: ${borders.imageRadius || 10}px;
+  --radius-button: ${borders.buttonRadius || 8}px;
+}
+
+.dark {
+  --bg-primary: ${colors.darkBackground || "#0a0a0a"};
+  --bg-secondary: ${colors.darkSurface || "#141414"};
+  --bg-card: ${colors.darkCard || "#18181b"};
+  --text-primary: ${colors.darkTextPrimary || "#f4f4f5"};
+  --text-secondary: ${colors.darkTextSecondary || "#a1a1aa"};
+  --border-color: ${colors.darkBorderColor || "#27272a"};
+  --leadjen-primary: #ffffff;
+  --leadjen-black: #ffffff;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --h1-size: ${typo.h1Tablet || 36}px;
+    --h2-size: ${typo.h2Tablet || 26}px;
+    --h3-size: ${typo.h3Tablet || 20}px;
+    --h4-size: ${typo.h4Tablet || 16}px;
+    --body-size: ${typo.bodyTablet || 15}px;
+    --page-padding: ${spacing.pagePaddingTablet || 16}px;
+    --section-gap: ${spacing.sectionGapTablet || 36}px;
+  }
+}
+
+@media (max-width: 640px) {
+  :root {
+    --h1-size: ${typo.h1Mobile || 28}px;
+    --h2-size: ${typo.h2Mobile || 22}px;
+    --h3-size: ${typo.h3Mobile || 18}px;
+    --h4-size: ${typo.h4Mobile || 15}px;
+    --body-size: ${typo.bodyMobile || 14}px;
+    --page-padding: ${spacing.pagePaddingMobile || 12}px;
+    --section-gap: ${spacing.sectionGapMobile || 24}px;
+  }
+}
+
+h1, .font-heading-h1 {
+  font-family: var(--font-heading) !important;
+  font-size: var(--h1-size);
+  line-height: var(--h1-lh);
+}
+h2, .font-heading-h2 {
+  font-family: var(--font-heading) !important;
+  font-size: var(--h2-size);
+  line-height: var(--h2-lh);
+}
+h3, .font-heading-h3 {
+  font-family: var(--font-heading) !important;
+  font-size: var(--h3-size);
+  line-height: var(--h3-lh);
+}
+h4, .font-heading-h4 {
+  font-family: var(--font-heading) !important;
+  font-size: var(--h4-size);
+  line-height: var(--h4-lh);
+}
+${
+  typo.dropCapEnabled !== false
+    ? `
+.article-content p:first-of-type::first-letter {
+  font-size: 3.5rem;
+  line-height: 0.8;
+  float: left;
+  margin-top: 0.15rem;
+  margin-right: 0.75rem;
+  font-family: var(--font-heading, Georgia, serif);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+`
+    : `
+.article-content p:first-of-type::first-letter {
+  font-size: inherit !important;
+  line-height: inherit !important;
+  float: none !important;
+  margin: 0 !important;
+  font-family: inherit !important;
+  font-weight: inherit !important;
+}
+`
+}
+`;
+}

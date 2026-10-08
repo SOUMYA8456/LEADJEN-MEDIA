@@ -16,8 +16,19 @@ import {
   ExternalLink,
   Edit2,
   Save,
+  Link as LinkIcon,
+  AlertTriangle,
 } from "lucide-react";
+import Link from "next/link";
 import { formatTimeAgo } from "@/lib/utils";
+
+interface MediaUsage {
+  type: "article" | "page";
+  id: string;
+  title: string;
+  slug: string;
+  status?: string;
+}
 
 interface MediaItem {
   id: string;
@@ -29,6 +40,8 @@ interface MediaItem {
   size?: number | null;
   altText?: string | null;
   createdAt: string;
+  usages?: MediaUsage[];
+  usageCount?: number;
 }
 
 export default function MediaLibraryPage() {
@@ -48,6 +61,12 @@ export default function MediaLibraryPage() {
   const [altSavedSuccess, setAltSavedSuccess] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isDragOver, setIsDragOver] = useState(false);
+
+  // Usage / Delete Warning modal
+  const [deleteWarningModal, setDeleteWarningModal] = useState<{
+    item: MediaItem;
+    usages: MediaUsage[];
+  } | null>(null);
 
   const fetchMedia = async () => {
     try {
@@ -112,15 +131,29 @@ export default function MediaLibraryPage() {
     }, 400);
   };
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this media asset? This cannot be undone.")) return;
+  const handleDelete = async (item: MediaItem, force = false) => {
+    if (item.usages && item.usages.length > 0 && !force) {
+      setDeleteWarningModal({ item, usages: item.usages });
+      return;
+    }
+
+    if (!force && !confirm("Are you sure you want to delete this media asset? This cannot be undone.")) return;
+
     try {
-      const res = await fetch(`/api/media?id=${id}`, { method: "DELETE" });
+      const res = await fetch(`/api/media?id=${item.id}${force ? "&force=true" : ""}`, { method: "DELETE" });
+      const data = await res.json();
       if (res.ok) {
-        setMediaList(mediaList.filter((m) => m.id !== id));
-        if (selectedMedia?.id === id) {
+        setMediaList(mediaList.filter((m) => m.id !== item.id));
+        if (selectedMedia?.id === item.id) {
           setSelectedMedia(null);
         }
+        if (deleteWarningModal) {
+          setDeleteWarningModal(null);
+        }
+      } else if (data.requiresForce) {
+        setDeleteWarningModal({ item, usages: data.usedInArticles });
+      } else {
+        alert(data.error || "Delete failed.");
       }
     } catch (err) {
       console.error("Delete error:", err);
@@ -149,7 +182,6 @@ export default function MediaLibraryPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ altText: editingAlt }),
       });
-      const data = await res.json();
       if (res.ok) {
         setSelectedMedia({ ...selectedMedia, altText: editingAlt });
         setMediaList(mediaList.map((m) => (m.id === selectedMedia.id ? { ...m, altText: editingAlt } : m)));
@@ -172,7 +204,7 @@ export default function MediaLibraryPage() {
             Media Asset Library
           </h1>
           <p className="text-xs text-neutral-500 font-mono mt-0.5">
-            Production Media Management • Cloud Storage & High-Res CDN
+            Production Media Management • Usage Tracking &amp; Reverse Reference Protection
           </p>
         </div>
 
@@ -212,7 +244,7 @@ export default function MediaLibraryPage() {
         <div className="flex flex-col items-center justify-center space-y-2">
           <Upload className="w-8 h-8 text-neutral-400" />
           <p className="text-sm font-serif font-bold text-black dark:text-white">
-            Drag & drop images here, or browse from computer
+            Drag &amp; drop images here, or browse from computer
           </p>
           <p className="text-xs font-mono text-neutral-500">
             Supports JPG, PNG, WEBP, GIF up to 10MB each
@@ -288,14 +320,14 @@ export default function MediaLibraryPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search filename or alt..."
-              className="w-full pl-9 pr-3 py-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 rounded-xl text-xs text-black dark:text-white font-mono focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 rounded-xl text-xs text-black dark:text-white font-mono focus:outline-hidden"
             />
           </div>
 
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as any)}
-            className="p-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 rounded-xl text-xs text-black dark:text-white font-mono uppercase focus:outline-none"
+            className="p-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 rounded-xl text-xs text-black dark:text-white font-mono uppercase focus:outline-hidden"
           >
             <option value="latest">Latest First</option>
             <option value="oldest">Oldest First</option>
@@ -317,67 +349,82 @@ export default function MediaLibraryPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-          {mediaList.map((item) => (
-            <div
-              key={item.id}
-              onClick={() => handleOpenDetails(item)}
-              className="group relative bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-xs hover:border-black dark:hover:border-white transition cursor-pointer flex flex-col justify-between"
-            >
-              <div className="relative aspect-[4/3] bg-neutral-100 dark:bg-neutral-950 overflow-hidden">
-                <img
-                  src={item.url}
-                  alt={item.altText || item.originalName}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                />
-              </div>
-
-              <div className="p-3">
-                <p className="text-xs font-bold text-black dark:text-white truncate" title={item.originalName}>
-                  {item.originalName}
-                </p>
-                <div className="flex items-center justify-between text-[10px] text-neutral-400 font-mono mt-1">
-                  <span>{item.size ? `${(item.size / 1024).toFixed(0)} KB` : "Asset"}</span>
-                  <span>{formatTimeAgo(item.createdAt)}</span>
-                </div>
-
-                {/* Bottom Actions */}
-                <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-neutral-800">
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleCopyUrl(item.url, item.id);
-                    }}
-                    className="flex items-center gap-1 text-[11px] font-mono font-bold text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white"
-                  >
-                    {copiedId === item.id ? (
-                      <>
-                        <Check className="w-3 h-3 text-green-500" />
-                        <span>Copied</span>
-                      </>
+          {mediaList.map((item) => {
+            const usageCount = item.usageCount || (item.usages ? item.usages.length : 0);
+            return (
+              <div
+                key={item.id}
+                onClick={() => handleOpenDetails(item)}
+                className="group relative bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 overflow-hidden shadow-xs hover:border-black dark:hover:border-white transition cursor-pointer flex flex-col justify-between"
+              >
+                <div className="relative aspect-[4/3] bg-neutral-100 dark:bg-neutral-950 overflow-hidden">
+                  <img
+                    src={item.url}
+                    alt={item.altText || item.originalName}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                  {/* Usage Badge */}
+                  <div className="absolute top-2 left-2">
+                    {usageCount > 0 ? (
+                      <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-md bg-black/80 text-white dark:bg-white/90 dark:text-black backdrop-blur-xs shadow-xs">
+                        {usageCount} {usageCount === 1 ? "Story" : "Stories"}
+                      </span>
                     ) : (
-                      <>
-                        <Copy className="w-3 h-3" />
-                        <span>Copy URL</span>
-                      </>
+                      <span className="px-2 py-0.5 text-[9px] font-mono font-bold uppercase rounded-md bg-neutral-900/60 text-neutral-300 backdrop-blur-xs">
+                        Unused
+                      </span>
                     )}
-                  </button>
+                  </div>
+                </div>
 
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(item.id);
-                    }}
-                    className="p-1 text-neutral-400 hover:text-red-600 rounded transition"
-                    title="Delete Asset"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                <div className="p-3">
+                  <p className="text-xs font-bold text-black dark:text-white truncate" title={item.originalName}>
+                    {item.originalName}
+                  </p>
+                  <div className="flex items-center justify-between text-[10px] text-neutral-400 font-mono mt-1">
+                    <span>{item.size ? `${(item.size / 1024).toFixed(0)} KB` : "Asset"}</span>
+                    <span>{formatTimeAgo(item.createdAt)}</span>
+                  </div>
+
+                  {/* Bottom Actions */}
+                  <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-neutral-100 dark:border-neutral-800">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCopyUrl(item.url, item.id);
+                      }}
+                      className="flex items-center gap-1 text-[11px] font-mono font-bold text-neutral-600 dark:text-neutral-300 hover:text-black dark:hover:text-white"
+                    >
+                      {copiedId === item.id ? (
+                        <>
+                          <Check className="w-3 h-3 text-green-500" />
+                          <span>Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3 h-3" />
+                          <span>Copy URL</span>
+                        </>
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(item);
+                      }}
+                      className="p-1 text-neutral-400 hover:text-red-600 rounded transition"
+                      title="Delete Asset"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
@@ -387,7 +434,7 @@ export default function MediaLibraryPage() {
           <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl max-w-2xl w-full p-6 space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-neutral-200 dark:border-neutral-800">
               <h3 className="font-serif font-black text-lg text-black dark:text-white">
-                Media Details & Metadata
+                Media Asset Details &amp; Usage
               </h3>
               <button
                 type="button"
@@ -431,17 +478,54 @@ export default function MediaLibraryPage() {
               </div>
             </div>
 
+            {/* Reverse Reference Usage List */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <LinkIcon className="w-4 h-4 text-black dark:text-white" />
+                <h4 className="text-xs font-mono font-bold uppercase text-black dark:text-white">
+                  Active References &amp; Articles ({selectedMedia.usages?.length || 0})
+                </h4>
+              </div>
+
+              {selectedMedia.usages && selectedMedia.usages.length > 0 ? (
+                <div className="max-h-40 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded-xl">
+                  {selectedMedia.usages.map((u) => (
+                    <div key={u.id} className="p-2.5 flex items-center justify-between text-xs hover:bg-neutral-50 dark:hover:bg-neutral-950">
+                      <div className="min-w-0 pr-3">
+                        <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold uppercase rounded bg-neutral-200 dark:bg-neutral-800 mr-2">
+                          {u.type}
+                        </span>
+                        <span className="font-medium text-black dark:text-white truncate">
+                          {u.title}
+                        </span>
+                      </div>
+                      <Link
+                        href={u.type === "article" ? `/admin/articles/${u.id}/edit` : "/admin/pages"}
+                        className="text-[11px] font-mono text-neutral-500 hover:text-black dark:hover:text-white shrink-0 hover:underline"
+                      >
+                        Edit Story &rarr;
+                      </Link>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs font-mono text-neutral-500 p-3 bg-neutral-50 dark:bg-neutral-950 rounded-xl">
+                  This asset is not currently referenced in any articles or static pages.
+                </p>
+              )}
+            </div>
+
             {/* Alt Text / Caption Editor */}
             <div className="space-y-2">
               <label className="block text-xs font-mono font-bold uppercase text-black dark:text-white">
-                Alt Description / Caption (For SEO & Accessibility)
+                Alt Description / Caption (For SEO &amp; Accessibility)
               </label>
               <textarea
                 rows={2}
                 value={editingAlt}
                 onChange={(e) => setEditingAlt(e.target.value)}
                 placeholder="Descriptive caption or alt text..."
-                className="w-full p-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-black dark:text-white font-sans focus:outline-none"
+                className="w-full p-3 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-black dark:text-white font-sans focus:outline-hidden"
               />
             </div>
 
@@ -465,7 +549,7 @@ export default function MediaLibraryPage() {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => handleDelete(selectedMedia.id)}
+                  onClick={() => handleDelete(selectedMedia)}
                   className="px-4 py-2 bg-red-950/20 text-red-600 border border-red-800/40 rounded-xl text-xs font-mono font-bold uppercase hover:bg-red-950/40 transition"
                 >
                   Delete
@@ -480,6 +564,49 @@ export default function MediaLibraryPage() {
                   <span>{savingAlt ? "Saving..." : "Save Changes"}</span>
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Warning Modal for Referenced Media */}
+      {deleteWarningModal && (
+        <div className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+            <div className="flex items-center gap-3 text-amber-600 dark:text-amber-400">
+              <AlertTriangle className="w-6 h-6" />
+              <h3 className="font-serif font-black text-lg text-black dark:text-white">
+                Active Story Reference Warning
+              </h3>
+            </div>
+            <p className="text-xs text-neutral-600 dark:text-neutral-400 font-sans leading-relaxed">
+              This media asset is currently referenced as the featured image or gallery photo in{" "}
+              <strong>{deleteWarningModal.usages.length} story/stories</strong>. Deleting it will cause broken image placeholders on public pages.
+            </p>
+
+            <div className="max-h-32 overflow-y-auto divide-y divide-neutral-100 dark:divide-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded-xl p-2 text-xs">
+              {deleteWarningModal.usages.map((u) => (
+                <div key={u.id} className="py-1 text-black dark:text-white truncate">
+                  &bull; {u.title}
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setDeleteWarningModal(null)}
+                className="px-4 py-2 bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white text-xs font-mono font-bold uppercase rounded-xl"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => handleDelete(deleteWarningModal.item, true)}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-mono font-bold uppercase rounded-xl shadow-xs"
+              >
+                Force Delete Anyway
+              </button>
             </div>
           </div>
         </div>
