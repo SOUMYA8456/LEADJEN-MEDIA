@@ -27,10 +27,6 @@ export async function GET(
         id: true,
         email: true,
         name: true,
-        displayName: true,
-        designation: true,
-        department: true,
-        bio: true,
         role: true,
         avatar: true,
         status: true,
@@ -67,12 +63,13 @@ export async function GET(
     return NextResponse.json({
       user: {
         ...user,
+        designation: author?.designation || (user.role === "SUPER_ADMIN" ? "Executive Editor" : user.role === "EDITOR" ? "Senior Editor" : "Staff Reporter"),
+        bio: author?.bio || null,
         authorProfile: author
           ? {
               id: author.id,
               slug: author.slug,
               designation: author.designation,
-              department: author.department,
               bio: author.bio,
               articleCount: author._count.articles,
             }
@@ -103,10 +100,8 @@ export async function PUT(
     const body = await req.json();
     const {
       name,
-      displayName,
       email,
       designation,
-      department,
       bio,
       role,
       avatar,
@@ -166,11 +161,7 @@ export async function PUT(
       where: { id },
       data: {
         name: name !== undefined ? name.trim() : existingUser.name,
-        displayName: displayName !== undefined ? displayName.trim() : existingUser.displayName,
         email: normalizedEmail,
-        designation: designation !== undefined ? designation.trim() : existingUser.designation,
-        department: department !== undefined ? department.trim() : existingUser.department,
-        bio: bio !== undefined ? bio?.trim() : existingUser.bio,
         role: role !== undefined ? (role as Role) : existingUser.role,
         avatar: avatar !== undefined ? avatar?.trim() : existingUser.avatar,
         status: status !== undefined ? status : existingUser.status,
@@ -179,10 +170,6 @@ export async function PUT(
         id: true,
         email: true,
         name: true,
-        displayName: true,
-        designation: true,
-        department: true,
-        bio: true,
         role: true,
         avatar: true,
         status: true,
@@ -208,11 +195,9 @@ export async function PUT(
         data: {
           name: updatedUser.name,
           email: updatedUser.email,
-          designation: updatedUser.designation || existingAuthor.designation,
-          department: updatedUser.department || existingAuthor.department,
-          bio: updatedUser.bio !== null ? updatedUser.bio : existingAuthor.bio,
+          designation: designation !== undefined ? designation.trim() : existingAuthor.designation,
+          bio: bio !== undefined ? bio?.trim() : existingAuthor.bio,
           avatar: updatedUser.avatar || existingAuthor.avatar,
-          status: updatedUser.status === "ACTIVE" ? "ACTIVE" : "SUSPENDED",
         },
       });
     }
@@ -233,15 +218,18 @@ export async function PUT(
           name: updatedUser.name,
           email: updatedUser.email,
           role: updatedUser.role,
-          designation: updatedUser.designation,
-          department: updatedUser.department,
+          designation: designation,
         },
       },
     });
 
     return NextResponse.json({
       success: true,
-      user: updatedUser,
+      user: {
+        ...updatedUser,
+        designation: designation || existingAuthor?.designation || "Staff Member",
+        bio: bio !== undefined ? bio : existingAuthor?.bio,
+      },
     });
   } catch (error) {
     console.error("PUT /api/admin/users/[id] error:", error);
@@ -327,13 +315,6 @@ export async function DELETE(
         where: { id },
         data: { status: "SUSPENDED" },
       });
-
-      if (authoredArticles) {
-        await prisma.author.update({
-          where: { id: authoredArticles.id },
-          data: { status: "ARCHIVED" },
-        });
-      }
 
       await logAuditEvent({
         userId: session.id,

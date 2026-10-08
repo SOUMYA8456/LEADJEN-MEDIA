@@ -71,20 +71,6 @@ export async function PATCH(
       },
     });
 
-    // Also sync Author profile status
-    const author = await prisma.author.findFirst({
-      where: {
-        OR: [{ email: user.email }, { name: user.name }],
-      },
-    });
-
-    if (author) {
-      await prisma.author.update({
-        where: { id: author.id },
-        data: { status: status === "ACTIVE" ? "ACTIVE" : "SUSPENDED" },
-      });
-    }
-
     // Audit Log
     await logAuditEvent({
       userId: session.id,

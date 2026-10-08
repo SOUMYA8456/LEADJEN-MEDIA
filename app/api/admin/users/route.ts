@@ -35,9 +35,6 @@ export async function GET(req: NextRequest) {
       where.OR = [
         { name: { contains: search, mode: "insensitive" } },
         { email: { contains: search, mode: "insensitive" } },
-        { displayName: { contains: search, mode: "insensitive" } },
-        { designation: { contains: search, mode: "insensitive" } },
-        { department: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -48,10 +45,6 @@ export async function GET(req: NextRequest) {
           id: true,
           email: true,
           name: true,
-          displayName: true,
-          designation: true,
-          department: true,
-          bio: true,
           role: true,
           avatar: true,
           status: true,
@@ -72,6 +65,9 @@ export async function GET(req: NextRequest) {
           name: true,
           email: true,
           slug: true,
+          designation: true,
+          bio: true,
+          avatar: true,
           _count: {
             select: { articles: true },
           },
@@ -79,19 +75,24 @@ export async function GET(req: NextRequest) {
       }),
     ]);
 
-    // Map author articles count to user by matching email or name
+    // Map author profile details & story count to user
     const usersWithStats = users.map((u) => {
       const matchingAuthor = authors.find(
         (a) =>
           (a.email && a.email.toLowerCase() === u.email.toLowerCase()) ||
           a.name.toLowerCase() === u.name.toLowerCase()
       );
+
       return {
         ...u,
+        designation: matchingAuthor?.designation || (u.role === "SUPER_ADMIN" ? "Executive Editor" : u.role === "EDITOR" ? "Senior Editor" : "Staff Reporter"),
+        bio: matchingAuthor?.bio || null,
         authorProfile: matchingAuthor
           ? {
               id: matchingAuthor.id,
               slug: matchingAuthor.slug,
+              designation: matchingAuthor.designation,
+              bio: matchingAuthor.bio,
               articleCount: matchingAuthor._count.articles,
             }
           : null,
@@ -135,10 +136,8 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       name,
-      displayName,
       email,
       designation,
-      department,
       role = "REPORTER",
       bio,
       avatar,
@@ -179,12 +178,8 @@ export async function POST(req: NextRequest) {
     const newUser = await prisma.user.create({
       data: {
         name: name.trim(),
-        displayName: displayName?.trim() || name.trim(),
         email: normalizedEmail,
-        designation: designation?.trim() || (role === "SUPER_ADMIN" ? "Executive Editor" : role === "EDITOR" ? "Senior Editor" : "Staff Reporter"),
-        department: department?.trim() || "Newsroom Desk",
         role: role as Role,
-        bio: bio?.trim() || null,
         avatar: avatar?.trim() || `https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=300&q=80`,
         status: status === "SUSPENDED" ? "SUSPENDED" : "ACTIVE",
         passwordHash,
@@ -193,10 +188,6 @@ export async function POST(req: NextRequest) {
         id: true,
         email: true,
         name: true,
-        displayName: true,
-        designation: true,
-        department: true,
-        bio: true,
         role: true,
         avatar: true,
         status: true,
@@ -220,11 +211,9 @@ export async function POST(req: NextRequest) {
           name: name.trim(),
           slug: finalSlug,
           designation: designation?.trim() || (role === "SUPER_ADMIN" ? "Executive Editor" : role === "EDITOR" ? "Senior Editor" : "Staff Reporter"),
-          department: department?.trim() || "Newsroom Desk",
           bio: bio?.trim() || null,
           avatar: newUser.avatar,
           email: normalizedEmail,
-          status: newUser.status,
         },
       });
     }
@@ -242,8 +231,7 @@ export async function POST(req: NextRequest) {
       details: {
         createdUserId: newUser.id,
         role: newUser.role,
-        department: newUser.department,
-        designation: newUser.designation,
+        designation: designation || "Editorial Staff",
         authorProfileId: authorProfile?.id || null,
       },
     });
@@ -252,6 +240,8 @@ export async function POST(req: NextRequest) {
       success: true,
       user: {
         ...newUser,
+        designation: designation?.trim() || "Editorial Staff",
+        bio: bio?.trim() || null,
         authorProfile: authorProfile
           ? { id: authorProfile.id, slug: authorProfile.slug, articleCount: 0 }
           : null,

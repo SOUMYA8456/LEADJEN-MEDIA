@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db";
 import { getSessionFromRequest } from "@/lib/auth";
 import { logAuditEvent } from "@/lib/audit";
-import { slugify } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -51,7 +50,7 @@ export async function PUT(
 
     const { id } = params;
     const body = await req.json();
-    const { name, designation, department, bio, avatar, email, twitter, linkedin, status } = body;
+    const { name, designation, bio, avatar, email, twitter, linkedin } = body;
 
     const existing = await prisma.author.findUnique({
       where: { id },
@@ -66,17 +65,15 @@ export async function PUT(
       data: {
         name: name !== undefined ? name.trim() : existing.name,
         designation: designation !== undefined ? designation.trim() : existing.designation,
-        department: department !== undefined ? department.trim() : existing.department,
         bio: bio !== undefined ? bio?.trim() : existing.bio,
         avatar: avatar !== undefined ? avatar?.trim() : existing.avatar,
         email: email !== undefined ? email?.trim() : existing.email,
         twitter: twitter !== undefined ? twitter?.trim() : existing.twitter,
         linkedin: linkedin !== undefined ? linkedin?.trim() : existing.linkedin,
-        status: status !== undefined ? status : existing.status,
       },
     });
 
-    // Also synchronize corresponding User account if one exists
+    // Synchronize corresponding User account if one exists
     if (updated.email || existing.email) {
       const user = await prisma.user.findFirst({
         where: {
@@ -92,9 +89,6 @@ export async function PUT(
           where: { id: user.id },
           data: {
             name: updated.name,
-            designation: updated.designation,
-            department: updated.department,
-            bio: updated.bio,
             avatar: updated.avatar,
           },
         });
@@ -109,7 +103,7 @@ export async function PUT(
       entityType: "AUTHOR",
       entityId: updated.id,
       entityTitle: `${updated.name} (${updated.designation})`,
-      details: { updatedFields: { name, designation, department, status } },
+      details: { updatedFields: { name, designation } },
     });
 
     return NextResponse.json({ success: true, author: updated });
@@ -119,7 +113,7 @@ export async function PUT(
   }
 }
 
-// DELETE /api/authors/[id] — Safe Archive or Delete Author (SUPER_ADMIN only)
+// DELETE /api/authors/[id] — Safe Remove Author (SUPER_ADMIN only)
 export async function DELETE(
   req: NextRequest,
   { params }: { params: { id: string } }
@@ -145,31 +139,14 @@ export async function DELETE(
       return NextResponse.json({ error: "Author not found" }, { status: 404 });
     }
 
-    // If author has published or historical articles: Archive rather than breaking article records
+    // If author has published articles: Prevent hard delete to preserve historical integrity
     if (author._count.articles > 0) {
-      await prisma.author.update({
-        where: { id },
-        data: { status: "ARCHIVED" },
-      });
-
-      await logAuditEvent({
-        userId: session.id,
-        userName: session.name,
-        userRole: session.role,
-        action: "AUTHOR_ARCHIVED",
-        entityType: "AUTHOR",
-        entityId: author.id,
-        entityTitle: `${author.name}`,
-        details: {
-          reason: `Preserved attribution for ${author._count.articles} published stories.`,
+      return NextResponse.json(
+        {
+          error: `Cannot delete author "${author.name}" because ${author._count.articles} published articles are linked to this journalist profile. You can edit their credentials or suspend their account instead.`,
         },
-      });
-
-      return NextResponse.json({
-        success: true,
-        archived: true,
-        message: `Author archived successfully. Historical attribution for ${author._count.articles} articles is preserved.`,
-      });
+        { status: 400 }
+      );
     }
 
     // Zero articles: safe removal

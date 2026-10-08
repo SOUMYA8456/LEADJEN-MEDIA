@@ -38,10 +38,6 @@ model User {
   email             String              @unique
   passwordHash      String
   name              String
-  displayName       String?
-  designation       String?             @default("Staff Member")
-  department        String?             @default("Editorial Desk")
-  bio               String?
   role              Role                @default(READER)
   avatar            String?
   status            String              @default("ACTIVE") // ACTIVE, SUSPENDED
@@ -61,13 +57,11 @@ model Author {
   name        String
   slug        String    @unique
   designation String?   @default("Senior Editorial Correspondent")
-  department  String?   @default("National Desk")
   bio         String?
   avatar      String?
   email       String?
   twitter     String?
   linkedin    String?
-  status      String?   @default("ACTIVE") // ACTIVE, SUSPENDED, ARCHIVED
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   articles    Article[]
