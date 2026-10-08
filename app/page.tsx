@@ -20,7 +20,7 @@ export default async function HomePage({
 
   // 3. Authenticate draft preview: only authorized staff (SUPER_ADMIN, EDITOR, REPORTER) can view draft
   let isPreviewDraft = false;
-  if (searchParams?.preview === "draft") {
+  if (searchParams?.preview === "draft" || searchParams?.preview === "true") {
     const session = await getSession();
     if (session && (session.role === "SUPER_ADMIN" || session.role === "EDITOR" || session.role === "REPORTER")) {
       isPreviewDraft = true;

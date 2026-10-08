@@ -59,8 +59,8 @@ export function VideoBriefSection({
           {/* Video Thumbnail */}
           <div className="md:col-span-5 relative group overflow-hidden rounded-lg aspect-video bg-black shadow-none">
             <img
-              src={currentVideo.thumbnailUrl || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80"}
-              alt={currentVideo.title}
+              src={currentVideo.thumbnailUrl || (currentVideo as any).thumbnail || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80"}
+              alt={currentVideo.title || "Video Brief"}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
             />
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
@@ -79,7 +79,7 @@ export function VideoBriefSection({
           <div className="md:col-span-7 space-y-2">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white border border-neutral-200 dark:border-neutral-700 text-[10px] font-mono font-bold uppercase rounded">
-                {currentVideo.category?.name || "Special Report"}
+                {typeof currentVideo.category === "string" ? currentVideo.category : currentVideo.category?.name || "Special Report"}
               </span>
               <span className="text-[10px] font-mono text-gray-500 uppercase">
                 Executive Briefing

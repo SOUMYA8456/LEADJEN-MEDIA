@@ -32,10 +32,21 @@ export function PhotoGallerySection({
 
   let photoList: PhotoItem[] = [];
   try {
-    photoList = JSON.parse(gallery.images);
-  } catch {
+    if (gallery.images) {
+      const parsed = typeof gallery.images === "string" ? JSON.parse(gallery.images) : gallery.images;
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        photoList = parsed.filter((p) => p && typeof p === "object" && p.url);
+      }
+    }
+  } catch {}
+
+  if (!photoList || photoList.length === 0) {
     photoList = [
-      { url: gallery.coverImage, caption: gallery.title, photographer: gallery.photographer || "Leadjen Visuals" },
+      {
+        url: gallery.coverImage || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&q=80",
+        caption: gallery.title || "Editorial Photography",
+        photographer: gallery.photographer || "Leadjen Visuals",
+      },
     ];
   }
 

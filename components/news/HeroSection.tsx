@@ -203,8 +203,8 @@ export function HeroSection({
                 <div className="group relative rounded overflow-hidden bg-gray-900">
                   <div className="relative aspect-video">
                     <img
-                      src={rightVideo.thumbnail}
-                      alt={rightVideo.title}
+                      src={rightVideo.thumbnail || rightVideo.thumbnailUrl || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80"}
+                      alt={rightVideo.title || "Video Briefing"}
                       className="w-full h-full object-cover group-hover:scale-105 transition duration-500 opacity-90"
                     />
                     <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
@@ -212,13 +212,15 @@ export function HeroSection({
                         <Play className="w-5 h-5 fill-current ml-0.5" />
                       </div>
                     </div>
-                    <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[9px] font-mono px-1.5 py-0.5 rounded">
-                      {rightVideo.duration}
-                    </span>
+                    {rightVideo.duration && (
+                      <span className="absolute bottom-1.5 right-1.5 bg-black/80 text-white text-[9px] font-mono px-1.5 py-0.5 rounded">
+                        {rightVideo.duration}
+                      </span>
+                    )}
                   </div>
                   <div className="p-2.5 bg-gray-950">
                     <h5 className="font-serif font-bold text-xs text-white line-clamp-2 leading-tight group-hover:text-neutral-300 transition">
-                      {rightVideo.title}
+                      {rightVideo.title || "Editorial Video Dispatch"}
                     </h5>
                   </div>
                 </div>

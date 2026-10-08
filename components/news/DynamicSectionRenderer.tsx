@@ -165,9 +165,9 @@ export function DynamicSectionRenderer({
 
   // 3. HERO SECTION
   if (type === "HERO") {
-    const heroArticle = articles[0];
-    const leftArticles = articles.slice(1, (parsedSettings.leftArticlesCount || 3) + 1);
-    const rightVideo = parsedSettings.showRightVideo !== false ? videoItems[0] : null;
+    const heroArticle = Array.isArray(articles) && articles.length > 0 ? articles[0] : null;
+    const leftArticles = Array.isArray(articles) && articles.length > 1 ? articles.slice(1, (parsedSettings.leftArticlesCount || 3) + 1) : [];
+    const rightVideo = parsedSettings.showRightVideo !== false && videoItems && videoItems.length > 0 ? videoItems[0] : null;
 
     if (!heroArticle) return null;
 
@@ -199,12 +199,12 @@ export function DynamicSectionRenderer({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Link
               href={`/${heroArticle.category?.slug || "news"}/${heroArticle.slug}`}
-              className="group block relative rounded-2xl overflow-hidden bg-gray-900 shadow-xl"
+              className="group block relative rounded-2xl overflow-hidden bg-gray-900 shadow-none"
             >
               <div className="aspect-[21/9] sm:aspect-[21/8] w-full relative">
                 <img
-                  src={heroArticle.featuredImage}
-                  alt={heroArticle.title}
+                  src={heroArticle.featuredImage || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&q=80"}
+                  alt={heroArticle.title || "Lead Story"}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-80"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-transparent" />
@@ -246,14 +246,19 @@ export function DynamicSectionRenderer({
 
   // 4. LATEST NEWS + MOST READ SPLIT
   if (type === "LATEST_NEWS") {
-    const mostReadList = [...articles].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)).slice(0, 5);
+    const mostReadList = Array.isArray(articles)
+      ? [...articles].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)).slice(0, 5)
+      : [];
+    const feedArticles = Array.isArray(articles) ? articles.slice(0, 6) : [];
+
+    if (feedArticles.length === 0 && mostReadList.length === 0) return null;
 
     return (
       <section className={`w-full ${bgClass} ${borderClass} ${spacingClass}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-8">
-              <LatestNewsFeed articles={articles.slice(0, 6)} />
+              <LatestNewsFeed articles={feedArticles} />
             </div>
             <div className="lg:col-span-4 space-y-6">
               <MostRead articles={mostReadList} title="MOST READ STORIES" />
