@@ -662,7 +662,7 @@ export function Header() {
                   <div className="space-y-3">
                     <h3 className="font-mono text-xs font-bold uppercase tracking-wider text-[#1E1B1A] dark:text-white flex items-center gap-1.5 pb-1.5 border-b border-gray-200 dark:border-gray-800">
                       <Globe className="w-3.5 h-3.5" />
-                      ABOUT LEADJEN
+                      ABOUT LEADJEN MEDIA
                     </h3>
                     <ul className="space-y-2 text-xs font-sans text-gray-700 dark:text-gray-300">
                       <li>

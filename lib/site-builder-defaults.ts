@@ -844,7 +844,7 @@ export const DEFAULT_SITE_BUILDER_CONFIG: SiteBuilderConfig = {
         ],
       },
       {
-        title: "Company Services",
+        title: "About Leadjen Media",
         links: [
           { label: "About Leadjen Media", url: "/about" },
           { label: "Digital Marketing Agency", url: "/services/digital-marketing-agency" },

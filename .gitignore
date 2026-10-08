@@ -40,3 +40,6 @@ next-env.d.ts
 # local database cluster & backups
 /pgdata
 /backups/*.json
+
+.vercel
+.env*
