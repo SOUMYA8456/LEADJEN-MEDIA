@@ -7,6 +7,78 @@ import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
+const ARTICLE_CARD_SELECT = {
+  id: true,
+  title: true,
+  slug: true,
+  subtitle: true,
+  excerpt: true,
+  featuredImage: true,
+  readingTime: true,
+  publishedAt: true,
+  isBreaking: true,
+  isFeatured: true,
+  isTrending: true,
+  isVideo: true,
+  viewCount: true,
+  status: true,
+  category: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      color: true,
+    },
+  },
+  author: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      avatar: true,
+      designation: true,
+    },
+  },
+};
+
+function formatArticleForCard(art: any): ArticleData | null {
+  if (!art) return null;
+  let featuredImage = art.featuredImage;
+  if (featuredImage && typeof featuredImage === "string" && featuredImage.startsWith("data:")) {
+    featuredImage = `/api/articles/${art.id}/image`;
+  }
+  return {
+    id: art.id,
+    title: art.title || "",
+    slug: art.slug || "",
+    subtitle: art.subtitle || null,
+    excerpt: art.excerpt || "",
+    featuredImage: featuredImage || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&q=80",
+    category: art.category
+      ? {
+          name: art.category.name,
+          slug: art.category.slug,
+          color: art.category.color || null,
+        }
+      : { name: "News", slug: "news", color: null },
+    author: art.author
+      ? {
+          name: art.author.name,
+          slug: art.author.slug,
+          avatar: art.author.avatar || null,
+          designation: art.author.designation || null,
+        }
+      : { name: "Leadjen Media", slug: "leadjen-media", avatar: null, designation: null },
+    readingTime: Number(art.readingTime) || 3,
+    publishedAt: art.publishedAt,
+    isBreaking: Boolean(art.isBreaking),
+    isFeatured: Boolean(art.isFeatured),
+    isTrending: Boolean(art.isTrending),
+    isVideo: Boolean(art.isVideo),
+    viewCount: Number(art.viewCount) || 0,
+  };
+}
+
 export default async function HomePage({
   searchParams,
 }: {
@@ -57,7 +129,7 @@ export default async function HomePage({
           manualArticles: {
             include: {
               article: {
-                include: { category: true, author: true },
+                select: ARTICLE_CARD_SELECT,
               },
             },
             orderBy: { sortOrder: "asc" },
@@ -90,7 +162,7 @@ export default async function HomePage({
             manualArticles: {
               include: {
                 article: {
-                  include: { category: true, author: true },
+                  select: ARTICLE_CARD_SELECT,
                 },
               },
               orderBy: { sortOrder: "asc" },
@@ -159,7 +231,7 @@ export default async function HomePage({
   const sections = Array.isArray(rawSections) ? rawSections.filter(Boolean) : [];
   const trendingTopics = trendingList.map((t) => t.title).filter(Boolean);
 
-  // 6. Resilient content fetching per section
+  // 6. Resilient lightweight content fetching per section
   const statusFilter = isPreviewDraft ? undefined : "PUBLISHED";
   const dateFilter = isPreviewDraft ? undefined : { lte: now };
 
@@ -171,59 +243,66 @@ export default async function HomePage({
         if (sec.contentSource === "MANUAL" && Array.isArray(sec.manualArticles) && sec.manualArticles.length > 0) {
           articles = sec.manualArticles
             .map((m: any) => m?.article)
-            .filter((a: any) => a && (isPreviewDraft || (a.status === "PUBLISHED" && (!a.publishedAt || a.publishedAt <= now)))) as any;
+            .filter((a: any) => a && (isPreviewDraft || (a.status === "PUBLISHED" && (!a.publishedAt || a.publishedAt <= now))))
+            .map(formatArticleForCard)
+            .filter(Boolean) as ArticleData[];
         } else if (sec.contentSource === "CATEGORY" && sec.categoryId) {
-          articles = (await prisma.article.findMany({
+          const raw = await prisma.article.findMany({
             where: {
               categoryId: sec.categoryId,
               ...(statusFilter ? { status: statusFilter } : {}),
               ...(dateFilter ? { publishedAt: dateFilter } : {}),
             },
-            include: { category: true, author: true },
+            select: ARTICLE_CARD_SELECT,
             orderBy: { publishedAt: "desc" },
             take: Number(sec.storyLimit) || 4,
-          })) as any;
+          });
+          articles = raw.map(formatArticleForCard).filter(Boolean) as ArticleData[];
         } else if (sec.contentSource === "FEATURED" || sec.type === "HERO") {
-          articles = (await prisma.article.findMany({
+          const raw = await prisma.article.findMany({
             where: {
               ...(statusFilter ? { status: statusFilter } : {}),
               ...(dateFilter ? { publishedAt: dateFilter } : {}),
             },
-            include: { category: true, author: true },
+            select: ARTICLE_CARD_SELECT,
             orderBy: [{ isFeatured: "desc" }, { publishedAt: "desc" }],
             take: Math.max(Number(sec.storyLimit) || 5, 5),
-          })) as any;
+          });
+          articles = raw.map(formatArticleForCard).filter(Boolean) as ArticleData[];
         } else if (sec.contentSource === "TRENDING" || sec.type === "TRENDING") {
-          articles = (await prisma.article.findMany({
+          const raw = await prisma.article.findMany({
             where: {
               isTrending: true,
               ...(statusFilter ? { status: statusFilter } : {}),
               ...(dateFilter ? { publishedAt: dateFilter } : {}),
             },
-            include: { category: true, author: true },
+            select: ARTICLE_CARD_SELECT,
             orderBy: { publishedAt: "desc" },
             take: Number(sec.storyLimit) || 4,
-          })) as any;
+          });
+          articles = raw.map(formatArticleForCard).filter(Boolean) as ArticleData[];
         } else if (sec.contentSource === "MOST_READ" || sec.type === "MOST_READ") {
-          articles = (await prisma.article.findMany({
+          const raw = await prisma.article.findMany({
             where: {
               ...(statusFilter ? { status: statusFilter } : {}),
               ...(dateFilter ? { publishedAt: dateFilter } : {}),
             },
-            include: { category: true, author: true },
+            select: ARTICLE_CARD_SELECT,
             orderBy: { viewCount: "desc" },
             take: Number(sec.storyLimit) || 6,
-          })) as any;
-        } else if (sec.contentSource === "LATEST" || sec.type === "LATEST_NEWS" || sec.type === "NEWS_GRID") {
-          articles = (await prisma.article.findMany({
+          });
+          articles = raw.map(formatArticleForCard).filter(Boolean) as ArticleData[];
+        } else if (sec.contentSource === "LATEST" || sec.type === "LATEST_NEWS" || sec.type === "NEWS_GRID" || sec.type === "EDITORIAL_DISPATCH") {
+          const raw = await prisma.article.findMany({
             where: {
               ...(statusFilter ? { status: statusFilter } : {}),
               ...(dateFilter ? { publishedAt: dateFilter } : {}),
             },
-            include: { category: true, author: true },
+            select: ARTICLE_CARD_SELECT,
             orderBy: { publishedAt: "desc" },
             take: Number(sec.storyLimit) || 6,
-          })) as any;
+          });
+          articles = raw.map(formatArticleForCard).filter(Boolean) as ArticleData[];
         }
       } catch (secFetchErr: any) {
         console.warn(`[Homepage] Error resolving articles for section ${sec.name || sec.id}:`, secFetchErr?.message || secFetchErr);
