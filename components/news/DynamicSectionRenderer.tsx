@@ -61,6 +61,11 @@ export function DynamicSectionRenderer({
   sidebarAd = null,
   liveUpdates = [],
 }: SectionRenderProps) {
+  const safeArticles = Array.isArray(articles) ? articles.filter(Boolean) : [];
+  const safeBreaking = Array.isArray(breakingItems) ? breakingItems : [];
+  const safeTrending = Array.isArray(trendingTopics) ? trendingTopics : [];
+  const safeVideos = Array.isArray(videoItems) ? videoItems : [];
+
   const {
     type,
     title,
@@ -148,7 +153,7 @@ export function DynamicSectionRenderer({
       <div className={`w-full ${borderClass}`}>
         <VideoBriefSection
           title={sectionHeading || "SPECIAL LEADJEN VIDEO BRIEF"}
-          video={videoItems[0]}
+          video={safeVideos[0]}
         />
       </div>
     );
@@ -158,16 +163,16 @@ export function DynamicSectionRenderer({
   if (type === "BREAKING_TICKER") {
     return (
       <div className={`w-full ${borderClass}`}>
-        <BreakingTicker items={breakingItems} trendingTopics={trendingTopics} />
+        <BreakingTicker items={safeBreaking} trendingTopics={safeTrending} />
       </div>
     );
   }
 
   // 3. HERO SECTION
   if (type === "HERO") {
-    const heroArticle = Array.isArray(articles) && articles.length > 0 ? articles[0] : null;
-    const leftArticles = Array.isArray(articles) && articles.length > 1 ? articles.slice(1, (parsedSettings.leftArticlesCount || 3) + 1) : [];
-    const rightVideo = parsedSettings.showRightVideo !== false && videoItems && videoItems.length > 0 ? videoItems[0] : null;
+    const heroArticle = safeArticles.length > 0 ? safeArticles[0] : null;
+    const leftArticles = safeArticles.length > 1 ? safeArticles.slice(1, (parsedSettings.leftArticlesCount || 3) + 1) : [];
+    const rightVideo = parsedSettings.showRightVideo !== false && safeVideos.length > 0 ? safeVideos[0] : null;
 
     if (!heroArticle) return null;
 
@@ -246,10 +251,8 @@ export function DynamicSectionRenderer({
 
   // 4. LATEST NEWS + MOST READ SPLIT
   if (type === "LATEST_NEWS") {
-    const mostReadList = Array.isArray(articles)
-      ? [...articles].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)).slice(0, 5)
-      : [];
-    const feedArticles = Array.isArray(articles) ? articles.slice(0, 6) : [];
+    const mostReadList = [...safeArticles].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)).slice(0, 5);
+    const feedArticles = safeArticles.slice(0, 6);
 
     if (feedArticles.length === 0 && mostReadList.length === 0) return null;
 
@@ -274,7 +277,7 @@ export function DynamicSectionRenderer({
   if (type === "VIDEO") {
     return (
       <div className={`w-full ${bgClass} ${borderClass}`}>
-        <VideoNewsSection videos={videoItems} />
+        <VideoNewsSection videos={safeVideos} />
       </div>
     );
   }
@@ -318,7 +321,7 @@ export function DynamicSectionRenderer({
 
   // 8. MOST READ STANDALONE
   if (type === "MOST_READ") {
-    const mostReadList = [...articles].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)).slice(0, 8);
+    const mostReadList = [...safeArticles].sort((a, b) => (b.viewCount || 0) - (a.viewCount || 0)).slice(0, 8);
     return (
       <section className={`w-full ${bgClass} ${borderClass} ${spacingClass}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -357,7 +360,7 @@ export function DynamicSectionRenderer({
   }
 
   // 9. GENERAL CATEGORY & NEWS GRIDS
-  if (articles.length === 0) return null;
+  if (safeArticles.length === 0) return null;
 
   return (
     <section className={`w-full ${bgClass} ${borderClass} ${spacingClass}`}>
@@ -392,15 +395,15 @@ export function DynamicSectionRenderer({
         {layout === "featured-split" && (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             <div className="lg:col-span-7">
-              {articles[0] && (
+              {safeArticles[0] && (
                 <NewsCard
-                  article={articles[0]}
+                  article={safeArticles[0]}
                   showExcerpt={showExcerpt}
                 />
               )}
             </div>
             <div className="lg:col-span-5 space-y-4">
-              {articles.slice(1, 4).map((art) => (
+              {safeArticles.slice(1, 4).map((art) => (
                 <CompactNewsCard key={art.id} article={art} />
               ))}
             </div>
@@ -410,7 +413,7 @@ export function DynamicSectionRenderer({
         {/* Layout: THREE-COLUMN */}
         {layout === "three-col" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {articles.slice(0, 3).map((art) => (
+            {safeArticles.slice(0, 3).map((art) => (
               <NewsCard
                 key={art.id}
                 article={art}
@@ -423,7 +426,7 @@ export function DynamicSectionRenderer({
         {/* Layout: FOUR-COLUMN */}
         {layout === "four-col" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {articles.slice(0, 4).map((art) => (
+            {safeArticles.slice(0, 4).map((art) => (
               <NewsCard
                 key={art.id}
                 article={art}
@@ -436,7 +439,7 @@ export function DynamicSectionRenderer({
         {/* Layout: HORIZONTAL-LIST */}
         {layout === "horizontal-list" && (
           <div className="space-y-4">
-            {articles.slice(0, 4).map((art) => (
+            {safeArticles.slice(0, 4).map((art) => (
               <HorizontalNewsCard key={art.id} article={art} />
             ))}
           </div>
@@ -445,7 +448,7 @@ export function DynamicSectionRenderer({
         {/* Layout: COMPACT-LIST */}
         {layout === "compact-list" && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {articles.slice(0, 6).map((art) => (
+            {safeArticles.slice(0, 6).map((art) => (
               <CompactNewsCard key={art.id} article={art} />
             ))}
           </div>
@@ -458,7 +461,7 @@ export function DynamicSectionRenderer({
               desktopCols === 4 ? "lg:grid-cols-4" : desktopCols === 2 ? "lg:grid-cols-2" : "lg:grid-cols-3"
             } gap-6`}
           >
-            {articles.map((art) => (
+            {safeArticles.map((art) => (
               <NewsCard
                 key={art.id}
                 article={art}

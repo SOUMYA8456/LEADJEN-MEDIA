@@ -4,7 +4,7 @@ import prisma from "@/lib/db";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjen-media-news.vercel.app";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.leadjenmediadaily.com";
 
   try {
     const articles = await prisma.article.findMany({

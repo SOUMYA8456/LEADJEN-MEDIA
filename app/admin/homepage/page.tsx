@@ -173,6 +173,25 @@ export default function HomepageBuilderPage() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, [hasUnsavedChanges]);
 
+  // Fullscreen preview scroll-lock and escape key listener
+  useEffect(() => {
+    if (isFullscreenPreviewOpen) {
+      document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") {
+          setIsFullscreenPreviewOpen(false);
+        }
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "";
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    } else {
+      document.body.style.overflow = "";
+    }
+  }, [isFullscreenPreviewOpen]);
+
   const fetchData = async () => {
     try {
       setLoading(true);
@@ -1554,34 +1573,118 @@ export default function HomepageBuilderPage() {
       {/* Fullscreen Preview Modal */}
       {isFullscreenPreviewOpen && (
         <div className="fixed inset-0 z-50 bg-black/95 flex flex-col">
-          <div className="bg-gray-900 border-b border-gray-800 px-6 py-3 flex items-center justify-between">
-            <span className="font-serif font-black text-lg text-white">FULLSCREEN DRAFT PREVIEW</span>
+          <div className="bg-gray-900 border-b border-gray-800 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
             <div className="flex items-center gap-3">
+              <span className="font-serif font-black text-base sm:text-lg text-white">FULLSCREEN DRAFT PREVIEW</span>
+              <span className="px-2 py-0.5 bg-amber-950 text-amber-300 text-[10px] font-mono font-bold rounded-full border border-amber-800 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
+                DRAFT
+              </span>
+            </div>
+
+            {/* Device Switcher & Preview Controls */}
+            <div className="flex items-center gap-2">
+              <div className="flex bg-gray-950 p-1 rounded-lg border border-gray-800">
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice("desktop")}
+                  className={`p-1.5 rounded text-xs font-mono font-bold flex items-center gap-1 transition ${
+                    previewDevice === "desktop"
+                      ? "bg-leadjen-600 text-white"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                  title="Desktop View (100% / 1280px)"
+                >
+                  <Monitor className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Desktop</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice("tablet")}
+                  className={`p-1.5 rounded text-xs font-mono font-bold flex items-center gap-1 transition ${
+                    previewDevice === "tablet"
+                      ? "bg-leadjen-600 text-white"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                  title="Tablet View (768px)"
+                >
+                  <Tablet className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Tablet</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPreviewDevice("mobile")}
+                  className={`p-1.5 rounded text-xs font-mono font-bold flex items-center gap-1 transition ${
+                    previewDevice === "mobile"
+                      ? "bg-leadjen-600 text-white"
+                      : "text-gray-400 hover:text-white"
+                  }`}
+                  title="Mobile View (390px)"
+                >
+                  <Smartphone className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">Mobile</span>
+                </button>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setPreviewKey(Date.now())}
+                className="p-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-xs transition border border-gray-700"
+                title="Reload Preview"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
+
+              <a
+                href={`/?preview=draft&t=${previewKey}`}
+                target="_blank"
+                rel="noreferrer"
+                className="p-2 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg text-xs transition border border-gray-700"
+                title="Open in new window"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            </div>
+
+            <div className="flex items-center gap-2">
               <button
                 type="button"
                 onClick={() => {
                   setIsFullscreenPreviewOpen(false);
                   setIsPublishConfirmOpen(true);
                 }}
-                className="px-4 py-2 bg-leadjen-600 hover:bg-leadjen-700 text-white rounded-xl text-xs font-bold uppercase"
+                className="px-4 py-1.5 bg-leadjen-600 hover:bg-leadjen-700 text-white rounded-xl text-xs font-bold uppercase shadow tracking-wider transition"
               >
                 Publish Live
               </button>
               <button
                 type="button"
                 onClick={() => setIsFullscreenPreviewOpen(false)}
-                className="p-2 text-gray-400 hover:text-white"
+                className="p-1.5 text-gray-400 hover:text-white rounded-lg hover:bg-gray-800 transition"
+                title="Close (Esc)"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
           </div>
-          <div className="flex-1 bg-neutral-900 p-4 overflow-y-auto flex items-start justify-center">
-            <iframe
-              src={`/?preview=draft&t=${previewKey}`}
-              className="w-full h-full min-h-[90vh] border-0 bg-white rounded-xl"
-              title="Fullscreen Preview"
-            />
+
+          {/* Iframe Viewport Area */}
+          <div className="flex-1 bg-neutral-950 p-2 sm:p-4 overflow-y-auto flex items-center justify-center">
+            <div
+              className={`h-full w-full transition-all duration-300 flex items-center justify-center ${
+                previewDevice === "mobile"
+                  ? "max-w-[400px] py-4"
+                  : previewDevice === "tablet"
+                  ? "max-w-[800px] py-4"
+                  : "max-w-[1400px]"
+              }`}
+            >
+              <iframe
+                src={`/?preview=draft&t=${previewKey}`}
+                className="w-full h-full min-h-[85vh] border border-gray-800 bg-white rounded-xl shadow-2xl"
+                title="Fullscreen Preview"
+              />
+            </div>
           </div>
         </div>
       )}
