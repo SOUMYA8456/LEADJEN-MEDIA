@@ -2,13 +2,28 @@ const { PrismaClient } = require('@prisma/client');
 const fs = require('fs');
 const path = require('path');
 
+function resolveProdDbUrl(customDbUrl = null) {
+  if (customDbUrl) return customDbUrl;
+  if (process.env.PRODUCTION_DATABASE_URL) return process.env.PRODUCTION_DATABASE_URL;
+  if (fs.existsSync('.env.vercel')) {
+    const envContent = fs.readFileSync('.env.vercel', 'utf8');
+    for (const line of envContent.split('\n')) {
+      if (line.startsWith('DATABASE_URL=')) {
+        return line.substring('DATABASE_URL='.length).trim().replace(/^"|"$/g, '');
+      }
+    }
+  }
+  return process.env.DATABASE_URL;
+}
+
 async function backupProductionDatabase(customDbUrl = null) {
-  const dbUrl = customDbUrl || process.env.PRODUCTION_DATABASE_URL || process.env.DATABASE_URL;
+  const dbUrl = resolveProdDbUrl(customDbUrl);
 
   if (!dbUrl) {
     throw new Error('No DATABASE_URL or PRODUCTION_DATABASE_URL provided.');
   }
 
+  const maskedHost = dbUrl.replace(/:\/\/[^:]+:[^@]+@/, '://***:***@');
   const prisma = new PrismaClient({
     datasources: { db: { url: dbUrl } }
   });
@@ -24,6 +39,7 @@ async function backupProductionDatabase(customDbUrl = null) {
   console.log('================================================================');
   console.log('LEADJEN MEDIA — PRODUCTION DATABASE PRE-MIGRATION BACKUP');
   console.log('================================================================');
+  console.log(`Connecting to: ${maskedHost}`);
 
   try {
     const [
@@ -68,7 +84,8 @@ async function backupProductionDatabase(customDbUrl = null) {
 
     const backupData = {
       metadata: {
-        environment: 'PRODUCTION',
+        environment: 'VERCEL_PRODUCTION',
+        targetHost: maskedHost,
         timestamp: new Date().toISOString(),
         version: '1.0.0'
       },
