@@ -32,14 +32,17 @@ yarn-error.log*
 
 # vercel deployment metadata
 .vercel
+.vercel/
+/.vercel/
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
 
-# local database cluster & backups
+# local database cluster, temporary files, and backups
 /pgdata
-/backups/*.json
-
-.vercel
+/backups/
+/scratch/
+*.docx
+~*
 .env*
