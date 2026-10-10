@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   Headphones,
@@ -90,17 +90,33 @@ const FEATURED_EPISODES: AudioEpisode[] = [
 ];
 
 export default function ListenPage() {
+  const [episodes, setEpisodes] = useState<AudioEpisode[]>(FEATURED_EPISODES);
   const [activeEpisode, setActiveEpisode] = useState<AudioEpisode>(FEATURED_EPISODES[0]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [playbackSpeed, setPlaybackSpeed] = useState<"1x" | "1.25x" | "1.5x" | "2x">("1x");
   const [selectedCategory, setSelectedCategory] = useState<string>("ALL");
 
+  useEffect(() => {
+    fetch("/api/podcasts")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data.episodes) && data.episodes.length > 0) {
+          setEpisodes(data.episodes);
+          setActiveEpisode((current) => {
+            const found = data.episodes.find((e: AudioEpisode) => e.id === current.id);
+            return found || data.episodes[0];
+          });
+        }
+      })
+      .catch((err) => console.warn("[Listen Page] Podcasts fetch error:", err));
+  }, []);
+
   const categories = ["ALL", "Daily Briefing", "Technology", "Business", "World", "Science"];
 
   const filteredEpisodes =
     selectedCategory === "ALL"
-      ? FEATURED_EPISODES
-      : FEATURED_EPISODES.filter((ep) => ep.category === selectedCategory);
+      ? episodes
+      : episodes.filter((ep) => ep.category === selectedCategory);
 
   const togglePlay = (episode: AudioEpisode) => {
     if (activeEpisode.id === episode.id) {

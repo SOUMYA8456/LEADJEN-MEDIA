@@ -5,39 +5,126 @@ export const ALLOWED_IMAGE_MIME_TYPES = [
   "image/png",
   "image/webp",
   "image/gif",
+  "image/avif",
   "image/jpg",
 ];
 
-export const ALLOWED_IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif"];
-export const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+export const ALLOWED_AUDIO_MIME_TYPES = [
+  "audio/mpeg",
+  "audio/mp3",
+  "audio/wav",
+  "audio/aac",
+  "audio/m4a",
+  "audio/ogg",
+  "audio/x-m4a",
+];
+
+export const ALLOWED_VIDEO_MIME_TYPES = [
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
+];
+
+export const ALLOWED_IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".avif"];
+export const ALLOWED_AUDIO_EXTENSIONS = [".mp3", ".wav", ".aac", ".m4a", ".ogg"];
+export const ALLOWED_VIDEO_EXTENSIONS = [".mp4", ".webm", ".mov"];
+
+export const MAX_IMAGE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
+export const MAX_AUDIO_SIZE_BYTES = 50 * 1024 * 1024; // 50MB
+export const MAX_VIDEO_SIZE_BYTES = 100 * 1024 * 1024; // 100MB
 
 export interface ValidationResult {
   valid: boolean;
+  mediaCategory?: "image" | "audio" | "video";
   error?: string;
 }
 
-export function validateImageFile(file: File | { name: string; type: string; size: number }): ValidationResult {
+/**
+ * Validates file extension, MIME type, and size.
+ * Disallows executable scripts, HTML, SVG, or path traversal patterns.
+ */
+export function validateMediaFile(
+  file: File | { name: string; type: string; size: number }
+): ValidationResult {
   if (!file) {
     return { valid: false, error: "No file provided" };
   }
 
-  if (file.size > MAX_FILE_SIZE_BYTES) {
-    return { valid: false, error: "Image is too large. Maximum allowed size is 10MB." };
+  const mimeType = (file.type || "").toLowerCase().trim();
+  const rawFileName = (file.name || "").toLowerCase().trim();
+
+  // Guard against path traversal patterns
+  if (rawFileName.includes("..") || rawFileName.includes("/") || rawFileName.includes("\\")) {
+    return { valid: false, error: "Invalid filename. Path traversal characters detected." };
   }
 
-  const mimeType = file.type?.toLowerCase();
-  const fileName = file.name?.toLowerCase() || "";
-  const hasValidExtension = ALLOWED_IMAGE_EXTENSIONS.some((ext) => fileName.endsWith(ext));
+  // Determine media category
+  const isImage =
+    ALLOWED_IMAGE_MIME_TYPES.includes(mimeType) ||
+    ALLOWED_IMAGE_EXTENSIONS.some((ext) => rawFileName.endsWith(ext));
 
-  if (!ALLOWED_IMAGE_MIME_TYPES.includes(mimeType) && !hasValidExtension) {
-    return { valid: false, error: "Unsupported image format. Please upload JPG, PNG, WEBP, or GIF." };
+  const isAudio =
+    ALLOWED_AUDIO_MIME_TYPES.includes(mimeType) ||
+    ALLOWED_AUDIO_EXTENSIONS.some((ext) => rawFileName.endsWith(ext));
+
+  const isVideo =
+    ALLOWED_VIDEO_MIME_TYPES.includes(mimeType) ||
+    ALLOWED_VIDEO_EXTENSIONS.some((ext) => rawFileName.endsWith(ext));
+
+  if (!isImage && !isAudio && !isVideo) {
+    return {
+      valid: false,
+      error:
+        "Unsupported file format. Please upload an image (JPG, PNG, WEBP, GIF), audio podcast (MP3, WAV, AAC, M4A), or video (MP4, WEBM).",
+    };
   }
 
-  return { valid: true };
+  if (isImage) {
+    if (file.size > MAX_IMAGE_SIZE_BYTES) {
+      return { valid: false, error: "Image file exceeds maximum limit of 10 MB." };
+    }
+    return { valid: true, mediaCategory: "image" };
+  }
+
+  if (isAudio) {
+    if (file.size > MAX_AUDIO_SIZE_BYTES) {
+      return { valid: false, error: "Audio file exceeds maximum limit of 50 MB." };
+    }
+    return { valid: true, mediaCategory: "audio" };
+  }
+
+  if (isVideo) {
+    if (file.size > MAX_VIDEO_SIZE_BYTES) {
+      return { valid: false, error: "Video file exceeds maximum limit of 100 MB." };
+    }
+    return { valid: true, mediaCategory: "video" };
+  }
+
+  return { valid: false, error: "Unsupported file type" };
+}
+
+// Backward-compatible alias for existing callers
+export function validateImageFile(file: File | { name: string; type: string; size: number }): ValidationResult {
+  return validateMediaFile(file);
 }
 
 /**
- * Uploads media using Cloudinary (if configured with API secret) or falls back to permanent data storage.
+ * Generates safe, sanitized filename with random hash to prevent naming collisions
+ */
+export function generateSafeFilename(originalName: string): string {
+  const sanitized = originalName.replace(/[^a-zA-Z0-9._-]/g, "_");
+  const randomSuffix = crypto.randomBytes(4).toString("hex");
+  const dotIndex = sanitized.lastIndexOf(".");
+  if (dotIndex !== -1) {
+    const base = sanitized.substring(0, dotIndex).substring(0, 50);
+    const ext = sanitized.substring(dotIndex);
+    return `${Date.now()}_${base}_${randomSuffix}${ext}`;
+  }
+  return `${Date.now()}_${sanitized.substring(0, 50)}_${randomSuffix}`;
+}
+
+/**
+ * Uploads media using Cloudinary (if credentials exist) or persists in permanent storage.
  */
 export async function uploadMedia(
   buffer: Buffer,
@@ -48,21 +135,29 @@ export async function uploadMedia(
   const apiKey = process.env.CLOUDINARY_API_KEY;
   const apiSecret = process.env.CLOUDINARY_API_SECRET;
 
+  const safeFilename = generateSafeFilename(filename);
+
   // 1. If Cloudinary credentials exist, perform signed upload
-  if (cloudName && apiKey && apiSecret) {
+  if (cloudName && apiKey && apiSecret && cloudName.trim() && apiKey.trim() && apiSecret.trim()) {
     try {
       const timestamp = Math.floor(Date.now() / 1000);
       const signatureString = `timestamp=${timestamp}${apiSecret}`;
       const signature = crypto.createHash("sha1").update(signatureString).digest("hex");
 
+      const resourceType = mimeType.startsWith("video/")
+        ? "video"
+        : mimeType.startsWith("audio/")
+        ? "auto"
+        : "image";
+
       const formData = new FormData();
       const blob = new Blob([new Uint8Array(buffer)], { type: mimeType });
-      formData.append("file", blob, filename);
+      formData.append("file", blob, safeFilename);
       formData.append("api_key", apiKey);
       formData.append("timestamp", timestamp.toString());
       formData.append("signature", signature);
 
-      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/${resourceType}/upload`, {
         method: "POST",
         body: formData,
       });
@@ -72,23 +167,21 @@ export async function uploadMedia(
         if (data.secure_url) {
           return {
             url: data.secure_url,
-            publicId: data.public_id || filename,
+            publicId: data.public_id || safeFilename,
           };
         }
       } else {
-        console.warn("Cloudinary upload returned non-200, falling back to permanent storage:", await res.text());
+        console.warn("[Storage] Cloudinary upload returned non-200, falling back to permanent storage:", await res.text());
       }
     } catch (cloudErr) {
-      console.warn("Cloudinary upload failed, falling back to permanent data URI storage:", cloudErr);
+      console.warn("[Storage] Cloudinary upload failed, falling back to permanent storage:", cloudErr);
     }
   }
 
-  // 2. Permanent Data URI Storage Fallback
-  // On Serverless (Vercel), writing to local disk filesystem is ephemeral.
-  // Data URIs stored directly in PostgreSQL are 100% permanent, self-contained, and never break.
+  // 2. Permanent Data Storage Fallback (Stored in Postgres)
   const base64Data = buffer.toString("base64");
   const dataUrl = `data:${mimeType};base64,${base64Data}`;
-  const publicId = `media_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  const publicId = `media_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
 
   return {
     url: dataUrl,

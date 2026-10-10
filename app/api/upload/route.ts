@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSessionFromRequest } from "@/lib/auth";
 import prisma from "@/lib/db";
-import { validateImageFile, uploadMedia } from "@/lib/storage";
+import { validateMediaFile, uploadMedia, generateSafeFilename } from "@/lib/storage";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   try {
     const user = getSessionFromRequest(req);
     if (!user || (user.role !== "SUPER_ADMIN" && user.role !== "EDITOR" && user.role !== "REPORTER")) {
-      return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized access. Staff permission required." }, { status: 401 });
     }
 
     let formData: FormData;
@@ -23,8 +25,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // 1. Validate File
-    const validation = validateImageFile(file);
+    // 1. Validate File format & size
+    const validation = validateMediaFile(file);
     if (!validation.valid) {
       return NextResponse.json({ error: validation.error }, { status: 400 });
     }
@@ -40,7 +42,7 @@ export async function POST(req: NextRequest) {
     const altText = file.name.replace(/\.[^/.]+$/, "").replace(/[_-]/g, " ");
     const media = await prisma.media.create({
       data: {
-        filename: file.name,
+        filename: generateSafeFilename(file.name),
         originalName: file.name,
         url,
         publicId,
@@ -49,6 +51,11 @@ export async function POST(req: NextRequest) {
         altText,
       },
     });
+
+    // Clean streaming URL for clients (NEVER send raw base64 string to caller!)
+    const cleanPublicUrl = url.startsWith("data:")
+      ? `/api/media/${media.id}/file`
+      : url;
 
     // 5. Audit Log Entry
     try {
@@ -61,22 +68,29 @@ export async function POST(req: NextRequest) {
           entityType: "MEDIA",
           entityId: media.id,
           entityTitle: file.name,
-          details: JSON.stringify({ size: file.size, mimeType: file.type }),
+          details: JSON.stringify({
+            size: file.size,
+            mimeType: file.type,
+            category: validation.mediaCategory,
+          }),
         },
       });
     } catch (auditErr) {
-      console.warn("Could not write audit log for media upload:", auditErr);
+      console.warn("[Upload API] Could not write audit log:", auditErr);
     }
 
     return NextResponse.json({
       success: true,
-      url,
-      media,
+      url: cleanPublicUrl,
+      media: {
+        ...media,
+        url: cleanPublicUrl,
+      },
     });
   } catch (error: any) {
     console.error("Upload API error:", error);
     return NextResponse.json(
-      { error: "Upload failed. Please try again." },
+      { error: "Upload failed. Please check file format and size." },
       { status: 500 }
     );
   }
