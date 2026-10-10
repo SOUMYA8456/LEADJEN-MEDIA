@@ -35,7 +35,7 @@ const FONT_HEADING_OPTIONS = [
 ];
 
 const FONT_BODY_OPTIONS = [
-  { label: "Inter / System Sans (Optimized Newsroom)", value: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)" },
+  { label: "Inter / System Sans (Optimized Newsroom)", value: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', LINESeedJP, sans-serif)" },
   { label: "Source Sans 3 (Editorial Sans)", value: "'Source Sans 3', -apple-system, sans-serif" },
   { label: "Georgia (Serif Long-Form Reading)", value: "Georgia, serif" },
 ];

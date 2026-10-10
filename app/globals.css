@@ -26,7 +26,7 @@
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
-    font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+    font-family: var(--font-sans, -apple-system, BlinkMacSystemFont, "Segoe UI", "LINESeedJP", sans-serif);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     overflow-x: hidden;

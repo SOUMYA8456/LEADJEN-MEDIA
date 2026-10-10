@@ -289,8 +289,8 @@ export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   },
   typography: {
     headingFont: "Georgia, Cambria, 'Times New Roman', Times, serif",
-    bodyFont: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
-    uiFont: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif)",
+    bodyFont: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', LINESeedJP, sans-serif)",
+    uiFont: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', LINESeedJP, sans-serif)",
     h1Desktop: 44,
     h1Tablet: 36,
     h1Mobile: 28,
