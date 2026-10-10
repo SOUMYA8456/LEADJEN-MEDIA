@@ -289,8 +289,8 @@ export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   },
   typography: {
     headingFont: "Georgia, Cambria, 'Times New Roman', Times, serif",
-    bodyFont: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', LINESeedJP, sans-serif)",
-    uiFont: "var(--font-sans, -apple-system, BlinkMacSystemFont, 'Segoe UI', LINESeedJP, sans-serif)",
+    bodyFont: "'LINESeedJP', 'LINE Seed JP', var(--font-sans), sans-serif",
+    uiFont: "'LINESeedJP', 'LINE Seed JP', var(--font-sans), sans-serif",
     h1Desktop: 44,
     h1Tablet: 36,
     h1Mobile: 28,
@@ -906,8 +906,9 @@ export function generateThemeCss(config?: Partial<SiteBuilderConfig>): string {
   --leadjen-black: ${colors.textPrimary || "#0a0a0a"};
 
   --font-heading: ${typo.headingFont || "Georgia, serif"};
-  --font-body: ${typo.bodyFont || "inherit"};
-  --font-ui: ${typo.uiFont || "inherit"};
+  --font-sans: ${typo.bodyFont || "'LINESeedJP', 'LINE Seed JP', sans-serif"};
+  --font-body: ${typo.bodyFont || "'LINESeedJP', 'LINE Seed JP', sans-serif"};
+  --font-ui: ${typo.uiFont || "'LINESeedJP', 'LINE Seed JP', sans-serif"};
 
   --h1-size: ${typo.h1Desktop || 44}px;
   --h1-lh: ${typo.h1LineHeight || 1.15};

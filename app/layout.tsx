@@ -8,7 +8,7 @@ import { Footer } from "@/components/layout/Footer";
 import prisma from "@/lib/db";
 import { DEFAULT_SITE_BUILDER_CONFIG, generateThemeCss, SiteBuilderConfig } from "@/lib/site-builder-defaults";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "LEADJEN MEDIA | Independent Journalism. Important Stories.",
@@ -110,6 +110,12 @@ export default async function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=LINE+Seed+JP:wght@100;200;300;400;500;600;700;800;900&display=swap"
+        />
         <style id="leadjen-theme-vars" dangerouslySetInnerHTML={{ __html: themeCss }} />
         <script
           type="application/ld+json"

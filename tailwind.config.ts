@@ -45,7 +45,7 @@ const config: Config = {
       },
       fontFamily: {
         serif: ["Georgia", "Cambria", "'Times New Roman'", "Times", "serif"],
-        sans: ["Inter", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "LINESeedJP", "sans-serif"],
+        sans: ["LINESeedJP", "'LINE Seed JP'", "var(--font-inter)", "-apple-system", "BlinkMacSystemFont", "'Segoe UI'", "sans-serif"],
         mono: ["Consolas", "Monaco", "'Courier New'", "monospace"],
       },
       screens: {
