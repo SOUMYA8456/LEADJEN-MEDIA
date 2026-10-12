@@ -8,42 +8,55 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
+function getSafeAuthorAvatarUrl(avatar: string | null | undefined, siteUrl: string): string {
+  if (!avatar) return "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80";
+  if (avatar.startsWith("data:")) return "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=400&q=80";
+  if (avatar.startsWith("/")) return `${siteUrl}${avatar}`;
+  return avatar;
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: { slug: string };
 }): Promise<Metadata> {
-  const author = await prisma.author.findUnique({
-    where: { slug: params.slug },
-  });
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
+  try {
+    const author = await prisma.author.findUnique({
+      where: { slug: params.slug },
+    });
 
-  if (!author) {
-    return { title: "Author Not Found | LEADJEN MEDIA" };
+    if (!author) {
+      return { title: "Author Not Found | LEADJEN MEDIA" };
+    }
+
+    const authorUrl = `${siteUrl}/author/${params.slug}`;
+    const avatarUrl = getSafeAuthorAvatarUrl(author.avatar, siteUrl);
+
+    return {
+      title: `${author.name} — Author & Correspondent | LEADJEN MEDIA`,
+      description: author.bio || `Read articles, investigative analysis, and reports written by ${author.name} for Leadjen Media.`,
+      alternates: {
+        canonical: authorUrl,
+      },
+      openGraph: {
+        title: `${author.name} — Leadjen Media`,
+        description: author.bio || `Read stories by ${author.name}`,
+        url: authorUrl,
+        images: [{ url: avatarUrl }],
+        type: "profile",
+      },
+      twitter: {
+        card: "summary",
+        title: `${author.name} — Leadjen Media`,
+        description: author.bio || `Read stories by ${author.name}`,
+        images: [avatarUrl],
+      },
+    };
+  } catch (err) {
+    console.warn("[Author Profile] generateMetadata exception:", err);
+    return { title: "Author Profile | LEADJEN MEDIA" };
   }
-
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjen-media-news.vercel.app";
-  const authorUrl = `${siteUrl}/author/${params.slug}`;
-
-  return {
-    title: `${author.name} — Author & Correspondent | LEADJEN MEDIA`,
-    description: author.bio || `Read articles, investigative analysis, and reports written by ${author.name} for Leadjen Media.`,
-    alternates: {
-      canonical: authorUrl,
-    },
-    openGraph: {
-      title: `${author.name} — Leadjen Media`,
-      description: author.bio || `Read stories by ${author.name}`,
-      url: authorUrl,
-      images: author.avatar ? [{ url: author.avatar }] : [],
-      type: "profile",
-    },
-    twitter: {
-      card: "summary",
-      title: `${author.name} — Leadjen Media`,
-      description: author.bio || `Read stories by ${author.name}`,
-      images: author.avatar ? [author.avatar] : [],
-    },
-  };
 }
 
 export default async function AuthorProfilePage({
@@ -51,9 +64,9 @@ export default async function AuthorProfilePage({
 }: {
   params: { slug: string };
 }) {
-  await syncScheduledArticles();
+  await syncScheduledArticles().catch(() => {});
   const now = new Date();
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjen-media-news.vercel.app";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
   const authorUrl = `${siteUrl}/author/${params.slug}`;
 
   const author = await prisma.author.findUnique({

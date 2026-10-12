@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function VideosPage() {
   const videos = await prisma.videoNews.findMany({
     orderBy: { publishedAt: "desc" },
-  });
+  }).catch(() => []);
 
   return (
     <div className="w-full bg-gray-950 text-white py-10 min-h-screen">

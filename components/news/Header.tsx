@@ -666,13 +666,16 @@ export function Header() {
                     </h3>
                     <ul className="space-y-2 text-xs font-sans text-gray-700 dark:text-gray-300">
                       <li>
-                        <Link
-                          href="/about"
+                        <a
+                          href="https://leadjenmedia.com/"
+                          target="_blank"
+                          rel="noopener noreferrer"
                           onClick={() => setMoreMenuOpen(false)}
-                          className="hover:text-[#1E1B1A] dark:hover:text-white hover:underline block py-0.5 font-medium"
+                          className="hover:text-[#1E1B1A] dark:hover:text-white hover:underline py-0.5 font-medium flex items-center justify-between"
                         >
-                          About the Organization
-                        </Link>
+                          <span>About Leadjen Media</span>
+                          <span className="text-[10px] font-mono font-bold text-red-600 dark:text-red-400">Agency ↗</span>
+                        </a>
                       </li>
                       <li>
                         <Link
@@ -961,13 +964,16 @@ export function Header() {
                 <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-gray-400 px-3 block mb-1">
                   COMPANY
                 </span>
-                <Link
-                  href="/about"
+                <a
+                  href="https://leadjenmedia.com/"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-[#1E1B1A]"
+                  className="px-3 py-1.5 text-xs text-gray-600 dark:text-gray-400 hover:text-[#1E1B1A] flex items-center justify-between"
                 >
-                  About Leadjen Media
-                </Link>
+                  <span>About Leadjen Media</span>
+                  <span className="text-[10px] font-mono font-bold text-red-600 dark:text-red-400">leadjenmedia.com ↗</span>
+                </a>
                 <Link
                   href="/services"
                   onClick={() => setMobileMenuOpen(false)}

@@ -21,46 +21,50 @@ export async function generateMetadata({
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
   const slug = params.category;
 
-  // 1. Check Category
-  const category = await prisma.category.findUnique({
-    where: { slug },
-  });
+  try {
+    // 1. Check Category
+    const category = await prisma.category.findUnique({
+      where: { slug },
+    });
 
-  if (category) {
-    const categoryUrl = `${siteUrl}/${slug}`;
-    return {
-      title: `${category.name} News, Breaking Bulletins & Analysis | LEADJEN MEDIA`,
-      description:
-        category.description ||
-        `Read latest ${category.name} news, updates, investigative reports, and in-depth editorial coverage from Leadjen Media.`,
-      alternates: { canonical: categoryUrl },
-      openGraph: {
-        title: `${category.name} News — Leadjen Media`,
-        description: category.description || `Latest ${category.name} stories and reports`,
-        url: categoryUrl,
-        type: "website",
-      },
-    };
-  }
+    if (category) {
+      const categoryUrl = `${siteUrl}/${slug}`;
+      return {
+        title: `${category.name} News, Breaking Bulletins & Analysis | LEADJEN MEDIA`,
+        description:
+          category.description ||
+          `Read latest ${category.name} news, updates, investigative reports, and in-depth editorial coverage from Leadjen Media.`,
+        alternates: { canonical: categoryUrl },
+        openGraph: {
+          title: `${category.name} News — Leadjen Media`,
+          description: category.description || `Latest ${category.name} stories and reports`,
+          url: categoryUrl,
+          type: "website",
+        },
+      };
+    }
 
-  // 2. Check Static Page
-  const staticPage = await prisma.page.findUnique({
-    where: { slug },
-  });
+    // 2. Check Static Page
+    const staticPage = await prisma.page.findUnique({
+      where: { slug },
+    });
 
-  if (staticPage && staticPage.status === "PUBLISHED") {
-    const pageUrl = `${siteUrl}/${slug}`;
-    return {
-      title: staticPage.seoTitle || `${staticPage.title} | LEADJEN MEDIA`,
-      description: staticPage.seoDescription || `Read ${staticPage.title} on Leadjen Media.`,
-      alternates: { canonical: pageUrl },
-      openGraph: {
-        title: staticPage.seoTitle || staticPage.title,
-        description: staticPage.seoDescription || "",
-        url: pageUrl,
-        type: "article",
-      },
-    };
+    if (staticPage && staticPage.status === "PUBLISHED") {
+      const pageUrl = `${siteUrl}/${slug}`;
+      return {
+        title: staticPage.seoTitle || `${staticPage.title} | LEADJEN MEDIA`,
+        description: staticPage.seoDescription || `Read ${staticPage.title} on Leadjen Media.`,
+        alternates: { canonical: pageUrl },
+        openGraph: {
+          title: staticPage.seoTitle || staticPage.title,
+          description: staticPage.seoDescription || "",
+          url: pageUrl,
+          type: "article",
+        },
+      };
+    }
+  } catch (err) {
+    console.warn("[Category Metadata] Error:", err);
   }
 
   return { title: "Page Not Found | LEADJEN MEDIA" };
@@ -71,7 +75,7 @@ export default async function DynamicCategoryOrStaticPage({
 }: {
   params: { category: string };
 }) {
-  await syncScheduledArticles();
+  await syncScheduledArticles().catch(() => {});
   const now = new Date();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
   const slug = params.category;
@@ -79,17 +83,17 @@ export default async function DynamicCategoryOrStaticPage({
   // 1. Check if slug matches a Category
   const category = await prisma.category.findUnique({
     where: { slug },
-  });
+  }).catch(() => null);
 
   if (category) {
     // Fetch Site Builder Settings
-    const settingsRecord = await prisma.siteSettings.findUnique({ where: { id: "default" } });
     let siteConfig: SiteBuilderConfig = DEFAULT_SITE_BUILDER_CONFIG;
-    if (settingsRecord?.siteConfigJson) {
-      try {
+    try {
+      const settingsRecord = await prisma.siteSettings.findUnique({ where: { id: "default" } });
+      if (settingsRecord?.siteConfigJson) {
         siteConfig = { ...DEFAULT_SITE_BUILDER_CONFIG, ...JSON.parse(settingsRecord.siteConfigJson) };
-      } catch {}
-    }
+      }
+    } catch {}
 
     const catDefaults = siteConfig.categories || DEFAULT_SITE_BUILDER_CONFIG.categories;
     const override = catDefaults.categoryOverrides?.[slug] || {};
@@ -111,6 +115,9 @@ export default async function DynamicCategoryOrStaticPage({
         include: { category: true, author: true },
         orderBy: { publishedAt: "desc" },
         take: 30,
+      }).catch((err) => {
+        console.warn("[Category Page] Failed to fetch articles:", err);
+        return [];
       }),
       prisma.article.findMany({
         where: {
@@ -120,12 +127,12 @@ export default async function DynamicCategoryOrStaticPage({
         include: { category: true },
         orderBy: { viewCount: "desc" },
         take: 5,
-      }),
+      }).catch(() => []),
       showAdBanner
         ? prisma.advertisement.findFirst({
             where: { location: "SIDEBAR_AD", isActive: true },
-          })
-        : null,
+          }).catch(() => null)
+        : Promise.resolve(null),
     ]);
 
     const leadStory = (catDefaults.showFeaturedStory !== false && layoutStyle === "split-hero") ? articles[0] : null;

@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default async function PhotosPage() {
   const gallery = await prisma.photoGallery.findFirst({
     orderBy: { publishedAt: "desc" },
-  });
+  }).catch(() => null);
 
   return (
     <div className="w-full bg-white dark:bg-editorial-darkBg py-10 min-h-screen">

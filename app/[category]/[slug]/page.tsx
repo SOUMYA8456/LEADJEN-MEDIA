@@ -19,54 +19,67 @@ import type { Metadata } from "next";
 
 export const dynamic = "force-dynamic";
 
+function getSafeMetadataImageUrl(raw: string | null | undefined, articleId: string, siteUrl: string): string {
+  if (!raw) return "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&q=80";
+  if (raw.startsWith("data:")) return `${siteUrl}/api/articles/${articleId}/image`;
+  if (raw.startsWith("/")) return `${siteUrl}${raw}`;
+  return raw;
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: { category: string; slug: string };
 }): Promise<Metadata> {
-  const article = await prisma.article.findUnique({
-    where: { slug: params.slug },
-    include: { category: true, author: true },
-  });
-
-  if (!article) {
-    return { title: "Article Not Found | LEADJEN MEDIA" };
-  }
-
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
-  const articleUrl = `${siteUrl}/${params.category}/${params.slug}`;
+  try {
+    const article = await prisma.article.findUnique({
+      where: { slug: params.slug },
+      include: { category: true, author: true },
+    });
 
-  return {
-    title: article.seoTitle || `${article.title} | LEADJEN MEDIA`,
-    description: article.seoDescription || article.excerpt,
-    alternates: {
-      canonical: articleUrl,
-    },
-    openGraph: {
-      title: article.seoTitle || article.title,
+    if (!article) {
+      return { title: "Article Not Found | LEADJEN MEDIA" };
+    }
+
+    const articleUrl = `${siteUrl}/${params.category}/${params.slug}`;
+    const metaImageUrl = getSafeMetadataImageUrl(article.ogImage || article.featuredImage, article.id, siteUrl);
+
+    return {
+      title: article.seoTitle || `${article.title} | LEADJEN MEDIA`,
       description: article.seoDescription || article.excerpt,
-      url: articleUrl,
-      siteName: "LEADJEN MEDIA",
-      images: [
-        {
-          url: article.ogImage || article.featuredImage,
-          width: 1200,
-          height: 630,
-          alt: article.title,
-        },
-      ],
-      type: "article",
-      publishedTime: article.publishedAt?.toISOString(),
-      authors: [article.author?.name || "Leadjen Editorial Desk"],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: article.seoTitle || article.title,
-      description: article.seoDescription || article.excerpt,
-      images: [article.ogImage || article.featuredImage],
-      creator: "@leadjenmedia",
-    },
-  };
+      alternates: {
+        canonical: articleUrl,
+      },
+      openGraph: {
+        title: article.seoTitle || article.title,
+        description: article.seoDescription || article.excerpt,
+        url: articleUrl,
+        siteName: "LEADJEN MEDIA",
+        images: [
+          {
+            url: metaImageUrl,
+            width: 1200,
+            height: 630,
+            alt: article.title,
+          },
+        ],
+        type: "article",
+        publishedTime: article.publishedAt ? new Date(article.publishedAt).toISOString() : undefined,
+        authors: [article.author?.name || "Leadjen Editorial Desk"],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: article.seoTitle || article.title,
+        description: article.seoDescription || article.excerpt,
+        images: [metaImageUrl],
+        creator: "@leadjenmedia",
+      },
+    };
+  } catch (err) {
+    console.warn("[Article Detail] generateMetadata exception:", err);
+    return { title: "Leadjen Media News" };
+  }
 }
 
 export default async function ArticleDetailPage({
@@ -74,7 +87,9 @@ export default async function ArticleDetailPage({
 }: {
   params: { category: string; slug: string };
 }) {
-  await syncScheduledArticles();
+  await syncScheduledArticles().catch((err) => {
+    console.warn("[Article Detail] syncScheduledArticles error:", err);
+  });
   const now = new Date();
 
   // Query article by slug
@@ -84,6 +99,9 @@ export default async function ArticleDetailPage({
       category: true,
       author: true,
     },
+  }).catch((err) => {
+    console.error("[Article Detail] prisma.article.findUnique error:", err);
+    return null;
   });
 
   if (!article || article.status !== "PUBLISHED") {
@@ -115,6 +133,9 @@ export default async function ArticleDetailPage({
           include: { category: true, author: true },
           orderBy: { publishedAt: "desc" },
           take: relatedLimit,
+        }).catch((err) => {
+          console.warn("[Article Detail] Failed to fetch related articles:", err);
+          return [];
         })
       : Promise.resolve([]),
     articleConfig.showMostReadSidebar !== false
@@ -126,6 +147,9 @@ export default async function ArticleDetailPage({
           include: { category: true },
           orderBy: { viewCount: "desc" },
           take: 5,
+        }).catch((err) => {
+          console.warn("[Article Detail] Failed to fetch trending articles:", err);
+          return [];
         })
       : Promise.resolve([]),
     articleConfig.topAdEnabled !== false
@@ -135,7 +159,7 @@ export default async function ArticleDetailPage({
             isActive: true,
             status: "ACTIVE",
           },
-        })
+        }).catch(() => null)
       : Promise.resolve(null),
     articleConfig.middleAdEnabled !== false
       ? prisma.advertisement.findFirst({
@@ -145,7 +169,7 @@ export default async function ArticleDetailPage({
             status: "ACTIVE",
           },
           orderBy: [{ priority: "desc" }, { updatedAt: "desc" }],
-        })
+        }).catch(() => null)
       : Promise.resolve(null),
     articleConfig.sidebarAdEnabled !== false
       ? prisma.advertisement.findFirst({
@@ -155,7 +179,7 @@ export default async function ArticleDetailPage({
             status: "ACTIVE",
           },
           orderBy: [{ priority: "desc" }, { updatedAt: "desc" }],
-        })
+        }).catch(() => null)
       : Promise.resolve(null),
     articleConfig.bottomAdEnabled !== false
       ? prisma.advertisement.findFirst({
@@ -164,7 +188,7 @@ export default async function ArticleDetailPage({
             isActive: true,
             status: "ACTIVE",
           },
-        })
+        }).catch(() => null)
       : Promise.resolve(null),
   ]);
 
@@ -172,6 +196,10 @@ export default async function ArticleDetailPage({
   const articleUrl = `${siteUrl}/${params.category}/${params.slug}`;
   const categoryUrl = `${siteUrl}/${params.category}`;
   const authorUrl = `${siteUrl}/author/${article.author?.slug || "editorial-desk"}`;
+  const metaImageUrl = getSafeMetadataImageUrl(article.ogImage || article.featuredImage, article.id, siteUrl);
+  const safeFeaturedImage = article.featuredImage?.startsWith("data:")
+    ? `/api/articles/${article.id}/image`
+    : (article.featuredImage || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&q=80");
 
   // JSON-LD NewsArticle Structured Data
   const newsArticleJsonLd = {
@@ -183,9 +211,9 @@ export default async function ArticleDetailPage({
     },
     headline: article.title,
     description: article.seoDescription || article.excerpt,
-    image: [article.ogImage || article.featuredImage],
-    datePublished: article.publishedAt?.toISOString() || article.createdAt.toISOString(),
-    dateModified: article.updatedAt.toISOString(),
+    image: [metaImageUrl],
+    datePublished: article.publishedAt ? new Date(article.publishedAt).toISOString() : article.createdAt.toISOString(),
+    dateModified: article.updatedAt ? new Date(article.updatedAt).toISOString() : new Date().toISOString(),
     articleSection: article.category?.name || "News",
     inLanguage: "en-US",
     author: [
@@ -221,7 +249,7 @@ export default async function ArticleDetailPage({
       {
         "@type": "ListItem",
         position: 2,
-        name: article.category.name,
+        name: article.category?.name || "News",
         item: categoryUrl,
       },
       {
@@ -360,7 +388,7 @@ export default async function ArticleDetailPage({
               {/* Featured Visual */}
               <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden my-6 bg-neutral-100 dark:bg-neutral-800 shadow-xs">
                 <img
-                  src={article.featuredImage}
+                  src={safeFeaturedImage}
                   alt={article.title}
                   className="w-full h-full object-cover"
                 />

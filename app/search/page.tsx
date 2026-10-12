@@ -58,8 +58,8 @@ export default async function SearchPage({
       include: { category: true, author: true },
       orderBy,
       take: 40,
-    }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    }).catch(() => []),
+    prisma.category.findMany({ orderBy: { name: "asc" } }).catch(() => []),
   ]);
 
   return (

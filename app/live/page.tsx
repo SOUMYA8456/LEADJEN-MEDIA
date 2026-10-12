@@ -15,11 +15,11 @@ export default async function LiveNewsPage() {
     prisma.liveCoverage.findFirst({
       where: { status: { in: ["LIVE", "PAUSED", "UPCOMING"] } },
       orderBy: { startedAt: "desc" },
-    }),
+    }).catch(() => null),
     prisma.liveUpdate.findMany({
       orderBy: { createdAt: "desc" },
       take: 50,
-    }),
+    }).catch(() => []),
   ]);
 
   return (
