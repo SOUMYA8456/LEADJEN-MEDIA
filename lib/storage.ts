@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import { extractYouTubeVideoId } from "./youtube";
 
 export const ALLOWED_IMAGE_MIME_TYPES = [
   "image/jpeg",
@@ -215,22 +216,12 @@ export function sanitizeVideoUrl(rawUrl: string): { valid: boolean; embedUrl?: s
     const host = parsed.hostname.toLowerCase();
 
     // YouTube handler
-    if (host.includes("youtube.com") || host.includes("youtu.be")) {
-      let videoId = "";
-      if (host.includes("youtu.be")) {
-        videoId = parsed.pathname.slice(1);
-      } else if (parsed.searchParams.has("v")) {
-        videoId = parsed.searchParams.get("v") || "";
-      } else if (parsed.pathname.includes("/embed/")) {
-        videoId = parsed.pathname.split("/embed/")[1] || "";
-      }
-
-      if (videoId) {
-        return {
-          valid: true,
-          embedUrl: `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=0&controls=1&rel=0`,
-        };
-      }
+    const ytId = extractYouTubeVideoId(trimmed);
+    if (ytId) {
+      return {
+        valid: true,
+        embedUrl: `https://www.youtube-nocookie.com/embed/${ytId}?autoplay=0&controls=1&rel=0`,
+      };
     }
 
     // Vimeo handler

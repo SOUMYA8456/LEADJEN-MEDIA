@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { Play, ArrowRight, Video } from "lucide-react";
+import { YouTubePlayerModal } from "./YouTubePlayerModal";
 
 interface VideoBriefSectionProps {
   title?: string;
@@ -13,7 +14,7 @@ interface VideoBriefSectionProps {
     thumbnailUrl?: string | null;
     videoUrl?: string | null;
     duration?: string | null;
-    category?: { name: string; slug: string } | null;
+    category?: { name: string; slug: string } | string | null;
   } | null;
   className?: string;
 }
@@ -23,15 +24,22 @@ export function VideoBriefSection({
   video,
   className = "",
 }: VideoBriefSectionProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+
   const currentVideo = video || {
     title: "Inside the AI News Operations Command Center: How 24/7 Verification Works",
     description:
       "A special documentary dispatch behind Leadjen Media's technological journalism infrastructure, verified reporting standards, and global correspondent network.",
     thumbnailUrl:
       "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=1200&h=600&q=80",
-    videoUrl: "/videos",
+    videoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
     duration: "04:45",
     category: { name: "Technology", slug: "technology" },
+  };
+
+  const handleOpenPlayer = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsPlaying(true);
   };
 
   return (
@@ -56,8 +64,20 @@ export function VideoBriefSection({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center bg-gray-50 dark:bg-gray-900/60 p-4 rounded-xl border border-gray-200 dark:border-gray-800">
-          {/* Video Thumbnail */}
-          <div className="md:col-span-5 relative group overflow-hidden rounded-lg aspect-video bg-black shadow-none">
+          {/* Video Thumbnail (Clickable Player Trigger) */}
+          <div
+            onClick={handleOpenPlayer}
+            className="md:col-span-5 relative group overflow-hidden rounded-lg aspect-video bg-black shadow-none cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setIsPlaying(true);
+              }
+            }}
+            aria-label={`Play video: ${currentVideo.title}`}
+          >
             <img
               src={currentVideo.thumbnailUrl || (currentVideo as any).thumbnail || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=800&q=80"}
               alt={currentVideo.title || "Video Brief"}
@@ -86,11 +106,15 @@ export function VideoBriefSection({
               </span>
             </div>
 
-            <Link href="/videos" className="block group">
+            <button
+              type="button"
+              onClick={handleOpenPlayer}
+              className="block text-left group"
+            >
               <h4 className="font-serif font-bold text-lg sm:text-xl text-gray-950 dark:text-white group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors line-clamp-2">
                 {currentVideo.title}
               </h4>
-            </Link>
+            </button>
 
             {currentVideo.description && (
               <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2 font-sans">
@@ -98,18 +122,31 @@ export function VideoBriefSection({
               </p>
             )}
 
-            <div className="pt-2">
-              <Link
-                href="/videos"
+            <div className="pt-2 flex items-center gap-3">
+              <button
+                type="button"
+                onClick={handleOpenPlayer}
                 className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1E1B1A] dark:bg-white text-white dark:text-gray-950 hover:bg-black dark:hover:bg-neutral-200 text-xs font-bold font-mono uppercase tracking-wider rounded transition-colors shadow-none"
               >
                 <Play className="w-3 h-3 fill-current" />
-                <span>Watch →</span>
+                <span>Watch Video</span>
+              </button>
+              <Link
+                href="/videos"
+                className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white hover:underline"
+              >
+                All Videos →
               </Link>
             </div>
           </div>
         </div>
       </div>
+
+      <YouTubePlayerModal
+        isOpen={isPlaying}
+        onClose={() => setIsPlaying(false)}
+        video={currentVideo}
+      />
     </section>
   );
 }

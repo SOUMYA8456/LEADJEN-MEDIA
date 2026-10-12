@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useRealtime } from "@/hooks/useRealtime";
 import { MediaLibraryModal } from "@/components/admin/MediaLibraryModal";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 
 interface LiveUpdateItem {
   id: string;
@@ -578,28 +579,14 @@ export default function AdminLivePage() {
               </div>
 
               {/* Image Input + Media Library button */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-[11px] font-bold uppercase text-neutral-500">
-                    Dispatch Photo (Optional)
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => setMediaModalOpen(true)}
-                    className="text-[10px] font-mono text-neutral-400 hover:text-black dark:hover:text-white hover:underline inline-flex items-center gap-1"
-                  >
-                    <ImageIcon className="w-3 h-3" />
-                    <span>Media Library</span>
-                  </button>
-                </div>
-                <input
-                  type="text"
-                  placeholder="https://..."
-                  value={updateImageUrl}
-                  onChange={(e) => setUpdateImageUrl(e.target.value)}
-                  className="w-full p-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white font-mono text-xs focus:outline-none"
-                />
-              </div>
+              <ImageUploadField
+                label="Dispatch Photo (Optional)"
+                value={updateImageUrl}
+                onChange={(url) => setUpdateImageUrl(url)}
+                onOpenMediaLibrary={() => setMediaModalOpen(true)}
+                maxSizeMB={10}
+                placeholder="https://... or upload local image"
+              />
 
               {/* Video URL */}
               <div>

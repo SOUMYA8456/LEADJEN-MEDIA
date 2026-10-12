@@ -2,8 +2,9 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Play, X, ArrowRight } from "lucide-react";
+import { Play, ArrowRight } from "lucide-react";
 import { VideoNewsCard } from "./NewsCard";
+import { YouTubePlayerModal } from "./YouTubePlayerModal";
 
 interface VideoNewsSectionProps {
   videos: any[];
@@ -45,50 +46,26 @@ export function VideoNewsSection({ videos }: VideoNewsSectionProps) {
             key={vid.id}
             onClick={() => setActiveVideo(vid)}
             className="cursor-pointer"
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                setActiveVideo(vid);
+              }
+            }}
           >
             <VideoNewsCard video={vid} />
           </div>
         ))}
       </div>
 
-      {/* Video Player Modal */}
-      {activeVideo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in">
-          <div className="relative w-full max-w-4xl bg-gray-900 rounded-xl overflow-hidden shadow-none border border-gray-800">
-            <div className="flex items-center justify-between p-4 border-b border-gray-800">
-              <span className="text-xs font-mono uppercase tracking-wider text-neutral-400 font-bold">
-                {activeVideo.category} • {activeVideo.duration}
-              </span>
-              <button
-                type="button"
-                onClick={() => setActiveVideo(null)}
-                className="p-1 text-gray-400 hover:text-white rounded-lg"
-              >
-                <X className="w-6 h-6" />
-              </button>
-            </div>
-
-            <div className="relative aspect-video bg-black flex items-center justify-center">
-              <img
-                src={activeVideo.thumbnail}
-                alt={activeVideo.title}
-                className="w-full h-full object-cover opacity-60"
-              />
-              <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
-                <div className="w-16 h-16 rounded-full bg-white text-black flex items-center justify-center shadow-none mb-4">
-                  <Play className="w-8 h-8 fill-current ml-1" />
-                </div>
-                <h3 className="text-xl sm:text-2xl font-serif font-bold text-white max-w-lg">
-                  {activeVideo.title}
-                </h3>
-                <p className="text-xs text-gray-300 mt-2 font-mono">
-                  Streaming HD Video Broadcast (Demo Stream)
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Real Responsive Video Player Modal */}
+      <YouTubePlayerModal
+        isOpen={!!activeVideo}
+        onClose={() => setActiveVideo(null)}
+        video={activeVideo}
+      />
     </section>
   );
 }

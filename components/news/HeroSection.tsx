@@ -1,9 +1,12 @@
-import React from "react";
+"use client";
+
+import React, { useState } from "react";
 import Link from "next/link";
 import { Play, ArrowRight, Radio } from "lucide-react";
 import { ArticleData } from "./NewsCard";
 import { SidebarAd } from "@/components/ads/AdBanner";
 import { formatTimeAgo, formatArticleDate } from "@/lib/utils";
+import { YouTubePlayerModal } from "./YouTubePlayerModal";
 
 interface HeroSectionProps {
   heroArticle?: ArticleData | null;
@@ -32,6 +35,8 @@ export function HeroSection({
   rightTitle = "Video Briefing",
   rightWatchUrl = "/videos",
 }: HeroSectionProps) {
+  const [isPlayingVideo, setIsPlayingVideo] = useState(false);
+
   if (!heroArticle) return null;
 
   const categorySlug = heroArticle.category?.slug || "news";
@@ -200,7 +205,19 @@ export function HeroSection({
                   </Link>
                 </div>
 
-                <div className="group relative rounded overflow-hidden bg-gray-900">
+                <div
+                  onClick={() => setIsPlayingVideo(true)}
+                  className="group relative rounded overflow-hidden bg-gray-900 cursor-pointer"
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      setIsPlayingVideo(true);
+                    }
+                  }}
+                  aria-label={`Play video dispatch: ${rightVideo.title || "Video Briefing"}`}
+                >
                   <div className="relative aspect-video">
                     <img
                       src={rightVideo.thumbnail || rightVideo.thumbnailUrl || "https://images.unsplash.com/photo-1585829365295-ab7cd400c167?auto=format&fit=crop&w=600&q=80"}
@@ -224,6 +241,12 @@ export function HeroSection({
                     </h5>
                   </div>
                 </div>
+
+                <YouTubePlayerModal
+                  isOpen={isPlayingVideo}
+                  onClose={() => setIsPlayingVideo(false)}
+                  video={rightVideo}
+                />
               </div>
             )}
 

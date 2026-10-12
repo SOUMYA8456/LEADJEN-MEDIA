@@ -171,7 +171,7 @@ export default async function ArticleDetailPage({
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://leadjenmediadaily.com";
   const articleUrl = `${siteUrl}/${params.category}/${params.slug}`;
   const categoryUrl = `${siteUrl}/${params.category}`;
-  const authorUrl = `${siteUrl}/author/${article.author?.slug}`;
+  const authorUrl = `${siteUrl}/author/${article.author?.slug || "editorial-desk"}`;
 
   // JSON-LD NewsArticle Structured Data
   const newsArticleJsonLd = {
@@ -186,7 +186,7 @@ export default async function ArticleDetailPage({
     image: [article.ogImage || article.featuredImage],
     datePublished: article.publishedAt?.toISOString() || article.createdAt.toISOString(),
     dateModified: article.updatedAt.toISOString(),
-    articleSection: article.category.name,
+    articleSection: article.category?.name || "News",
     inLanguage: "en-US",
     author: [
       {
@@ -270,16 +270,18 @@ export default async function ArticleDetailPage({
                     </Link>
                     <span>/</span>
                     <Link
-                      href={`/${article.category.slug}`}
+                      href={`/${article.category?.slug || params.category}`}
                       className="text-black dark:text-white hover:text-neutral-600 dark:hover:text-neutral-300 hover:underline"
                     >
-                      {article.category.name}
+                      {article.category?.name || "News"}
                     </Link>
                   </div>
-                  <FollowCategoryButton
-                    categoryId={article.categoryId}
-                    categoryName={article.category.name}
-                  />
+                  {article.categoryId && (
+                    <FollowCategoryButton
+                      categoryId={article.categoryId}
+                      categoryName={article.category?.name || "News"}
+                    />
+                  )}
                 </div>
               )}
 
@@ -298,26 +300,43 @@ export default async function ArticleDetailPage({
               {/* Author, Date, Reading Time Bar */}
               <div className="mt-5 py-4 border-y border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  {articleConfig.showAuthorAvatar !== false && (
-                    <Link href={`/author/${article.author.slug}`} className="shrink-0">
-                      <img
-                        src={article.author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80"}
-                        alt={article.author.name}
-                        className="w-10 h-10 rounded-full object-cover bg-neutral-100"
-                      />
-                    </Link>
+                  {article.author ? (
+                    <>
+                      {articleConfig.showAuthorAvatar !== false && (
+                        <Link href={`/author/${article.author.slug}`} className="shrink-0">
+                          <img
+                            src={article.author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80"}
+                            alt={article.author.name}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80";
+                            }}
+                            className="w-10 h-10 rounded-full object-cover bg-neutral-100"
+                          />
+                        </Link>
+                      )}
+                      <div>
+                        <Link
+                          href={`/author/${article.author.slug}`}
+                          className="font-serif font-bold text-sm text-black dark:text-white hover:text-neutral-600 dark:hover:text-neutral-300 block"
+                        >
+                          {article.author.name}
+                        </Link>
+                        <span className="text-[11px] text-neutral-500 font-mono block">
+                          {article.author.designation || "Editorial Correspondent"}
+                        </span>
+                      </div>
+                    </>
+                  ) : (
+                    <div>
+                      <span className="font-serif font-bold text-sm text-black dark:text-white block">
+                        Leadjen Editorial Desk
+                      </span>
+                      <span className="text-[11px] text-neutral-500 font-mono block">
+                        Editorial Correspondent
+                      </span>
+                    </div>
                   )}
-                  <div>
-                    <Link
-                      href={`/author/${article.author.slug}`}
-                      className="font-serif font-bold text-sm text-black dark:text-white hover:text-neutral-600 dark:hover:text-neutral-300 block"
-                    >
-                      {article.author.name}
-                    </Link>
-                    <span className="text-[11px] text-neutral-500 font-mono block">
-                      {article.author.designation || "Editorial Correspondent"}
-                    </span>
-                  </div>
                 </div>
 
                 <div className="text-xs text-neutral-500 dark:text-neutral-400 font-mono space-y-0.5 sm:text-right">
@@ -358,11 +377,15 @@ export default async function ArticleDetailPage({
               )}
 
               {/* Author Bio Box */}
-              {articleConfig.showAuthorBio !== false && (
+              {articleConfig.showAuthorBio !== false && article.author && (
                 <div className="my-8 p-5 bg-neutral-50 dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 flex items-start gap-4">
                   <img
                     src={article.author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80"}
                     alt={article.author.name}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src =
+                        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80";
+                    }}
                     className="w-14 h-14 rounded-full object-cover shrink-0"
                   />
                   <div>
@@ -386,7 +409,7 @@ export default async function ArticleDetailPage({
               {articleConfig.showRelatedStories !== false && relatedArticles.length > 0 && (
                 <div className="my-10 pt-8 border-t-2 border-black dark:border-white">
                   <h3 className="font-serif font-black text-xl text-black dark:text-white uppercase tracking-tight mb-6">
-                    RELATED STORIES IN {article.category.name}
+                    RELATED STORIES IN {article.category?.name || "THIS TOPIC"}
                   </h3>
                   <div className={`grid grid-cols-1 ${relatedLimit === 4 ? "sm:grid-cols-2 lg:grid-cols-4" : relatedLimit === 6 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-3"} gap-5`}>
                     {relatedArticles.map((rel) => (

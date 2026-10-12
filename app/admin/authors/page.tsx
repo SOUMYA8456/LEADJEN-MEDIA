@@ -26,6 +26,7 @@ import {
   Calendar,
   X,
 } from "lucide-react";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 
 interface AuthorItem {
   id: string;
@@ -474,6 +475,10 @@ export default function AdminAuthorsPage() {
                         "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80"
                       }
                       alt={item.name}
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src =
+                          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80";
+                      }}
                       className="w-14 h-14 rounded-xl object-cover bg-neutral-100 dark:bg-neutral-800 flex-shrink-0 border border-neutral-200 dark:border-neutral-800 shadow-xs"
                     />
 
@@ -775,18 +780,13 @@ export default function AdminAuthorsPage() {
                   </div>
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-mono uppercase font-bold text-neutral-500 mb-1">
-                    Profile Photo URL
-                  </label>
-                  <input
-                    type="url"
-                    placeholder="https://..."
-                    value={formData.avatar}
-                    onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                    className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:border-red-600"
-                  />
-                </div>
+                <ImageUploadField
+                  label="Profile Photo (Avatar)"
+                  value={formData.avatar}
+                  onChange={(url) => setFormData({ ...formData, avatar: url })}
+                  aspectRatioHint="1:1 Square"
+                  maxSizeMB={5}
+                />
 
                 <div>
                   <label className="block text-[10px] font-mono uppercase font-bold text-neutral-500 mb-1">
@@ -980,17 +980,13 @@ export default function AdminAuthorsPage() {
                   </select>
                 </div>
 
-                <div>
-                  <label className="block text-[10px] font-mono uppercase font-bold text-neutral-500 mb-1">
-                    Profile Photo URL
-                  </label>
-                  <input
-                    type="url"
-                    value={formData.avatar}
-                    onChange={(e) => setFormData({ ...formData, avatar: e.target.value })}
-                    className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-xs text-black dark:text-white focus:outline-none focus:border-red-600"
-                  />
-                </div>
+              <ImageUploadField
+                label="Profile Photo (Avatar)"
+                value={formData.avatar}
+                onChange={(url) => setFormData({ ...formData, avatar: url })}
+                aspectRatioHint="1:1 Square"
+                maxSizeMB={5}
+              />
               </div>
 
               <div>

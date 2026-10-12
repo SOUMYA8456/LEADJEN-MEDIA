@@ -34,6 +34,7 @@ import {
 } from "lucide-react";
 import { slugify } from "@/lib/utils";
 import { MediaLibraryModal } from "@/components/admin/MediaLibraryModal";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 
 interface Category {
   id: string;
@@ -516,119 +517,21 @@ export function ArticleForm({
           </div>
 
           {/* Featured Image Management */}
-          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xs space-y-4">
-            <div className="flex items-center justify-between">
-              <label className="block text-xs font-mono font-bold uppercase tracking-wider text-black dark:text-white">
-                Featured Lead Image *
-              </label>
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setMediaLibraryOpen(true)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 dark:bg-neutral-800 dark:hover:bg-neutral-700 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase transition"
-                >
-                  <ImageIcon className="w-3.5 h-3.5" />
-                  <span>Select from Media Library</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Upload Progress Bar */}
-            {uploading && (
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-[11px] font-mono text-neutral-500">
-                  <span>Uploading to Media Storage...</span>
-                  <span>{uploadProgress}%</span>
-                </div>
-                <div className="w-full bg-neutral-200 dark:bg-neutral-800 h-1.5 rounded-full overflow-hidden">
-                  <div
-                    className="bg-black dark:bg-white h-full transition-all duration-200"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* Image Preview & Controls */}
-            {featuredImage && (
-              <div className="relative aspect-[16/9] w-full rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-800 bg-neutral-100 dark:bg-neutral-950 group">
-                <img
-                  src={featuredImage}
-                  alt="Featured preview"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setMediaLibraryOpen(true)}
-                    className="px-3 py-1.5 bg-white text-black rounded-lg text-xs font-mono font-bold uppercase hover:bg-neutral-200 transition shadow-md"
-                  >
-                    Replace Image
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setFeaturedImage("")}
-                    className="px-3 py-1.5 bg-red-600 text-white rounded-lg text-xs font-mono font-bold uppercase hover:bg-red-700 transition shadow-md"
-                  >
-                    Remove
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Drag and Drop Upload Zone */}
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setIsDragOver(true);
+          <div className="bg-white dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xs">
+            <ImageUploadField
+              label="Featured Lead Image"
+              value={featuredImage}
+              onChange={(url) => {
+                setFeaturedImage(url);
+                if (!ogImage) setOgImage(url);
               }}
-              onDragLeave={() => setIsDragOver(false)}
-              onDrop={(e) => {
-                e.preventDefault();
-                setIsDragOver(false);
-                const file = e.dataTransfer.files?.[0];
-                if (file) processUploadFile(file);
-              }}
-              className={`border-2 border-dashed rounded-xl p-5 text-center transition ${
-                isDragOver
-                  ? "border-black dark:border-white bg-neutral-100 dark:bg-neutral-800"
-                  : "border-neutral-300 dark:border-neutral-700 bg-neutral-50/60 dark:bg-neutral-950/60"
-              }`}
-            >
-              <div className="flex flex-col items-center justify-center space-y-2">
-                <label className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-neutral-800 text-white dark:bg-white dark:text-black rounded-xl text-xs font-mono font-bold uppercase cursor-pointer transition shadow-xs">
-                  <Upload className="w-4 h-4" />
-                  <span>Upload from Computer</span>
-                  <input
-                    type="file"
-                    accept="image/jpeg,image/png,image/webp,image/gif"
-                    onChange={(e) => handleFileUpload(e, false)}
-                    className="hidden"
-                    disabled={uploading}
-                  />
-                </label>
-                <span className="text-[10px] text-neutral-400 font-mono">
-                  Or drag and drop JPG, PNG, WEBP, GIF up to 10MB
-                </span>
-              </div>
-            </div>
-
-            {/* Direct Image URL fallback */}
-            <div className="pt-2">
-              <span className="text-[10px] font-mono text-neutral-400 uppercase block mb-1">
-                Direct Image URL (Alternative):
-              </span>
-              <input
-                type="text"
-                value={featuredImage}
-                onChange={(e) => {
-                  setFeaturedImage(e.target.value);
-                  if (!ogImage) setOgImage(e.target.value);
-                }}
-                placeholder="https://..."
-                className="w-full text-xs p-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-800 rounded-xl text-black dark:text-white font-mono focus:outline-none"
-              />
-            </div>
+              onOpenMediaLibrary={() => setMediaLibraryOpen(true)}
+              aspectRatioHint="16:9 Landscape"
+              maxSizeMB={10}
+              required
+              placeholder="https://... or upload local image"
+              helpText="Primary hero image displayed across the homepage, category feeds, and article lead."
+            />
           </div>
 
           {/* Article Content Editor */}

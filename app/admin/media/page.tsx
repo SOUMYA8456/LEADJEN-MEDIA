@@ -33,6 +33,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { formatTimeAgo } from "@/lib/utils";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
+import { extractYouTubeVideoId, getYouTubeThumbnailUrl, isYouTubeUrl } from "@/lib/youtube";
 
 interface MediaUsage {
   type: string;
@@ -1656,17 +1658,38 @@ export default function MediaManagerPage() {
               </div>
 
               <div>
-                <label className="block font-bold uppercase mb-1">
-                  Video Stream URL (YouTube, Vimeo, Cloudinary, MP4)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block font-bold uppercase">
+                    Video Stream URL (YouTube, Vimeo, Cloudinary, MP4) *
+                  </label>
+                  {isYouTubeUrl(videoForm.videoUrl) && (
+                    <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-200 dark:border-emerald-800">
+                      ✓ Valid YouTube Video
+                    </span>
+                  )}
+                </div>
                 <input
                   type="url"
                   required
                   value={videoForm.videoUrl}
-                  onChange={(e) => setVideoForm({ ...videoForm, videoUrl: e.target.value })}
-                  placeholder="https://www.youtube.com/watch?v=... or https://..."
+                  onChange={(e) => {
+                    const newUrl = e.target.value;
+                    setVideoForm((prev) => {
+                      const updated = { ...prev, videoUrl: newUrl };
+                      // If thumbnail is empty, attempt auto-filling from YouTube
+                      if (!updated.thumbnail && isYouTubeUrl(newUrl)) {
+                        const ytThumb = getYouTubeThumbnailUrl(newUrl, "hq");
+                        if (ytThumb) updated.thumbnail = ytThumb;
+                      }
+                      return updated;
+                    });
+                  }}
+                  placeholder="https://www.youtube.com/watch?v=... or https://youtu.be/... or shorts"
                   className="w-full p-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 rounded-xl focus:outline-hidden"
                 />
+                <p className="text-[10px] font-mono text-neutral-400 mt-1">
+                  Supports standard YouTube links, Shorts, Live, youtu.be, Vimeo, and MP4 files.
+                </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
@@ -1697,15 +1720,29 @@ export default function MediaManagerPage() {
               </div>
 
               <div>
-                <label className="block font-bold uppercase mb-1">Thumbnail Image URL</label>
-                <input
-                  type="text"
-                  required
+                <ImageUploadField
+                  label="Thumbnail Image"
                   value={videoForm.thumbnail}
-                  onChange={(e) => setVideoForm({ ...videoForm, thumbnail: e.target.value })}
+                  onChange={(url) => setVideoForm({ ...videoForm, thumbnail: url })}
+                  aspectRatioHint="16:9 Landscape"
+                  maxSizeMB={10}
+                  required
                   placeholder="https://images.unsplash.com/... or /api/media/.../file"
-                  className="w-full p-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 rounded-xl focus:outline-hidden"
+                  helpText="Upload a crisp 16:9 cover image from your computer, or auto-fetch from YouTube."
                 />
+                {isYouTubeUrl(videoForm.videoUrl) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const ytThumb = getYouTubeThumbnailUrl(videoForm.videoUrl, "maxres") || getYouTubeThumbnailUrl(videoForm.videoUrl, "hq");
+                      if (ytThumb) setVideoForm({ ...videoForm, thumbnail: ytThumb });
+                    }}
+                    className="mt-1 text-[11px] font-mono font-bold text-red-600 hover:text-red-700 dark:text-red-400 hover:underline inline-flex items-center gap-1"
+                  >
+                    <Play className="w-3 h-3 fill-current" />
+                    <span>Auto-fetch Thumbnail from YouTube</span>
+                  </button>
+                )}
               </div>
 
               <div className="flex items-center gap-2 pt-1">
@@ -1794,17 +1831,15 @@ export default function MediaManagerPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="block font-bold uppercase mb-1">Cover Image URL</label>
-                <input
-                  type="text"
-                  required
-                  value={podcastForm.coverImage}
-                  onChange={(e) => setPodcastForm({ ...podcastForm, coverImage: e.target.value })}
-                  placeholder="https://... or /api/media/.../file"
-                  className="w-full p-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-700 rounded-xl focus:outline-hidden"
-                />
-              </div>
+              <ImageUploadField
+                label="Podcast Cover Image"
+                value={podcastForm.coverImage}
+                onChange={(url) => setPodcastForm({ ...podcastForm, coverImage: url })}
+                aspectRatioHint="1:1 Square"
+                maxSizeMB={10}
+                required
+                placeholder="https://... or /api/media/.../file"
+              />
 
               <div>
                 <label className="block font-bold uppercase mb-1">

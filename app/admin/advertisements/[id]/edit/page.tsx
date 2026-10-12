@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { MediaLibraryModal } from "@/components/admin/MediaLibraryModal";
 import { AdCreativeRenderer } from "@/components/ads/AdBanner";
+import { ImageUploadField } from "@/components/admin/ImageUploadField";
 
 const POSITIONS = [
   { id: "TOP_LEADERBOARD", name: "Top Leaderboard", description: "Prominent banner displayed above the main header.", desktopSize: "970 × 250 px" },
@@ -340,89 +341,40 @@ export default function EditAdvertisementPage() {
             {/* IMAGE CREATIVES */}
             {formData.creativeType === "IMAGE" && (
               <div className="space-y-4">
-                <div className="p-4 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold uppercase text-black dark:text-white">
-                      Desktop Creative Asset (Primary) *
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setMediaLibraryTarget("desktop")}
-                      className="text-[11px] font-mono font-bold text-neutral-600 dark:text-neutral-300 hover:underline flex items-center gap-1"
-                    >
-                      <ImageIcon className="w-3.5 h-3.5" />
-                      <span>From Media Library</span>
-                    </button>
-                  </div>
-
-                  <label className="flex items-center justify-center gap-2 p-3 bg-white dark:bg-neutral-900 border border-dashed border-neutral-300 dark:border-neutral-700 rounded-xl text-xs font-mono cursor-pointer hover:border-black dark:hover:border-white transition">
-                    <Upload className="w-4 h-4" />
-                    <span>{uploadingTarget === "desktop" ? `Uploading (${uploadProgress}%)` : "Upload New File"}</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleCreativeFileUpload(file, "desktop");
-                      }}
-                      className="hidden"
-                    />
-                  </label>
-
-                  <input
-                    type="url"
-                    placeholder="https://..."
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                  <ImageUploadField
+                    label="Desktop Creative Asset (Primary)"
                     value={formData.desktopImage}
-                    onChange={(e) =>
-                      setFormData({ ...formData, desktopImage: e.target.value, imageUrl: e.target.value })
+                    onChange={(url) =>
+                      setFormData({ ...formData, desktopImage: url, imageUrl: url })
                     }
-                    className="w-full text-xs p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl text-black dark:text-white font-mono focus:outline-none"
+                    onOpenMediaLibrary={() => setMediaLibraryTarget("desktop")}
+                    required
+                    maxSizeMB={10}
+                    placeholder="https://... or upload local banner"
+                    helpText="Primary display banner for desktop readers."
                   />
                 </div>
 
-                <div className="p-4 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold uppercase text-black dark:text-white">
-                      Tablet Creative (Optional)
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setMediaLibraryTarget("tablet")}
-                      className="text-[11px] font-mono font-bold text-neutral-600 dark:text-neutral-300 hover:underline flex items-center gap-1"
-                    >
-                      <ImageIcon className="w-3.5 h-3.5" />
-                      <span>From Library</span>
-                    </button>
-                  </div>
-                  <input
-                    type="url"
-                    placeholder="https://..."
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                  <ImageUploadField
+                    label="Tablet Creative (Optional - Fallbacks to Desktop)"
                     value={formData.tabletImage}
-                    onChange={(e) => setFormData({ ...formData, tabletImage: e.target.value })}
-                    className="w-full text-xs p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl text-black dark:text-white font-mono focus:outline-none"
+                    onChange={(url) => setFormData({ ...formData, tabletImage: url })}
+                    onOpenMediaLibrary={() => setMediaLibraryTarget("tablet")}
+                    maxSizeMB={10}
+                    placeholder="https://... or upload tablet banner"
                   />
                 </div>
 
-                <div className="p-4 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800 space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold uppercase text-black dark:text-white">
-                      Mobile Creative (Optional)
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setMediaLibraryTarget("mobile")}
-                      className="text-[11px] font-mono font-bold text-neutral-600 dark:text-neutral-300 hover:underline flex items-center gap-1"
-                    >
-                      <ImageIcon className="w-3.5 h-3.5" />
-                      <span>From Library</span>
-                    </button>
-                  </div>
-                  <input
-                    type="url"
-                    placeholder="https://..."
+                <div className="p-4 bg-neutral-50 dark:bg-neutral-950 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                  <ImageUploadField
+                    label="Mobile Creative (Optional - Fallbacks to Desktop)"
                     value={formData.mobileImage}
-                    onChange={(e) => setFormData({ ...formData, mobileImage: e.target.value })}
-                    className="w-full text-xs p-2.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl text-black dark:text-white font-mono focus:outline-none"
+                    onChange={(url) => setFormData({ ...formData, mobileImage: url })}
+                    onOpenMediaLibrary={() => setMediaLibraryTarget("mobile")}
+                    maxSizeMB={10}
+                    placeholder="https://... or upload mobile banner"
                   />
                 </div>
               </div>

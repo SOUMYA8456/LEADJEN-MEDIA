@@ -13,6 +13,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { MediaLibraryModal } from "./MediaLibraryModal";
+import { ImageUploadField } from "./ImageUploadField";
 import Link from "next/link";
 
 interface PageFormData {
@@ -187,28 +188,15 @@ export function PageForm({ initialData }: { initialData?: PageFormData }) {
         </div>
 
         {/* Featured Image */}
-        <div>
-          <label className="block text-xs font-mono uppercase font-bold text-neutral-600 dark:text-neutral-400 mb-1">
-            Featured Header Image (Optional)
-          </label>
-          <div className="flex items-center gap-2">
-            <input
-              type="text"
-              value={featuredImage}
-              onChange={(e) => setFeaturedImage(e.target.value)}
-              placeholder="https://... or select from Media Library"
-              className="w-full px-3.5 py-2.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-xl text-xs font-mono text-black dark:text-white focus:outline-hidden"
-            />
-            <button
-              type="button"
-              onClick={() => setMediaModalOpen(true)}
-              className="flex items-center gap-1.5 px-3 py-2.5 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 text-black dark:text-white rounded-xl text-xs font-mono font-bold uppercase shrink-0 transition"
-            >
-              <ImageIcon className="w-4 h-4" />
-              <span>Media Library</span>
-            </button>
-          </div>
-        </div>
+        <ImageUploadField
+          label="Featured Header Image (Optional)"
+          value={featuredImage}
+          onChange={(url) => setFeaturedImage(url)}
+          onOpenMediaLibrary={() => setMediaModalOpen(true)}
+          aspectRatioHint="16:9 Landscape"
+          maxSizeMB={10}
+          placeholder="https://... or upload local header image"
+        />
 
         {/* Content */}
         <div>
