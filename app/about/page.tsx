@@ -44,7 +44,13 @@ export default async function AboutPage() {
 
   const activeServices = services
     .filter((s) => s.isVisible !== false)
-    .sort((a, b) => (a.order || 0) - (b.order || 0));
+    .sort((a, b) => (a.order || 0) - (b.order || 0))
+    .map((s) => {
+      if (s.slug === "about" || s.id === "service_1") {
+        return { ...s, url: "https://leadjenmedia.com/" };
+      }
+      return s;
+    });
 
   return (
     <div className="min-h-screen bg-white dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 selection:bg-[#1E1B1A] selection:text-white">
@@ -71,11 +77,22 @@ export default async function AboutPage() {
           </p>
 
           <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
-            <Link
-              href="/advertise"
+            <a
+              href="https://leadjenmedia.com/"
+              target="_blank"
+              rel="noopener noreferrer"
               className="px-8 py-3.5 rounded-xl bg-white text-black text-xs font-mono font-bold uppercase tracking-wider hover:bg-neutral-200 transition shadow-xl flex items-center gap-2"
             >
-              <Megaphone className="w-4 h-4 text-red-600" />
+              <Globe className="w-4 h-4 text-red-600" />
+              <span>Digital Marketing Agency Portal (leadjenmedia.com)</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </a>
+
+            <Link
+              href="/advertise"
+              className="px-6 py-3.5 rounded-xl bg-neutral-900 border border-neutral-700 text-white text-xs font-mono font-bold uppercase tracking-wider hover:bg-neutral-800 transition flex items-center gap-2"
+            >
+              <Megaphone className="w-4 h-4 text-neutral-300" />
               <span>Advertise With Leadjen Media</span>
             </Link>
 
@@ -150,35 +167,43 @@ export default async function AboutPage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeServices.map((service, idx) => (
-            <Link
-              key={service.id || idx}
-              href={service.url || `/services/${service.slug}`}
-              className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-black dark:hover:border-white rounded-3xl p-6 flex flex-col justify-between transition group shadow-xs hover:shadow-md"
-            >
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400">
-                    {service.badge || `SERVICE 0${idx + 1}`}
-                  </span>
-                  <ArrowRight className="w-4 h-4 text-neutral-400 group-hover:text-black dark:group-hover:text-white transition" />
-                </div>
-                <h3 className="text-lg font-serif font-bold text-black dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition">
-                  {service.title}
-                </h3>
-                <p className="text-xs text-neutral-600 dark:text-neutral-400 line-clamp-3">
-                  {service.description}
-                </p>
-              </div>
+          {activeServices.map((service, idx) => {
+            const rawUrl = service.slug === "about" || service.id === "service_1"
+              ? "https://leadjenmedia.com/"
+              : (service.url || `/services/${service.slug}`);
+            const isExternal = rawUrl.startsWith("http://") || rawUrl.startsWith("https://");
 
-              <div className="pt-4 mt-4 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
-                <span className="text-xs font-mono font-semibold text-black dark:text-white group-hover:underline">
-                  Learn More
-                </span>
-                <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
-              </div>
-            </Link>
-          ))}
+            return (
+              <a
+                key={service.id || idx}
+                href={rawUrl}
+                {...(isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-black dark:hover:border-white rounded-3xl p-6 flex flex-col justify-between transition group shadow-xs hover:shadow-md cursor-pointer"
+              >
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-wider text-neutral-400">
+                      {service.badge || `SERVICE 0${idx + 1}`}
+                    </span>
+                    <ArrowRight className="w-4 h-4 text-neutral-400 group-hover:text-black dark:group-hover:text-white transition" />
+                  </div>
+                  <h3 className="text-lg font-serif font-bold text-black dark:text-white group-hover:text-red-600 dark:group-hover:text-red-400 transition">
+                    {service.title}
+                  </h3>
+                  <p className="text-xs text-neutral-600 dark:text-neutral-400 line-clamp-3">
+                    {service.description}
+                  </p>
+                </div>
+
+                <div className="pt-4 mt-4 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
+                  <span className="text-xs font-mono font-semibold text-black dark:text-white group-hover:underline">
+                    Learn More
+                  </span>
+                  <ChevronRight className="w-3.5 h-3.5 text-neutral-400" />
+                </div>
+              </a>
+            );
+          })}
         </div>
       </section>
     </div>

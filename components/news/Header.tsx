@@ -826,8 +826,37 @@ export function Header() {
 
                 <div className="space-y-0.5">
                   {servicesList.map((service) => {
-                    const sHref = service.url || `/services/${service.slug}`;
-                    const active = isLinkActive(sHref);
+                    const sHref = service.slug === "about" || service.id === "service_1"
+                      ? "https://leadjenmedia.com/"
+                      : (service.url || `/services/${service.slug}`);
+                    const isExternal = sHref.startsWith("http://") || sHref.startsWith("https://");
+                    const active = !isExternal && isLinkActive(sHref);
+
+                    if (isExternal) {
+                      return (
+                        <a
+                          key={service.id || service.slug}
+                          href={sHref}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setMobileMenuOpen(false)}
+                          className="flex items-center justify-between px-3 py-2 rounded-lg text-xs font-mono font-bold transition text-gray-800 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-900"
+                        >
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="w-1.5 h-1.5 rounded-full bg-red-600 flex-shrink-0" />
+                            <span className="truncate">{service.title}</span>
+                          </div>
+                          {service.badge ? (
+                            <span className="text-[9px] font-mono bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 px-1.5 py-0.5 rounded font-bold flex-shrink-0 ml-2">
+                              {service.badge}
+                            </span>
+                          ) : (
+                            <ChevronRight className="w-3.5 h-3.5 text-gray-400 flex-shrink-0 ml-2" />
+                          )}
+                        </a>
+                      );
+                    }
+
                     return (
                       <Link
                         key={service.id || service.slug}

@@ -131,13 +131,27 @@ export function Footer() {
                   {col.title}
                 </h4>
                 <ul className="space-y-2.5">
-                  {col.links.map((link, lIdx) => (
-                    <li key={lIdx}>
-                      <Link href={link.url} className="hover:text-white text-neutral-400 transition">
-                        {link.label}
-                      </Link>
-                    </li>
-                  ))}
+                  {col.links.map((link, lIdx) => {
+                    const isExternal = link.url?.startsWith("http://") || link.url?.startsWith("https://");
+                    return (
+                      <li key={lIdx}>
+                        {isExternal ? (
+                          <a
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="hover:text-white text-neutral-400 transition"
+                          >
+                            {link.label}
+                          </a>
+                        ) : (
+                          <Link href={link.url} className="hover:text-white text-neutral-400 transition">
+                            {link.label}
+                          </Link>
+                        )}
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             ))
