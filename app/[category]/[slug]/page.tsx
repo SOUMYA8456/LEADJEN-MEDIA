@@ -331,14 +331,10 @@ export default async function ArticleDetailPage({
                   {article.author ? (
                     <>
                       {articleConfig.showAuthorAvatar !== false && (
-                        <Link href={`/author/${article.author.slug}`} className="shrink-0">
+                        <Link href={`/author/${article.author.slug || "editorial-desk"}`} className="shrink-0">
                           <img
                             src={article.author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80"}
                             alt={article.author.name}
-                            onError={(e) => {
-                              (e.target as HTMLImageElement).src =
-                                "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80";
-                            }}
                             className="w-10 h-10 rounded-full object-cover bg-neutral-100"
                           />
                         </Link>
@@ -410,10 +406,6 @@ export default async function ArticleDetailPage({
                   <img
                     src={article.author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80"}
                     alt={article.author.name}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80";
-                    }}
                     className="w-14 h-14 rounded-full object-cover shrink-0"
                   />
                   <div>
@@ -424,7 +416,7 @@ export default async function ArticleDetailPage({
                       {article.author.bio || "Senior journalist for Leadjen Media covering critical national and international developments."}
                     </p>
                     <Link
-                      href={`/author/${article.author.slug}`}
+                      href={`/author/${article.author.slug || "editorial-desk"}`}
                       className="inline-block mt-2 text-xs font-bold text-black dark:text-white hover:underline"
                     >
                       View all stories by {article.author.name} →
