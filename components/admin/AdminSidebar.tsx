@@ -78,6 +78,7 @@ export function AdminSidebar({ user, onCloseMobile }: AdminSidebarProps) {
       groupTitle: "WEBSITE BUILDER",
       items: [
         { label: "Site Builder Studio", href: "/admin/site-builder", icon: Layers, editorOrAdmin: true, highlight: true },
+        { label: "About Page", href: "/admin/about", icon: Users, editorOrAdmin: true },
         { label: "Homepage Builder", href: "/admin/homepage", icon: LayoutDashboard, editorOrAdmin: true },
         { label: "Static & Policy Pages", href: "/admin/pages", icon: FileText, editorOrAdmin: true },
         { label: "Technical SEO", href: "/admin/seo", icon: Globe, editorOrAdmin: true },

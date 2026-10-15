@@ -40,6 +40,8 @@ model User {
   name              String
   role              Role                @default(READER)
   avatar            String?
+  designation       String?
+  department        String?
   status            String              @default("ACTIVE") // ACTIVE, SUSPENDED
   resetToken        String?
   resetTokenExpiry  DateTime?
@@ -57,6 +59,8 @@ model Author {
   name        String
   slug        String    @unique
   designation String?   @default("Senior Editorial Correspondent")
+  department  String?
+  status      String?   @default("ACTIVE")
   bio         String?
   avatar      String?
   email       String?
@@ -529,5 +533,61 @@ model SeoSettings {
   bingVerify       String?
   updatedAt        DateTime @updatedAt
 }
+
+// ==========================================
+// ABOUT PAGE & TEAM MANAGEMENT MODELS
+// ==========================================
+
+model AboutPageSettings {
+  id             String   @id @default("default")
+  heroHeading    String   @default("ABOUT LEADJEN MEDIA")
+  heroSubtitle   String   @default("Independent Journalism. Trusted Perspectives. Stories That Matter.")
+  introduction   String   @default("Leadjen Media is an independent digital news publishing and media enterprise dedicated to authoritative journalism, investigative depth, cultural insight, and public-interest reporting. Our newsroom operates with unwavering commitment to accuracy, balance, and editorial integrity.")
+  
+  // CEO & Director Profile
+  ceoName        String   @default("Editorial Leadership Desk")
+  ceoDesignation String   @default("CEO & Director")
+  ceoBio         String   @default("Directs Leadjen Media Daily's strategic editorial mission, nationwide investigative bureau network, multi-format newsroom operations, and digital journalism innovation.")
+  ceoMessage     String   @default("In an era of relentless information noise, our newsroom stands for unflinching independence, verified reporting, and stories that matter. We believe ethical journalism is not merely an industry—it is a vital pillar of a free and informed society.")
+  ceoPhoto       String?
+  ceoTwitter     String?
+  ceoLinkedin    String?
+  ceoEmail       String?
+  
+  // Mission & Vision
+  missionTitle   String   @default("OUR MISSION")
+  missionText    String   @default("To provide verified, non-partisan, and impactful journalism that holds institutions accountable, illuminates complex national and international affairs, and serves the public good.")
+  visionTitle    String   @default("OUR VISION")
+  visionText     String   @default("To build India's most trusted and technologically advanced digital news ecosystem, combining journalistic integrity with cutting-edge multimedia storytelling.")
+  
+  // Editorial Values
+  valuesTitle    String   @default("OUR EDITORIAL VALUES")
+  valuesJson     String?  // JSON string array of { title, description, icon }
+  
+  // Coverage section
+  coverageTitle  String   @default("WHAT WE COVER")
+  coverageText   String   @default("Authoritative, real-time reporting across key national and global beats.")
+  
+  updatedAt      DateTime @updatedAt
+}
+
+model TeamMember {
+  id          String   @id @default(cuid())
+  name        String
+  designation String
+  bio         String?
+  photo       String?
+  order       Int      @default(0)
+  status      String   @default("PUBLISHED") // DRAFT, PUBLISHED
+  isDemo      Boolean  @default(false)
+  twitter     String?
+  linkedin    String?
+  email       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status, order])
+}
+
 
 

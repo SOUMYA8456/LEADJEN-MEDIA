@@ -100,7 +100,7 @@ export default async function ServicesHubPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {activeServices.map((service, idx) => {
             const rawUrl = service.slug === "about" || service.id === "service_1"
-              ? "https://leadjenmedia.com/"
+              ? "/about"
               : (service.url || `/services/${service.slug}`);
             const isExternal = rawUrl.startsWith("http://") || rawUrl.startsWith("https://");
 

@@ -29,6 +29,7 @@ export const SITE_BUILDER_TABS = [
   { label: "Header", href: "/admin/site-builder/header", icon: Columns },
   { label: "Navigation", href: "/admin/site-builder/navigation", icon: Navigation },
   { label: "Company Services", href: "/admin/site-builder/services", icon: Sparkles },
+  { label: "About Page", href: "/admin/about", icon: Users },
   { label: "Advertising Studio", href: "/admin/site-builder/advertising", icon: Megaphone },
   { label: "Homepage", href: "/admin/homepage", icon: Layers },
   { label: "Categories", href: "/admin/site-builder/categories", icon: Columns },

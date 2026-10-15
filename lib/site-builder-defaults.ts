@@ -337,7 +337,7 @@ export const DEFAULT_SERVICES: ServiceItemConfig[] = [
     id: "service_1",
     title: "About Leadjen Media",
     slug: "about",
-    url: "https://leadjenmedia.com/",
+    url: "/about",
     description: "The premier independent digital newsroom delivering investigative journalism, policy breakdowns, and global analysis.",
     longDescription: "Leadjen Media Daily operates as an independent, non-partisan digital news organization dedicated to investigative rigour, high-fidelity financial dispatches, geopolitical analysis, and multimedia broadcasting. We serve an engaged community of policymakers, corporate executives, innovators, and readers across India and the global diaspora.",
     badge: "Flagship Media",
@@ -846,7 +846,7 @@ export const DEFAULT_SITE_BUILDER_CONFIG: SiteBuilderConfig = {
       {
         title: "About Leadjen Media",
         links: [
-          { label: "About Leadjen Media", url: "https://leadjenmedia.com/" },
+          { label: "About Leadjen Media", url: "/about" },
           { label: "Digital Marketing Agency", url: "https://leadjenmedia.com/" },
           { label: "Media House", url: "/services/media-house" },
           { label: "Podcasting Venture", url: "/services/podcasting-venture" },
