@@ -44,7 +44,7 @@ export default async function AdminDashboardPage() {
     scheduledCount,
     breakingCount,
     totalViewsAgg,
-    recentArticles,
+    rawRecentArticles,
     mostReadArticles,
     scheduledArticles,
     totalSectionsCount,
@@ -66,23 +66,52 @@ export default async function AdminDashboardPage() {
     prisma.article.findMany({
       take: 8,
       orderBy: { createdAt: "desc" },
-      include: { category: true, author: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        featuredImage: true,
+        status: true,
+        viewCount: true,
+        updatedAt: true,
+        category: { select: { name: true, slug: true } },
+        author: { select: { name: true, slug: true } },
+      },
     }),
     prisma.article.findMany({
       where: { status: "PUBLISHED" },
       take: 5,
       orderBy: { viewCount: "desc" },
-      include: { category: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        viewCount: true,
+        category: { select: { name: true, slug: true } },
+      },
     }),
     prisma.article.findMany({
       where: { status: "SCHEDULED" },
       take: 3,
       orderBy: { scheduledAt: "asc" },
-      include: { category: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        scheduledAt: true,
+        category: { select: { name: true, slug: true } },
+      },
     }),
     prisma.homepageSection.count({ where: { enabled: true } }),
     prisma.homepageVersion.findFirst({ orderBy: { publishedAt: "desc" } }),
   ]);
+
+  const recentArticles = rawRecentArticles.map((art) => ({
+    ...art,
+    featuredImage: art.featuredImage?.startsWith("data:")
+      ? `/api/articles/${art.id}/image`
+      : (art.featuredImage || ""),
+  }));
 
   const totalViews = totalViewsAgg._sum.viewCount || 0;
 

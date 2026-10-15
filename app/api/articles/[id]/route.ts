@@ -172,7 +172,12 @@ export async function PUT(
         subtitle: subtitle !== undefined ? subtitle : existing.subtitle,
         excerpt: excerpt !== undefined ? excerpt : existing.excerpt,
         content: content !== undefined ? content : existing.content,
-        featuredImage: featuredImage !== undefined ? featuredImage : existing.featuredImage,
+        featuredImage:
+          featuredImage !== undefined
+            ? (typeof featuredImage === "string" && featuredImage.includes(`/api/articles/${params.id}/image`)
+                ? existing.featuredImage
+                : featuredImage)
+            : existing.featuredImage,
         gallery: gallery !== undefined ? (typeof gallery === "string" ? gallery : JSON.stringify(gallery)) : existing.gallery,
         categoryId: categoryId !== undefined ? categoryId : existing.categoryId,
         authorId: authorId !== undefined ? authorId : existing.authorId,

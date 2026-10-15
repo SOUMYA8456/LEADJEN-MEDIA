@@ -34,15 +34,41 @@ export default async function AdminArticlesListPage({
     ];
   }
 
-  const [articles, categories, total] = await Promise.all([
+  const [rawArticles, categories, total] = await Promise.all([
     prisma.article.findMany({
       where,
-      include: { category: true, author: true },
+      select: {
+        id: true,
+        title: true,
+        slug: true,
+        excerpt: true,
+        featuredImage: true,
+        status: true,
+        isFeatured: true,
+        isBreaking: true,
+        isTrending: true,
+        viewCount: true,
+        scheduledAt: true,
+        createdAt: true,
+        category: {
+          select: { id: true, name: true, slug: true },
+        },
+        author: {
+          select: { id: true, name: true, slug: true },
+        },
+      },
       orderBy: { createdAt: "desc" },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
     prisma.article.count({ where }),
   ]);
+
+  const articles = rawArticles.map((art) => ({
+    ...art,
+    featuredImage: art.featuredImage?.startsWith("data:")
+      ? `/api/articles/${art.id}/image`
+      : (art.featuredImage || ""),
+  }));
 
   return (
     <div className="space-y-5 pb-20 max-w-[1720px] mx-auto px-1 sm:px-4">

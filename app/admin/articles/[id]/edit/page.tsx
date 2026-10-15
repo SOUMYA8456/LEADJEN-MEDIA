@@ -29,10 +29,17 @@ export default async function EditArticlePage({
     notFound();
   }
 
+  const sanitizedArticle = {
+    ...article,
+    featuredImage: article.featuredImage?.startsWith("data:")
+      ? `/api/articles/${article.id}/image`
+      : (article.featuredImage || ""),
+  };
+
   return (
     <div>
       <ArticleForm
-        initialData={article}
+        initialData={sanitizedArticle}
         categories={categories}
         authors={authors}
         isEditing={true}

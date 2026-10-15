@@ -83,8 +83,15 @@ export async function GET(req: NextRequest) {
       prisma.article.count({ where }),
     ]);
 
+    const sanitizedArticles = articles.map((art) => ({
+      ...art,
+      featuredImage: art.featuredImage?.startsWith("data:")
+        ? `/api/articles/${art.id}/image`
+        : (art.featuredImage || ""),
+    }));
+
     return NextResponse.json({
-      articles,
+      articles: sanitizedArticles,
       pagination: {
         total,
         page,

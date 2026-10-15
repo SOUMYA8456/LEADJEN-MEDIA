@@ -220,7 +220,8 @@ export default function AdminAuthorsPage() {
     setActionError("");
 
     try {
-      const res = await fetch("/api/admin/users", {
+      const url = isSuperAdmin ? "/api/admin/users" : "/api/authors";
+      const res = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -228,11 +229,11 @@ export default function AdminAuthorsPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to create employee");
+        throw new Error(data.error || "Failed to create correspondent");
       }
 
       setGeneratedPassword(data.tempPassword || formData.password);
-      setActionSuccess(`Employee account for "${data.user.name}" created successfully!`);
+      setActionSuccess(`Account for "${data.user?.name || data.author?.name}" created successfully!`);
       await fetchInitialData();
     } catch (err: any) {
       setActionError(err.message || "Something went wrong");
@@ -249,7 +250,8 @@ export default function AdminAuthorsPage() {
     setActionError("");
 
     try {
-      const res = await fetch(`/api/admin/users/${selectedUser.id}`, {
+      const url = isSuperAdmin ? `/api/admin/users/${selectedUser.id}` : `/api/authors/${selectedUser.id}`;
+      const res = await fetch(url, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
@@ -257,14 +259,14 @@ export default function AdminAuthorsPage() {
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to update employee details");
+        throw new Error(data.error || "Failed to update correspondent details");
       }
 
-      setActionSuccess(`Staff details for "${data.user.name}" updated successfully.`);
+      setActionSuccess(`Details for "${data.user?.name || data.author?.name || formData.name}" updated successfully.`);
       await fetchInitialData();
       setTimeout(() => setShowEditModal(false), 1200);
     } catch (err: any) {
-      setActionError(err.message || "Failed to update employee");
+      setActionError(err.message || "Failed to update details");
     } finally {
       setActionLoading(false);
     }

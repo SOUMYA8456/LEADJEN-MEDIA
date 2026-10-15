@@ -15,7 +15,7 @@ const ALLOWED_MIME_TYPES = new Set([
   "image/avif",
 ]);
 
-const MAX_IMAGE_BYTES = 5 * 1024 * 1024; // 5 MB max
+const MAX_IMAGE_BYTES = 15 * 1024 * 1024; // 15 MB max (supports high-res existing articles)
 
 export async function GET(
   req: NextRequest,

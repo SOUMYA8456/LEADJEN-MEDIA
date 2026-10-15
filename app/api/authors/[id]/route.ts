@@ -41,9 +41,9 @@ export async function PUT(
 ) {
   try {
     const session = getSessionFromRequest(req);
-    if (!session || session.role !== "SUPER_ADMIN") {
+    if (!session || (session.role !== "SUPER_ADMIN" && session.role !== "EDITOR")) {
       return NextResponse.json(
-        { error: "Forbidden. Super Admin access required." },
+        { error: "Forbidden. Editorial staff access required." },
         { status: 403 }
       );
     }
@@ -120,9 +120,9 @@ export async function DELETE(
 ) {
   try {
     const session = getSessionFromRequest(req);
-    if (!session || session.role !== "SUPER_ADMIN") {
+    if (!session || (session.role !== "SUPER_ADMIN" && session.role !== "EDITOR")) {
       return NextResponse.json(
-        { error: "Forbidden. Super Admin access required." },
+        { error: "Forbidden. Editorial staff access required." },
         { status: 403 }
       );
     }
