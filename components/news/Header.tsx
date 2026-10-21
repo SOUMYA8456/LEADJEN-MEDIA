@@ -234,8 +234,8 @@ export function Header() {
                   className="h-9 sm:h-12 md:h-14 w-auto object-contain hidden dark:block transition-transform group-hover:scale-[1.01]"
                 />
               </Link>
-              <p className="hidden md:block text-[10px] font-mono tracking-[0.22em] text-[#665858] dark:text-gray-400 uppercase mt-1 font-semibold">
-                INDEPENDENT JOURNALISM • INSIGHT • IMPACT
+              <p className="hidden md:block text-[10px] font-mono tracking-[0.22em] text-[#665858] dark:text-[#F4DDE3] uppercase mt-1 font-semibold">
+                DRIVING LEADS, POWERING GROWTH! • INDEPENDENT JOURNALISM
               </p>
             </div>
 
