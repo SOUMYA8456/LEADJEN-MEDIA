@@ -226,7 +226,12 @@ export function Header() {
                 <img
                   src="/images/logo.png"
                   alt="LEADJEN MEDIA"
-                  className="h-10 sm:h-12 md:h-14 w-auto object-contain transition-transform group-hover:scale-[1.01]"
+                  className="h-10 sm:h-12 md:h-14 w-auto object-contain dark:hidden transition-transform group-hover:scale-[1.01]"
+                />
+                <img
+                  src="/images/logo-white.png"
+                  alt="LEADJEN MEDIA"
+                  className="h-10 sm:h-12 md:h-14 w-auto object-contain hidden dark:block transition-transform group-hover:scale-[1.01]"
                 />
               </Link>
               <p className="hidden md:block text-[10px] font-mono tracking-[0.22em] text-[#665858] dark:text-gray-400 uppercase mt-1 font-semibold">
