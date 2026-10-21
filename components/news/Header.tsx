@@ -226,12 +226,12 @@ export function Header() {
                 <img
                   src="/images/logo.png"
                   alt="LEADJEN MEDIA"
-                  className="h-8 sm:h-11 md:h-12 w-auto object-contain dark:hidden transition-transform group-hover:scale-[1.01]"
+                  className="h-9 sm:h-12 md:h-14 w-auto object-contain dark:hidden transition-transform group-hover:scale-[1.01]"
                 />
                 <img
                   src="/images/logo-white.png"
                   alt="LEADJEN MEDIA"
-                  className="h-8 sm:h-11 md:h-12 w-auto object-contain hidden dark:block transition-transform group-hover:scale-[1.01]"
+                  className="h-9 sm:h-12 md:h-14 w-auto object-contain hidden dark:block transition-transform group-hover:scale-[1.01]"
                 />
               </Link>
               <p className="hidden md:block text-[10px] font-mono tracking-[0.22em] text-[#665858] dark:text-gray-400 uppercase mt-1 font-semibold">
@@ -726,7 +726,7 @@ export function Header() {
                 <img
                   src="/images/logo-white.png"
                   alt="LEADJEN MEDIA"
-                  className="h-8 w-auto object-contain"
+                  className="h-9 sm:h-10 w-auto object-contain"
                 />
               </Link>
               <button
@@ -1007,7 +1007,7 @@ export function Header() {
                 <img
                   src="/images/leadjen-bottom-logo.png"
                   alt="LEADJEN MEDIA"
-                  className="h-7 w-auto object-contain mx-auto mb-2 opacity-95"
+                  className="h-8 sm:h-9 w-auto object-contain mx-auto mb-2 opacity-95"
                 />
                 <p className="text-[10px] text-[#F4DDE3]/80 font-medium">
                   © 2026 LEADJEN MEDIA. All rights reserved.
