@@ -30,18 +30,18 @@ export function ArticleContent({ content, ad }: ArticleContentProps) {
   return (
     <div className="w-full">
       {/* Reader Controls Toolbar */}
-      <div className="flex items-center justify-between py-2.5 px-3 my-4 bg-gray-50 dark:bg-editorial-darkCard rounded-lg border border-gray-200 dark:border-gray-800 text-xs font-mono">
+      <div className="flex items-center justify-between py-2.5 px-3 my-4 bg-[#FFFCF5] dark:bg-editorial-darkCard rounded-lg border border-[#E8DCCB] dark:border-gray-800 text-xs font-mono">
         {/* Font Size Adjuster */}
         <div className="flex items-center gap-1.5">
-          <Type className="w-4 h-4 text-gray-500" />
-          <span className="text-gray-500 uppercase mr-1">Text Size:</span>
+          <Type className="w-4 h-4 text-[#665858]" />
+          <span className="text-[#665858] uppercase mr-1">Text Size:</span>
           <button
             type="button"
             onClick={() => setFontSize("sm")}
-            className={`px-2 py-1 rounded ${
+            className={`px-2 py-1 rounded transition ${
               fontSize === "sm"
-                ? "bg-[#1E1B1A] dark:bg-white text-white dark:text-black font-bold"
-                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
+                ? "bg-[#4A0B1C] text-white font-bold"
+                : "bg-[#F7EEDB] dark:bg-gray-800 text-[#241A1A] dark:text-gray-300 hover:bg-[#E8DCCB]"
             }`}
           >
             A-
@@ -49,10 +49,10 @@ export function ArticleContent({ content, ad }: ArticleContentProps) {
           <button
             type="button"
             onClick={() => setFontSize("base")}
-            className={`px-2 py-1 rounded ${
+            className={`px-2 py-1 rounded transition ${
               fontSize === "base"
-                ? "bg-[#1E1B1A] dark:bg-white text-white dark:text-black font-bold"
-                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
+                ? "bg-[#4A0B1C] text-white font-bold"
+                : "bg-[#F7EEDB] dark:bg-gray-800 text-[#241A1A] dark:text-gray-300 hover:bg-[#E8DCCB]"
             }`}
           >
             A
@@ -60,10 +60,10 @@ export function ArticleContent({ content, ad }: ArticleContentProps) {
           <button
             type="button"
             onClick={() => setFontSize("lg")}
-            className={`px-2 py-1 rounded ${
+            className={`px-2 py-1 rounded transition ${
               fontSize === "lg"
-                ? "bg-[#1E1B1A] dark:bg-white text-white dark:text-black font-bold"
-                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
+                ? "bg-[#4A0B1C] text-white font-bold"
+                : "bg-[#F7EEDB] dark:bg-gray-800 text-[#241A1A] dark:text-gray-300 hover:bg-[#E8DCCB]"
             }`}
           >
             A+
@@ -75,10 +75,10 @@ export function ArticleContent({ content, ad }: ArticleContentProps) {
           <button
             type="button"
             onClick={handleSave}
-            className={`flex items-center gap-1 px-2.5 py-1 rounded transition ${
+            className={`flex items-center gap-1 px-2.5 py-1 rounded transition border ${
               saved
-                ? "bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 font-bold"
-                : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200"
+                ? "bg-[#F7EEDB] text-[#4A0B1C] border-[#E8DCCB] font-bold"
+                : "bg-[#F7EEDB] dark:bg-gray-800 text-[#241A1A] dark:text-gray-300 border-[#E8DCCB]/60 hover:bg-[#E8DCCB]"
             }`}
           >
             <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-current" : ""}`} />
@@ -88,7 +88,7 @@ export function ArticleContent({ content, ad }: ArticleContentProps) {
           <button
             type="button"
             onClick={handlePrint}
-            className="flex items-center gap-1 px-2.5 py-1 rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 transition"
+            className="flex items-center gap-1 px-2.5 py-1 rounded bg-[#F7EEDB] dark:bg-gray-800 text-[#241A1A] dark:text-gray-300 border border-[#E8DCCB]/60 hover:bg-[#E8DCCB] transition"
           >
             <Printer className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Print</span>

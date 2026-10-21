@@ -73,6 +73,19 @@ export interface DesignColorsConfig {
   darkTextPrimary: string;
   darkTextSecondary: string;
   darkBorderColor: string;
+  // Cream & Maroon System Tokens
+  deepMaroon?: string;
+  maroonAccent?: string;
+  breakingRed?: string;
+  sidebarBackground?: string;
+  sidebarSecondary?: string;
+  sidebarActive?: string;
+  sidebarText?: string;
+  sidebarTextSecondary?: string;
+  sidebarDivider?: string;
+  navBackground?: string;
+  navText?: string;
+  navActive?: string;
 }
 
 export interface DesignTypographyConfig {
@@ -270,22 +283,34 @@ export interface SiteBuilderConfig {
 
 export const DEFAULT_DESIGN_SYSTEM: DesignSystemConfig = {
   colors: {
-    primary: "#1E1B1A",
-    secondary: "#2d2726",
-    accentRed: "#cc0000",
-    background: "#ffffff",
-    surface: "#f8f9fa",
-    card: "#ffffff",
-    textPrimary: "#0a0a0a",
-    textSecondary: "#52525b",
-    mutedText: "#71717a",
-    borderColor: "#e4e4e7",
+    primary: "#6B1024",
+    secondary: "#4A0B1C",
+    accentRed: "#B42332",
+    background: "#FFF8E7",
+    surface: "#F7EEDB",
+    card: "#FFFCF5",
+    textPrimary: "#241A1A",
+    textSecondary: "#665858",
+    mutedText: "#665858",
+    borderColor: "#E8DCCB",
     darkBackground: "#0a0a0a",
     darkSurface: "#141414",
     darkCard: "#18181b",
     darkTextPrimary: "#f4f4f5",
     darkTextSecondary: "#a1a1aa",
     darkBorderColor: "#27272a",
+    maroonAccent: "#6B1024",
+    deepMaroon: "#4A0B1C",
+    breakingRed: "#B42332",
+    sidebarBackground: "#4A0B1C",
+    sidebarSecondary: "#60152B",
+    sidebarActive: "#7A2038",
+    sidebarText: "#FFFFFF",
+    sidebarTextSecondary: "#F4DDE3",
+    sidebarDivider: "rgba(255,255,255,0.16)",
+    navBackground: "#4A0B1C",
+    navText: "#FFFFFF",
+    navActive: "#F4DDE3",
   },
   typography: {
     headingFont: "Georgia, Cambria, 'Times New Roman', Times, serif",
@@ -893,17 +918,29 @@ export function generateThemeCss(config?: Partial<SiteBuilderConfig>): string {
 
   return `
 :root {
-  --bg-primary: ${colors.background || "#ffffff"};
-  --bg-secondary: ${colors.surface || "#f8f9fa"};
-  --bg-card: ${colors.card || "#ffffff"};
-  --text-primary: ${colors.textPrimary || "#0a0a0a"};
-  --text-secondary: ${colors.textSecondary || "#52525b"};
-  --text-muted: ${colors.mutedText || "#71717a"};
-  --border-color: ${colors.borderColor || "#e4e4e7"};
-  --leadjen-primary: ${colors.primary || "#1E1B1A"};
-  --leadjen-secondary: ${colors.secondary || "#2d2726"};
-  --leadjen-red: ${colors.accentRed || "#cc0000"};
-  --leadjen-black: ${colors.textPrimary || "#0a0a0a"};
+  --bg-primary: ${colors.background || "#FFF8E7"};
+  --bg-secondary: ${colors.surface || "#F7EEDB"};
+  --bg-card: ${colors.card || "#FFFCF5"};
+  --text-primary: ${colors.textPrimary || "#241A1A"};
+  --text-secondary: ${colors.textSecondary || "#665858"};
+  --text-muted: ${colors.mutedText || "#665858"};
+  --border-color: ${colors.borderColor || "#E8DCCB"};
+  --leadjen-primary: ${colors.primary || "#6B1024"};
+  --leadjen-secondary: ${colors.secondary || "#4A0B1C"};
+  --leadjen-red: ${colors.accentRed || "#B42332"};
+  --leadjen-black: ${colors.textPrimary || "#241A1A"};
+  --maroon-accent: ${colors.maroonAccent || colors.primary || "#6B1024"};
+  --deep-maroon: ${colors.deepMaroon || colors.secondary || "#4A0B1C"};
+  --breaking-red: ${colors.breakingRed || colors.accentRed || "#B42332"};
+  --sidebar-bg: ${colors.sidebarBackground || "#4A0B1C"};
+  --sidebar-secondary: ${colors.sidebarSecondary || "#60152B"};
+  --sidebar-active: ${colors.sidebarActive || "#7A2038"};
+  --sidebar-text: ${colors.sidebarText || "#FFFFFF"};
+  --sidebar-text-secondary: ${colors.sidebarTextSecondary || "#F4DDE3"};
+  --sidebar-divider: ${colors.sidebarDivider || "rgba(255,255,255,0.16)"};
+  --nav-bg: ${colors.navBackground || "#4A0B1C"};
+  --nav-text: ${colors.navText || "#FFFFFF"};
+  --nav-active: ${colors.navActive || "#F4DDE3"};
 
   --font-heading: ${typo.headingFont || "Georgia, serif"};
   --font-sans: ${typo.bodyFont || "'LINESeedJP', 'LINE Seed JP', sans-serif"};
@@ -942,6 +979,18 @@ export function generateThemeCss(config?: Partial<SiteBuilderConfig>): string {
   --border-color: ${colors.darkBorderColor || "#27272a"};
   --leadjen-primary: #ffffff;
   --leadjen-black: #ffffff;
+  --maroon-accent: #E25B74;
+  --deep-maroon: #2C0711;
+  --breaking-red: #F87171;
+  --sidebar-bg: #2C0711;
+  --sidebar-secondary: #3D0A18;
+  --sidebar-active: #541123;
+  --sidebar-text: #FFFFFF;
+  --sidebar-text-secondary: #F4DDE3;
+  --sidebar-divider: rgba(255,255,255,0.16);
+  --nav-bg: #2C0711;
+  --nav-text: #FFFFFF;
+  --nav-active: #F4DDE3;
 }
 
 @media (max-width: 1024px) {

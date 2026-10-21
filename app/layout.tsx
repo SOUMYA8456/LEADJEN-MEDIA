@@ -126,7 +126,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
         />
       </head>
-      <body className={`${inter.variable} min-h-screen flex flex-col antialiased selection:bg-[#1E1B1A] selection:text-white dark:selection:bg-white dark:selection:text-black`}>
+      <body className={`${inter.variable} min-h-screen flex flex-col antialiased bg-[#FFF8E7] dark:bg-[#0a0a0a] text-[#241A1A] dark:text-[#f4f4f5] selection:bg-[#4A0B1C] selection:text-white dark:selection:bg-white dark:selection:text-black`}>
         <ThemeProvider initialConfig={siteConfig}>
           {/* Top Leaderboard Ad */}
           <LeaderboardAd ad={topAd} />

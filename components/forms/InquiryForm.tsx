@@ -100,34 +100,34 @@ export function InquiryForm({
   };
 
   return (
-    <div id="inquiry-form" className="bg-[#1E1B1A] text-white rounded-3xl p-6 sm:p-10 border border-neutral-800 shadow-2xl">
+    <div id="inquiry-form" className="bg-[#4A0B1C] text-white rounded-3xl p-6 sm:p-10 border border-[#60152B] shadow-2xl">
       <div className="max-w-3xl mx-auto">
         <div className="text-center space-y-2 mb-8">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest uppercase bg-red-600/20 text-red-400 border border-red-500/30">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold tracking-widest uppercase bg-[#60152B] text-[#F4DDE3] border border-[#7A2038]">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#B42332] animate-pulse" />
             COMMERCIAL &amp; PARTNERSHIP BUREAU
           </span>
           <h2 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-black tracking-tight text-white">
             {heading}
           </h2>
-          <p className="text-xs sm:text-sm text-neutral-400 font-sans max-w-xl mx-auto">
+          <p className="text-xs sm:text-sm text-[#F4DDE3] font-sans max-w-xl mx-auto">
             {subheading}
           </p>
         </div>
 
         {status === "success" ? (
-          <div className="p-8 rounded-2xl bg-neutral-900 border border-green-500/40 text-center space-y-4 animate-in fade-in zoom-in-95">
+          <div className="p-8 rounded-2xl bg-[#60152B] border border-green-500/40 text-center space-y-4 animate-in fade-in zoom-in-95">
             <div className="w-14 h-14 bg-green-500/10 text-green-400 rounded-full flex items-center justify-center mx-auto border border-green-500/30">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h3 className="text-xl font-serif font-bold text-white">Inquiry Received</h3>
-            <p className="text-sm text-neutral-300 font-sans max-w-md mx-auto">
+            <p className="text-sm text-[#F4DDE3] font-sans max-w-md mx-auto">
               {successMessage}
             </p>
             <button
               type="button"
               onClick={() => setStatus("idle")}
-              className="mt-4 px-6 py-2.5 rounded-xl bg-white text-black text-xs font-mono font-bold uppercase tracking-wider hover:bg-neutral-200 transition"
+              className="mt-4 px-6 py-2.5 rounded-xl bg-white text-[#4A0B1C] text-xs font-mono font-bold uppercase tracking-wider hover:bg-[#F7EEDB] transition"
             >
               Submit Another Inquiry
             </button>
@@ -135,7 +135,7 @@ export function InquiryForm({
         ) : (
           <form onSubmit={handleSubmit} className="space-y-5">
             {status === "error" && (
-              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-mono flex items-center gap-2">
+              <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-200 text-xs font-mono flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
                 <span>{errorMessage}</span>
               </div>
@@ -144,8 +144,8 @@ export function InquiryForm({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Full Name */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-neutral-300">
-                  Full Name <span className="text-red-500">*</span>
+                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-[#F4DDE3]">
+                  Full Name <span className="text-[#B42332]">*</span>
                 </label>
                 <input
                   type="text"
@@ -153,14 +153,14 @@ export function InquiryForm({
                   placeholder="e.g. Alex Morgan"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white transition"
+                  className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white placeholder-[#F4DDE3]/60 focus:outline-none focus:border-[#F4DDE3] transition"
                 />
               </div>
 
               {/* Work Email */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-neutral-300">
-                  Official Email <span className="text-red-500">*</span>
+                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-[#F4DDE3]">
+                  Official Email <span className="text-[#B42332]">*</span>
                 </label>
                 <input
                   type="email"
@@ -168,13 +168,13 @@ export function InquiryForm({
                   placeholder="e.g. partner@brand.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white transition"
+                  className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white placeholder-[#F4DDE3]/60 focus:outline-none focus:border-[#F4DDE3] transition"
                 />
               </div>
 
               {/* Phone */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-neutral-300">
+                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-[#F4DDE3]">
                   Phone / WhatsApp
                 </label>
                 <input
@@ -182,13 +182,13 @@ export function InquiryForm({
                   placeholder="+91 / +1 ..."
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white transition"
+                  className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white placeholder-[#F4DDE3]/60 focus:outline-none focus:border-[#F4DDE3] transition"
                 />
               </div>
 
               {/* Company / Brand */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-neutral-300">
+                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-[#F4DDE3]">
                   Company / Organization
                 </label>
                 <input
@@ -196,7 +196,7 @@ export function InquiryForm({
                   placeholder="e.g. Acme Global Media"
                   value={formData.company}
                   onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                  className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white transition"
+                  className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white placeholder-[#F4DDE3]/60 focus:outline-none focus:border-[#F4DDE3] transition"
                 />
               </div>
             </div>
@@ -204,13 +204,13 @@ export function InquiryForm({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               {/* Inquiry Type / Category */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-neutral-300">
+                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-[#F4DDE3]">
                   Inquiry Focus
                 </label>
                 <select
                   value={formData.inquiryType}
                   onChange={(e) => setFormData({ ...formData, inquiryType: e.target.value as any })}
-                  className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white focus:outline-none focus:border-white transition"
+                  className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white focus:outline-none focus:border-[#F4DDE3] transition"
                 >
                   <option value="ADVERTISING">Advertising &amp; Sponsorship</option>
                   <option value="SERVICE">Leadjen Media Agency Service</option>
@@ -220,14 +220,14 @@ export function InquiryForm({
 
               {/* Specific Placement / Service */}
               <div className="space-y-1.5 sm:col-span-2">
-                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-neutral-300">
+                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-[#F4DDE3]">
                   {formData.inquiryType === "ADVERTISING" ? "Target Advertising Section" : "Target Service"}
                 </label>
                 {formData.inquiryType === "ADVERTISING" ? (
                   <select
                     value={formData.advertisingType}
                     onChange={(e) => setFormData({ ...formData, advertisingType: e.target.value })}
-                    className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white focus:outline-none focus:border-white transition"
+                    className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white focus:outline-none focus:border-[#F4DDE3] transition"
                   >
                     {advertisingOptions.map((opt) => (
                       <option key={opt} value={opt}>
@@ -239,7 +239,7 @@ export function InquiryForm({
                   <select
                     value={formData.serviceName}
                     onChange={(e) => setFormData({ ...formData, serviceName: e.target.value })}
-                    className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white focus:outline-none focus:border-white transition"
+                    className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white focus:outline-none focus:border-[#F4DDE3] transition"
                   >
                     <option value="">Select a Leadjen Service...</option>
                     {serviceOptions.map((opt) => (
@@ -255,13 +255,13 @@ export function InquiryForm({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {/* Estimated Budget */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-neutral-300">
+                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-[#F4DDE3]">
                   Estimated Campaign Budget
                 </label>
                 <select
                   value={formData.budget}
                   onChange={(e) => setFormData({ ...formData, budget: e.target.value })}
-                  className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white focus:outline-none focus:border-white transition"
+                  className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white focus:outline-none focus:border-[#F4DDE3] transition"
                 >
                   <option value="Under $2,500">Under $2,500 / ₹2,00,000</option>
                   <option value="$2,500 - $10,000">$2,500 – $10,000 / ₹2L – ₹8L</option>
@@ -272,13 +272,13 @@ export function InquiryForm({
 
               {/* Timeline */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-neutral-300">
+                <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-[#F4DDE3]">
                   Target Launch Timeline
                 </label>
                 <select
                   value={formData.timeline}
                   onChange={(e) => setFormData({ ...formData, timeline: e.target.value })}
-                  className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white focus:outline-none focus:border-white transition"
+                  className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white focus:outline-none focus:border-[#F4DDE3] transition"
                 >
                   <option value="Immediate (1-7 Days)">Immediate (1–7 Days)</option>
                   <option value="Within 30 Days">Within 30 Days</option>
@@ -290,8 +290,8 @@ export function InquiryForm({
 
             {/* Campaign Brief / Message */}
             <div className="space-y-1.5">
-              <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-neutral-300">
-                Campaign Brief &amp; Objectives <span className="text-red-500">*</span>
+              <label className="block text-xs font-mono font-semibold uppercase tracking-wider text-[#F4DDE3]">
+                Campaign Brief &amp; Objectives <span className="text-[#B42332]">*</span>
               </label>
               <textarea
                 required
@@ -299,18 +299,18 @@ export function InquiryForm({
                 placeholder="Describe your brand goals, target audience, preferred editorial integrations, or custom requirements..."
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                className="w-full px-4 py-3 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-none focus:border-white transition resize-y"
+                className="w-full px-4 py-3 bg-[#60152B] border border-[rgba(255,255,255,0.2)] rounded-xl text-sm text-white placeholder-[#F4DDE3]/60 focus:outline-none focus:border-[#F4DDE3] transition resize-y"
               />
             </div>
 
             <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <p className="text-[11px] font-mono text-neutral-400 text-center sm:text-left">
+              <p className="text-[11px] font-mono text-[#F4DDE3]/80 text-center sm:text-left">
                 🔒 Strictly confidential. Verified enterprise editorial review within 24h.
               </p>
               <button
                 type="submit"
                 disabled={status === "submitting"}
-                className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-neutral-200 text-black rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg disabled:opacity-50"
+                className="w-full sm:w-auto px-8 py-3.5 bg-white hover:bg-[#F7EEDB] text-[#4A0B1C] rounded-xl text-xs font-mono font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition shadow-lg disabled:opacity-50"
               >
                 {status === "submitting" ? (
                   <>

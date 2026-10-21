@@ -103,25 +103,27 @@ export function DynamicSectionRenderer({
   // Section Background Classes
   const bgClass =
     background === "warm-white"
-      ? "bg-[#FAF8F5] dark:bg-[#12161E]"
+      ? "bg-[#FFF8E7] dark:bg-[#12161E]"
       : background === "light-gray"
-      ? "bg-gray-50 dark:bg-editorial-darkCard"
+      ? "bg-[#F7EEDB] dark:bg-editorial-darkCard"
+      : background === "card"
+      ? "bg-[#FFFCF5] dark:bg-editorial-darkCard"
       : background === "dark"
-      ? "bg-gray-950 text-white"
+      ? "bg-[#4A0B1C] text-white"
       : background === "deep-navy"
-      ? "bg-[#06101E] text-white"
+      ? "bg-[#4A0B1C] text-white"
       : background === "transparent"
       ? "bg-transparent"
-      : "bg-white dark:bg-editorial-darkBg";
+      : "bg-[#FFF8E7] dark:bg-editorial-darkBg";
 
   // Section Border Classes
   const borderClass =
     borders === "top"
-      ? "border-t border-gray-200 dark:border-gray-800"
+      ? "border-t border-[#E8DCCB] dark:border-gray-800"
       : borders === "bottom"
-      ? "border-b border-gray-200 dark:border-gray-800"
+      ? "border-b border-[#E8DCCB] dark:border-gray-800"
       : borders === "both"
-      ? "border-y border-gray-200 dark:border-gray-800"
+      ? "border-y border-[#E8DCCB] dark:border-gray-800"
       : "";
 
   const sectionHeading = title || (category ? category.name.toUpperCase() : "");
@@ -214,7 +216,7 @@ export function DynamicSectionRenderer({
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-950/40 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-10 max-w-4xl space-y-3">
-                  <span className="inline-block px-3 py-1 bg-[#1E1B1A] dark:bg-white text-white dark:text-black text-xs font-mono font-bold uppercase rounded tracking-wider">
+                  <span className="inline-block px-3 py-1 bg-[#4A0B1C] dark:bg-white text-white dark:text-black text-xs font-mono font-bold uppercase rounded tracking-wider">
                     {heroArticle.category?.name || "News"} • LEAD STORY
                   </span>
                   <h1 className="font-serif font-black text-2xl sm:text-4xl md:text-5xl text-white group-hover:text-neutral-300 transition-colors leading-[1.15]">
@@ -325,29 +327,29 @@ export function DynamicSectionRenderer({
     return (
       <section className={`w-full ${bgClass} ${borderClass} ${spacingClass}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="pb-3 mb-6 border-b-2 border-gray-950 dark:border-white flex items-center justify-between">
+          <div className="pb-3 mb-6 border-b-2 border-[#4A0B1C] dark:border-white flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Flame className="w-5 h-5 text-black dark:text-white" />
-              <h2 className="font-serif font-black text-xl text-gray-950 dark:text-white uppercase tracking-tight">
+              <Flame className="w-5 h-5 text-[#B42332] dark:text-white" />
+              <h2 className="font-serif font-black text-xl text-[#241A1A] dark:text-white uppercase tracking-tight">
                 {sectionHeading || "MOST READ STORIES"}
               </h2>
             </div>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {mostReadList.slice(0, 4).map((art, idx) => (
-              <div key={art.id} className="flex gap-4 items-start p-4 bg-gray-50 dark:bg-editorial-darkCard rounded-xl">
-                <span className="font-serif font-black text-3xl text-black dark:text-white">0{idx + 1}</span>
+              <div key={art.id} className="flex gap-4 items-start p-4 bg-[#FFFCF5] dark:bg-editorial-darkCard rounded-xl border border-[#E8DCCB]">
+                <span className="font-serif font-black text-3xl text-[#4A0B1C] dark:text-white">0{idx + 1}</span>
                 <div>
-                  <span className="text-[11px] font-mono font-bold uppercase text-gray-500 block mb-1">
+                  <span className="text-[11px] font-mono font-bold uppercase text-[#665858] block mb-1">
                     {art.category?.name || "News"}
                   </span>
                   <Link
                     href={`/${art.category?.slug || "news"}/${art.slug}`}
-                    className="font-serif font-bold text-sm text-gray-950 dark:text-white hover:text-neutral-600 dark:hover:text-neutral-300 line-clamp-2"
+                    className="font-serif font-bold text-sm text-[#241A1A] dark:text-white hover:text-[#6B1024] dark:hover:text-neutral-300 line-clamp-2"
                   >
                     {art.title}
                   </Link>
-                  <span className="text-[11px] text-gray-400 font-mono block mt-1">
+                  <span className="text-[11px] text-[#665858] font-mono block mt-1">
                     {art.viewCount || 0} verified readers
                   </span>
                 </div>
@@ -367,13 +369,13 @@ export function DynamicSectionRenderer({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         {sectionHeading && (
-          <div className="pb-3 mb-6 border-b-2 border-gray-950 dark:border-white flex items-center justify-between">
+          <div className="pb-3 mb-6 border-b-2 border-[#4A0B1C] dark:border-white flex items-center justify-between">
             <div>
-              <h2 className="font-serif font-black text-xl sm:text-2xl text-gray-950 dark:text-white uppercase tracking-tight">
+              <h2 className="font-serif font-black text-xl sm:text-2xl text-[#241A1A] dark:text-white uppercase tracking-tight">
                 {sectionHeading}
               </h2>
               {subtitle && (
-                <p className="text-xs text-gray-500 dark:text-gray-400 font-sans mt-0.5">
+                <p className="text-xs text-[#665858] dark:text-gray-400 font-sans mt-0.5">
                   {subtitle}
                 </p>
               )}
@@ -382,7 +384,7 @@ export function DynamicSectionRenderer({
             {showViewAll && targetViewAll && (
               <Link
                 href={targetViewAll}
-                className="text-xs font-mono font-bold uppercase tracking-wider text-black dark:text-white hover:underline flex items-center gap-1"
+                className="text-xs font-mono font-bold uppercase tracking-wider text-[#4A0B1C] hover:text-[#6B1024] dark:text-white hover:underline flex items-center gap-1 transition"
               >
                 <span>View All</span>
                 <ArrowRight className="w-3.5 h-3.5" />

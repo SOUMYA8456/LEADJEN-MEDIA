@@ -12,24 +12,54 @@
 @layer base {
   :root {
     --font-sans: "LINESeedJP", "LINE Seed JP", var(--font-inter, -apple-system), BlinkMacSystemFont, "Segoe UI", sans-serif;
-    --bg-primary: #ffffff;
-    --bg-secondary: #f8f9fa;
-    --text-primary: #0a0a0a;
-    --text-secondary: #52525b;
-    --border-color: #e4e4e7;
-    --leadjen-red: #cc0000;
-    --leadjen-black: #0a0a0a;
+    --bg-primary: #FFF8E7;
+    --bg-secondary: #F7EEDB;
+    --bg-card: #FFFCF5;
+    --text-primary: #241A1A;
+    --text-secondary: #665858;
+    --border-color: #E8DCCB;
+    --maroon-accent: #6B1024;
+    --deep-maroon: #4A0B1C;
+    --breaking-red: #B42332;
+    --leadjen-primary: #6B1024;
+    --leadjen-secondary: #4A0B1C;
+    --leadjen-red: #B42332;
+    --leadjen-black: #241A1A;
+    --sidebar-bg: #4A0B1C;
+    --sidebar-secondary: #60152B;
+    --sidebar-active: #7A2038;
+    --sidebar-text: #FFFFFF;
+    --sidebar-text-secondary: #F4DDE3;
+    --sidebar-divider: rgba(255, 255, 255, 0.16);
+    --nav-bg: #4A0B1C;
+    --nav-text: #FFFFFF;
+    --nav-active: #F4DDE3;
   }
 
   .dark {
     --font-sans: "LINESeedJP", "LINE Seed JP", var(--font-inter, -apple-system), BlinkMacSystemFont, "Segoe UI", sans-serif;
     --bg-primary: #0a0a0a;
     --bg-secondary: #141414;
+    --bg-card: #18181b;
     --text-primary: #f4f4f5;
     --text-secondary: #a1a1aa;
-    --border-color: #262626;
-    --leadjen-red: #e60000;
+    --border-color: #27272a;
+    --maroon-accent: #E25B74;
+    --deep-maroon: #2C0711;
+    --breaking-red: #F87171;
+    --leadjen-primary: #ffffff;
+    --leadjen-secondary: #2C0711;
+    --leadjen-red: #F87171;
     --leadjen-black: #ffffff;
+    --sidebar-bg: #2C0711;
+    --sidebar-secondary: #3D0A18;
+    --sidebar-active: #541123;
+    --sidebar-text: #FFFFFF;
+    --sidebar-text-secondary: #F4DDE3;
+    --sidebar-divider: rgba(255, 255, 255, 0.16);
+    --nav-bg: #2C0711;
+    --nav-text: #FFFFFF;
+    --nav-active: #F4DDE3;
   }
 
   body {
@@ -45,6 +75,30 @@
     font-family: Georgia, Cambria, "Times New Roman", Times, serif;
     letter-spacing: -0.015em;
   }
+}
+
+.bg-site {
+  background-color: var(--bg-primary);
+}
+
+.bg-surface {
+  background-color: var(--bg-secondary);
+}
+
+.bg-card-site {
+  background-color: var(--bg-card);
+}
+
+.text-site {
+  color: var(--text-primary);
+}
+
+.text-site-muted {
+  color: var(--text-secondary);
+}
+
+.border-site {
+  border-color: var(--border-color);
 }
 
 /* Custom Scrollbar for sleek editorial experience */

@@ -43,27 +43,27 @@ export function VideoBriefSection({
   };
 
   return (
-    <section className={`w-full bg-editorial-paper dark:bg-editorial-darkCard border-b border-editorial-border dark:border-editorial-darkBorder py-5 ${className}`}>
+    <section className={`w-full bg-[#FFF8E7] dark:bg-editorial-darkCard border-b border-[#E8DCCB] dark:border-editorial-darkBorder py-5 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between pb-2 mb-3 border-b border-gray-200 dark:border-gray-800">
+        <div className="flex items-center justify-between pb-2 mb-3 border-b border-[#E8DCCB] dark:border-gray-800">
           <div className="flex items-center gap-2">
-            <span className="p-1 bg-black text-white dark:bg-white dark:text-black rounded">
+            <span className="p-1 bg-[#4A0B1C] text-white dark:bg-white dark:text-black rounded">
               <Video className="w-3.5 h-3.5" />
             </span>
-            <h3 className="font-mono text-xs uppercase tracking-widest font-bold text-gray-900 dark:text-white">
+            <h3 className="font-mono text-xs uppercase tracking-widest font-bold text-[#241A1A] dark:text-white">
               {title}
             </h3>
           </div>
           <Link
             href="/videos"
-            className="text-[11px] font-bold font-mono uppercase tracking-wider text-black dark:text-white hover:underline flex items-center gap-1"
+            className="text-[11px] font-bold font-mono uppercase tracking-wider text-[#4A0B1C] hover:text-[#6B1024] dark:text-white hover:underline flex items-center gap-1 transition"
           >
             <span>Watch All Briefings</span>
             <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center bg-gray-50 dark:bg-gray-900/60 p-4 rounded-xl border border-gray-200 dark:border-gray-800">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center bg-[#FFFCF5] dark:bg-gray-900/60 p-4 rounded-xl border border-[#E8DCCB] dark:border-gray-800">
           {/* Video Thumbnail (Clickable Player Trigger) */}
           <div
             onClick={handleOpenPlayer}
@@ -84,7 +84,7 @@ export function VideoBriefSection({
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 opacity-90 group-hover:opacity-100"
             />
             <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-              <div className="w-12 h-12 rounded-full bg-white/90 text-black flex items-center justify-center group-hover:scale-110 group-hover:bg-white transition-transform shadow-none">
+              <div className="w-12 h-12 rounded-full bg-white/90 text-[#4A0B1C] flex items-center justify-center group-hover:scale-110 group-hover:bg-white transition-transform shadow-none">
                 <Play className="w-5 h-5 ml-0.5 fill-current" />
               </div>
             </div>
@@ -98,10 +98,10 @@ export function VideoBriefSection({
           {/* Video Editorial Details */}
           <div className="md:col-span-7 space-y-2">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 text-black dark:text-white border border-neutral-200 dark:border-neutral-700 text-[10px] font-mono font-bold uppercase rounded">
+              <span className="px-2 py-0.5 bg-[#F7EEDB] dark:bg-neutral-800 text-[#4A0B1C] dark:text-white border border-[#E8DCCB] dark:border-neutral-700 text-[10px] font-mono font-bold uppercase rounded">
                 {typeof currentVideo.category === "string" ? currentVideo.category : currentVideo.category?.name || "Special Report"}
               </span>
-              <span className="text-[10px] font-mono text-gray-500 uppercase">
+              <span className="text-[10px] font-mono text-[#665858] uppercase">
                 Executive Briefing
               </span>
             </div>
@@ -111,13 +111,13 @@ export function VideoBriefSection({
               onClick={handleOpenPlayer}
               className="block text-left group"
             >
-              <h4 className="font-serif font-bold text-lg sm:text-xl text-gray-950 dark:text-white group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors line-clamp-2">
+              <h4 className="font-serif font-bold text-lg sm:text-xl text-[#241A1A] dark:text-white group-hover:text-[#6B1024] dark:group-hover:text-neutral-300 transition-colors line-clamp-2">
                 {currentVideo.title}
               </h4>
             </button>
 
             {currentVideo.description && (
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 line-clamp-2 font-sans">
+              <p className="text-xs sm:text-sm text-[#665858] dark:text-gray-400 line-clamp-2 font-sans">
                 {currentVideo.description}
               </p>
             )}
@@ -126,14 +126,14 @@ export function VideoBriefSection({
               <button
                 type="button"
                 onClick={handleOpenPlayer}
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#1E1B1A] dark:bg-white text-white dark:text-gray-950 hover:bg-black dark:hover:bg-neutral-200 text-xs font-bold font-mono uppercase tracking-wider rounded transition-colors shadow-none"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#4A0B1C] dark:bg-white text-white dark:text-gray-950 hover:bg-[#6B1024] dark:hover:bg-neutral-200 text-xs font-bold font-mono uppercase tracking-wider rounded transition-colors shadow-none"
               >
                 <Play className="w-3 h-3 fill-current" />
                 <span>Watch Video</span>
               </button>
               <Link
                 href="/videos"
-                className="text-xs font-mono font-bold text-neutral-500 hover:text-black dark:hover:text-white hover:underline"
+                className="text-xs font-mono font-bold text-[#4A0B1C] hover:text-[#6B1024] dark:hover:text-white hover:underline transition"
               >
                 All Videos →
               </Link>

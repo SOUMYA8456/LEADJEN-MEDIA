@@ -61,19 +61,19 @@ export function LiveDeskStream({
   });
 
   return (
-    <div className="w-full bg-white dark:bg-neutral-950 py-10 min-h-screen font-sans">
+    <div className="w-full bg-[#FFF8E7] dark:bg-neutral-950 py-10 min-h-screen font-sans text-[#241A1A]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         {/* Header Block */}
-        <div className="pb-6 border-b-2 border-red-600 space-y-3">
+        <div className="pb-6 border-b-2 border-[#B42332] space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex items-center gap-2">
-              <span className="px-3 py-1 bg-red-600 text-white font-mono font-bold text-xs uppercase tracking-wider rounded flex items-center gap-1.5 shadow-xs">
+              <span className="px-3 py-1 bg-[#B42332] text-white font-mono font-bold text-xs uppercase tracking-wider rounded flex items-center gap-1.5 shadow-xs">
                 <span className="w-2 h-2 rounded-full bg-white animate-pulse"></span>
                 {coverage?.status === "ENDED" ? "COVERAGE CONCLUDED" : "LIVE DESK STREAM"}
               </span>
 
               {coverage?.category && (
-                <span className="text-xs font-mono uppercase text-neutral-500 font-bold">
+                <span className="text-xs font-mono uppercase text-[#665858] font-bold">
                   {coverage.category}
                 </span>
               )}
@@ -91,17 +91,17 @@ export function LiveDeskStream({
             </span>
           </div>
 
-          <h1 className="font-serif font-black text-3xl sm:text-5xl text-black dark:text-white tracking-tight">
+          <h1 className="font-serif font-black text-3xl sm:text-5xl text-[#241A1A] dark:text-white tracking-tight">
             {coverage ? coverage.title : "Continuous Live News Coverage & Real-Time Intelligence"}
           </h1>
 
           {coverage?.summary && (
-            <p className="text-sm text-neutral-600 dark:text-neutral-300 font-sans leading-relaxed">
+            <p className="text-sm text-[#665858] dark:text-neutral-300 font-sans leading-relaxed">
               {coverage.summary}
             </p>
           )}
 
-          <div className="flex items-center gap-4 text-xs font-mono text-neutral-400 pt-1">
+          <div className="flex items-center gap-4 text-xs font-mono text-[#665858] pt-1">
             <span>Started: {new Date(coverage?.startedAt || Date.now()).toLocaleTimeString("en-IN", { timeZone: "Asia/Kolkata", hour: "2-digit", minute: "2-digit" })} IST</span>
             <span>•</span>
             <span>{updates.length} Verified Dispatches</span>
@@ -110,25 +110,25 @@ export function LiveDeskStream({
 
         {/* Live Timeline Stream */}
         {updates.length === 0 ? (
-          <div className="p-12 text-center text-xs font-mono text-neutral-400 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-2xl">
+          <div className="p-12 text-center text-xs font-mono text-[#665858] border border-dashed border-[#E8DCCB] dark:border-neutral-800 rounded-2xl bg-[#FFFCF5]">
             Live correspondents are currently monitoring the wires. Verified updates will appear here in real time.
           </div>
         ) : (
-          <div className="relative border-l-2 border-red-200 dark:border-red-950 ml-4 sm:ml-6 pl-6 sm:pl-8 space-y-8">
+          <div className="relative border-l-2 border-[#B42332]/30 ml-4 sm:ml-6 pl-6 sm:pl-8 space-y-8">
             {updates.map((update) => (
               <div key={update.id} className="relative group">
                 {/* Pin on timeline */}
-                <div className="absolute -left-[31px] sm:-left-[39px] top-2 w-4 h-4 rounded-full bg-white dark:bg-neutral-950 border-4 border-red-600 group-hover:scale-125 transition-transform" />
+                <div className="absolute -left-[31px] sm:-left-[39px] top-2 w-4 h-4 rounded-full bg-[#FFF8E7] dark:bg-neutral-950 border-4 border-[#B42332] group-hover:scale-125 transition-transform" />
 
-                <div className="bg-neutral-50 dark:bg-neutral-900 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-800 shadow-xs space-y-3">
+                <div className="bg-[#FFFCF5] dark:bg-neutral-900 p-6 rounded-2xl border border-[#E8DCCB] dark:border-neutral-800 shadow-xs space-y-3">
                   {/* Timestamp & Metadata */}
-                  <div className="flex flex-wrap items-center justify-between text-xs font-mono text-neutral-500">
+                  <div className="flex flex-wrap items-center justify-between text-xs font-mono text-[#665858]">
                     <div className="flex items-center gap-2">
-                      <span className="font-bold text-red-600 dark:text-red-400">
+                      <span className="font-bold text-[#B42332]">
                         {update.timestamp || "LIVE"}
                       </span>
                       {update.isUrgent && (
-                        <span className="px-2 py-0.5 bg-red-600 text-white text-[9px] font-bold uppercase rounded">
+                        <span className="px-2 py-0.5 bg-[#B42332] text-white text-[9px] font-bold uppercase rounded">
                           URGENT
                         </span>
                       )}
@@ -137,12 +137,12 @@ export function LiveDeskStream({
                   </div>
 
                   {/* Title */}
-                  <h3 className="font-serif font-bold text-lg sm:text-xl text-black dark:text-white">
+                  <h3 className="font-serif font-bold text-lg sm:text-xl text-[#241A1A] dark:text-white">
                     {update.title}
                   </h3>
 
                   {/* Body Content */}
-                  <p className="text-xs sm:text-sm text-neutral-700 dark:text-neutral-300 font-sans leading-relaxed whitespace-pre-line">
+                  <p className="text-xs sm:text-sm text-[#665858] dark:text-neutral-300 font-sans leading-relaxed whitespace-pre-line">
                     {update.content}
                   </p>
 
@@ -152,7 +152,7 @@ export function LiveDeskStream({
                       <img
                         src={update.imageUrl}
                         alt={update.title}
-                        className="w-full max-h-96 object-cover rounded-xl border border-neutral-200 dark:border-neutral-800"
+                        className="w-full max-h-96 object-cover rounded-xl border border-[#E8DCCB] dark:border-neutral-800"
                         loading="lazy"
                       />
                     </div>
@@ -165,7 +165,7 @@ export function LiveDeskStream({
                         href={update.videoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-black text-white dark:bg-white dark:text-black rounded-xl text-xs font-mono font-bold uppercase hover:opacity-90 transition"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-[#4A0B1C] text-white rounded-xl text-xs font-mono font-bold uppercase hover:bg-[#6B1024] transition shadow-xs"
                       >
                         <Video className="w-4 h-4" />
                         <span>Watch Video Dispatch</span>

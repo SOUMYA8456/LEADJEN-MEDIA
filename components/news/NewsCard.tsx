@@ -46,7 +46,7 @@ export function NewsCard({
 
   return (
     <article className="group flex flex-col bg-transparent transition-all">
-      <Link href={href} className={`relative block w-full ${aspectRatio} overflow-hidden rounded bg-gray-100 dark:bg-gray-800`}>
+      <Link href={href} className={`relative block w-full ${aspectRatio} overflow-hidden rounded bg-[#F7EEDB] dark:bg-gray-800`}>
         <img
           src={article.featuredImage}
           alt={article.title}
@@ -54,7 +54,7 @@ export function NewsCard({
           loading={priority ? "eager" : "lazy"}
         />
         {article.isBreaking && (
-          <div className="absolute top-2 left-2 bg-red-600 text-white text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded shadow-none flex items-center gap-1">
+          <div className="absolute top-2 left-2 bg-[#B42332] text-white text-[10px] font-black tracking-wider uppercase px-2 py-0.5 rounded shadow-none flex items-center gap-1">
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
             BREAKING
           </div>
@@ -71,32 +71,32 @@ export function NewsCard({
         <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider mb-1.5">
           <Link
             href={`/${categorySlug}`}
-            className="text-neutral-600 dark:text-neutral-400 hover:text-black dark:hover:text-white hover:underline"
+            className="text-[#665858] dark:text-neutral-400 hover:text-[#4A0B1C] dark:hover:text-white hover:underline transition"
           >
             {article.category?.name || "News"}
           </Link>
-          <span className="text-gray-300 dark:text-gray-700">•</span>
-          <span className="text-gray-400 dark:text-gray-500 font-normal normal-case flex items-center gap-1">
+          <span className="text-[#E8DCCB] dark:text-gray-700">•</span>
+          <span className="text-[#665858] dark:text-gray-500 font-normal normal-case flex items-center gap-1">
             <Clock className="w-3 h-3" />
             {formatTimeAgo(article.publishedAt)}
           </span>
         </div>
 
-        <h3 className="font-serif font-bold text-base sm:text-lg leading-snug text-gray-950 dark:text-white group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors line-clamp-2">
+        <h3 className="font-serif font-bold text-base sm:text-lg leading-snug text-[#241A1A] dark:text-white group-hover:text-[#6B1024] dark:group-hover:text-neutral-300 transition-colors line-clamp-2">
           <Link href={href}>{article.title}</Link>
         </h3>
 
         {showExcerpt && article.excerpt && (
-          <p className="mt-1.5 text-xs sm:text-sm text-gray-600 dark:text-gray-300 line-clamp-2 leading-relaxed font-sans">
+          <p className="mt-1.5 text-xs sm:text-sm text-[#665858] dark:text-gray-300 line-clamp-2 leading-relaxed font-sans">
             {article.excerpt}
           </p>
         )}
 
-        <div className="mt-auto pt-3 flex items-center justify-between text-[11px] text-gray-500 dark:text-gray-400 border-t border-gray-100 dark:border-gray-800/80">
-          <span className="font-medium text-gray-700 dark:text-gray-300">
+        <div className="mt-auto pt-3 flex items-center justify-between text-[11px] text-[#665858] dark:text-gray-400 border-t border-[#E8DCCB] dark:border-gray-800/80">
+          <span className="font-medium text-[#241A1A] dark:text-gray-300">
             By {article.author?.name || "Leadjen Desk"}
           </span>
-          <span className="text-black dark:text-white font-semibold group-hover:translate-x-0.5 transition-transform">
+          <span className="text-[#4A0B1C] dark:text-white font-semibold group-hover:text-[#6B1024] group-hover:translate-x-0.5 transition">
             Read →
           </span>
         </div>
@@ -110,29 +110,29 @@ export function CompactNewsCard({ article }: { article: ArticleData }) {
   const href = `/${categorySlug}/${article.slug}`;
 
   return (
-    <article className="group flex gap-3.5 py-3 border-b border-gray-100 dark:border-gray-800/80 last:border-0">
-      <Link href={href} className="relative w-24 h-20 sm:w-28 sm:h-20 flex-shrink-0 overflow-hidden rounded bg-gray-100 dark:bg-gray-800">
+    <article className="group flex gap-3.5 py-3 border-b border-[#E8DCCB] dark:border-gray-800/80 last:border-0">
+      <Link href={href} className="relative w-24 h-20 sm:w-28 sm:h-20 flex-shrink-0 overflow-hidden rounded bg-[#F7EEDB] dark:bg-gray-800">
         <img
           src={article.featuredImage}
           alt={article.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {article.isBreaking && (
-          <span className="absolute top-1 left-1 bg-red-600 text-white text-[8px] font-black px-1 rounded">
+          <span className="absolute top-1 left-1 bg-[#B42332] text-white text-[8px] font-black px-1 rounded">
             LIVE
           </span>
         )}
       </Link>
 
       <div className="flex flex-col justify-center flex-1 min-w-0">
-        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400 mb-0.5">
+        <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider text-[#665858] dark:text-neutral-400 mb-0.5">
           <span>{article.category?.name || "News"}</span>
-          <span className="text-gray-300 dark:text-gray-700">•</span>
-          <span className="text-gray-400 font-normal normal-case">
+          <span className="text-[#E8DCCB] dark:text-gray-700">•</span>
+          <span className="text-[#665858] font-normal normal-case">
             {formatTimeAgo(article.publishedAt)}
           </span>
         </div>
-        <h4 className="font-serif font-bold text-xs sm:text-sm text-gray-900 dark:text-white group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition line-clamp-2 leading-tight">
+        <h4 className="font-serif font-bold text-xs sm:text-sm text-[#241A1A] dark:text-white group-hover:text-[#6B1024] dark:group-hover:text-neutral-300 transition line-clamp-2 leading-tight">
           <Link href={href}>{article.title}</Link>
         </h4>
       </div>
@@ -145,15 +145,15 @@ export function HorizontalNewsCard({ article }: { article: ArticleData }) {
   const href = `/${categorySlug}/${article.slug}`;
 
   return (
-    <article className="group flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-white dark:bg-editorial-darkCard border border-gray-200/80 dark:border-editorial-darkBorder hover:border-neutral-400 dark:hover:border-neutral-600 transition">
-      <Link href={href} className="relative w-full sm:w-56 h-40 sm:h-auto flex-shrink-0 overflow-hidden rounded bg-gray-100 dark:bg-gray-800">
+    <article className="group flex flex-col sm:flex-row gap-4 p-4 rounded-lg bg-[#FFFCF5] dark:bg-editorial-darkCard border border-[#E8DCCB] dark:border-editorial-darkBorder hover:border-[#4A0B1C] dark:hover:border-neutral-600 transition shadow-none">
+      <Link href={href} className="relative w-full sm:w-56 h-40 sm:h-auto flex-shrink-0 overflow-hidden rounded bg-[#F7EEDB] dark:bg-gray-800">
         <img
           src={article.featuredImage}
           alt={article.title}
           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
         />
         {article.isBreaking && (
-          <div className="absolute top-2 left-2 bg-red-600 text-white text-[9px] font-black px-1.5 py-0.5 rounded">
+          <div className="absolute top-2 left-2 bg-[#B42332] text-white text-[9px] font-black px-1.5 py-0.5 rounded">
             BREAKING
           </div>
         )}
@@ -161,26 +161,26 @@ export function HorizontalNewsCard({ article }: { article: ArticleData }) {
 
       <div className="flex flex-col flex-1">
         <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider mb-1">
-          <span className="text-neutral-600 dark:text-neutral-400">
+          <span className="text-[#665858] dark:text-neutral-400">
             {article.category?.name}
           </span>
-          <span className="text-gray-300 dark:text-gray-700">•</span>
-          <span className="text-gray-400 text-[11px] normal-case">
+          <span className="text-[#E8DCCB] dark:text-gray-700">•</span>
+          <span className="text-[#665858] text-[11px] normal-case">
             {formatTimeAgo(article.publishedAt)}
           </span>
         </div>
 
-        <h3 className="font-serif font-bold text-lg sm:text-xl text-gray-950 dark:text-white group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition leading-snug">
+        <h3 className="font-serif font-bold text-lg sm:text-xl text-[#241A1A] dark:text-white group-hover:text-[#6B1024] dark:group-hover:text-neutral-300 transition leading-snug">
           <Link href={href}>{article.title}</Link>
         </h3>
 
-        <p className="mt-2 text-xs sm:text-sm text-gray-600 dark:text-gray-300 line-clamp-2 leading-relaxed">
+        <p className="mt-2 text-xs sm:text-sm text-[#665858] dark:text-gray-300 line-clamp-2 leading-relaxed">
           {article.excerpt}
         </p>
 
-        <div className="mt-auto pt-3 flex items-center justify-between text-xs text-gray-500">
+        <div className="mt-auto pt-3 flex items-center justify-between text-xs text-[#665858] border-t border-[#E8DCCB]/60 dark:border-gray-800/80">
           <span>By {article.author?.name || "Leadjen Desk"}</span>
-          <span className="text-neutral-700 dark:text-neutral-300 font-semibold">
+          <span className="text-[#4A0B1C] dark:text-neutral-300 font-semibold">
             {article.readingTime || 3} min read
           </span>
         </div>

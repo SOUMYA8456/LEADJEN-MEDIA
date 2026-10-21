@@ -63,17 +63,17 @@ export function PhotoGallerySection({
   };
 
   return (
-    <section className="w-full py-8 border-b border-gray-200 dark:border-gray-800">
-      <div className="flex items-center justify-between pb-3 mb-6 border-b-2 border-gray-950 dark:border-white">
+    <section className="w-full py-8 border-b border-[#E8DCCB] dark:border-gray-800">
+      <div className="flex items-center justify-between pb-3 mb-6 border-b-2 border-[#4A0B1C] dark:border-white">
         <div className="flex items-center gap-2">
-          <Camera className="w-5 h-5 text-black dark:text-white" />
-          <h2 className="font-serif font-black text-xl sm:text-2xl text-gray-950 dark:text-white tracking-tight uppercase">
+          <Camera className="w-5 h-5 text-[#4A0B1C] dark:text-white" />
+          <h2 className="font-serif font-black text-xl sm:text-2xl text-[#241A1A] dark:text-white tracking-tight uppercase">
             {title}
           </h2>
         </div>
         <Link
           href="/photos"
-          className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-black dark:text-white hover:underline"
+          className="flex items-center gap-1 text-xs font-bold uppercase tracking-wider text-[#4A0B1C] hover:text-[#6B1024] dark:text-white hover:underline transition"
         >
           <span>All Galleries</span>
           <ArrowRight className="w-3.5 h-3.5" />
@@ -85,7 +85,7 @@ export function PhotoGallerySection({
           <div
             key={idx}
             onClick={() => setLightboxIndex(idx)}
-            className="group relative aspect-[4/3] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 cursor-pointer shadow-none"
+            className="group relative aspect-[4/3] rounded-lg overflow-hidden bg-[#F7EEDB] dark:bg-gray-800 cursor-pointer shadow-none"
           >
             <img
               src={photo.url}

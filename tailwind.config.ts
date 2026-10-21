@@ -11,36 +11,50 @@ const config: Config = {
     extend: {
       colors: {
         leadjen: {
-          50: "#fafafa",
-          100: "#f4f4f5",
-          200: "#e4e4e7",
+          50: "#FFFCF5",
+          100: "#F7EEDB",
+          200: "#E8DCCB",
           300: "#d4d4d8",
           400: "#a1a1aa",
-          500: "#71717a",
-          600: "#cc0000", // Leadjen Editorial Red accent
-          700: "#990000", // Deep Red
-          800: "#730000",
-          900: "#18181b", // Solid Neutral Black
-          950: "#09090b", // Pure Dark Black
-          red: "#cc0000",
-          darkRed: "#990000",
-          charcoal: "#121212",
+          500: "#665858",
+          600: "#B42332", // Breaking Red
+          700: "#6B1024", // Maroon accent
+          800: "#4A0B1C", // Deep maroon
+          900: "#241A1A", // Primary text
+          950: "#09090b",
+          cream: "#FFF8E7",
+          creamSecondary: "#F7EEDB",
+          creamCard: "#FFFCF5",
+          creamBorder: "#E8DCCB",
+          creamText: "#241A1A",
+          creamMuted: "#665858",
+          maroon: "#6B1024",
+          deepMaroon: "#4A0B1C",
+          sidebarSecondary: "#60152B",
+          sidebarActive: "#7A2038",
+          sidebarTextSecondary: "#F4DDE3",
+          red: "#B42332",
+          darkRed: "#6B1024",
+          charcoal: "#241A1A",
           dark: "#0a0a0a",
         },
         editorial: {
-          bg: "#ffffff",
-          paper: "#f8f9fa",
-          text: "#0a0a0a",
-          muted: "#52525b",
-          border: "#e4e4e7",
+          bg: "#FFF8E7",
+          paper: "#F7EEDB",
+          card: "#FFFCF5",
+          text: "#241A1A",
+          muted: "#665858",
+          border: "#E8DCCB",
+          maroon: "#6B1024",
+          deepMaroon: "#4A0B1C",
           darkBg: "#0a0a0a",
           darkCard: "#141414",
           darkBorder: "#262626",
         },
         breaking: {
-          red: "#cc0000",
-          darkRed: "#990000",
-          amber: "#cc0000",
+          red: "#B42332",
+          darkRed: "#6B1024",
+          amber: "#B42332",
         },
       },
       fontFamily: {

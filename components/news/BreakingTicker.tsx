@@ -78,11 +78,11 @@ export function BreakingTicker({
   const activeItems = breakingList.length > 0 ? breakingList : defaultItems;
 
   return (
-    <div className="w-full bg-white dark:bg-neutral-950 border-b border-neutral-200 dark:border-neutral-800 text-xs font-sans">
+    <div className="w-full bg-[#FFF8E7] dark:bg-neutral-950 border-b border-[#E8DCCB] dark:border-neutral-800 text-xs font-sans">
       {/* 1. BREAKING NEWS BAR */}
-      <div className="border-b border-neutral-100 dark:border-neutral-900 bg-red-950/10">
+      <div className="border-b border-[#E8DCCB]/60 dark:border-neutral-900 bg-[#6B1024]/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex items-center min-w-0">
-          <div className="flex items-center gap-1.5 px-3 py-1 bg-red-600 text-white font-mono font-bold text-[10px] tracking-wider rounded uppercase flex-shrink-0 mr-3 shadow-xs">
+          <div className="flex items-center gap-1.5 px-3 py-1 bg-[#B42332] text-white font-mono font-bold text-[10px] tracking-wider rounded uppercase flex-shrink-0 mr-3 shadow-xs">
             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse"></span>
             BREAKING NEWS
           </div>
@@ -93,21 +93,21 @@ export function BreakingTicker({
                 <Link
                   key={item.id}
                   href={item.linkUrl || "#"}
-                  className="inline-flex items-center text-black dark:text-white font-medium hover:underline mr-8 transition text-xs"
+                  className="inline-flex items-center text-[#241A1A] dark:text-white font-medium hover:text-[#6B1024] hover:underline mr-8 transition text-xs"
                 >
                   {item.priority === "URGENT" && (
-                    <span className="mr-1.5 px-1.5 py-0.2 bg-red-600 text-white text-[9px] font-mono font-bold rounded">
+                    <span className="mr-1.5 px-1.5 py-0.2 bg-[#B42332] text-white text-[9px] font-mono font-bold rounded">
                       URGENT
                     </span>
                   )}
                   {item.isLive && (
-                    <span className="mr-1.5 text-red-600 dark:text-red-400 font-mono font-bold text-[10px]">
+                    <span className="mr-1.5 text-[#B42332] dark:text-red-400 font-mono font-bold text-[10px]">
                       ● LIVE
                     </span>
                   )}
                   <span>{item.title}</span>
                   {idx < activeItems.length - 1 && (
-                    <span className="mx-4 text-neutral-300 dark:text-neutral-700">•</span>
+                    <span className="mx-4 text-[#E8DCCB] dark:text-neutral-700">•</span>
                   )}
                 </Link>
               ))}
@@ -117,23 +117,23 @@ export function BreakingTicker({
       </div>
 
       {/* 2. TRENDING TOPICS BAR */}
-      <div className="bg-neutral-50 dark:bg-neutral-900">
+      <div className="bg-[#F7EEDB] dark:bg-neutral-900 border-t border-[#E8DCCB]/40 dark:border-neutral-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-1.5 flex items-center gap-3 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1 text-black dark:text-white font-mono font-bold uppercase text-[10px] tracking-wider flex-shrink-0">
-            <Flame className="w-3.5 h-3.5 text-red-600 fill-current" />
+          <div className="flex items-center gap-1 text-[#4A0B1C] dark:text-white font-mono font-bold uppercase text-[10px] tracking-wider flex-shrink-0">
+            <Flame className="w-3.5 h-3.5 text-[#B42332] fill-current" />
             <span>TRENDING TOPICS:</span>
           </div>
-          <div className="flex items-center space-x-2 text-[11px] text-neutral-700 dark:text-neutral-300 font-mono whitespace-nowrap flex-1">
+          <div className="flex items-center space-x-2 text-[11px] text-[#241A1A] dark:text-neutral-300 font-mono whitespace-nowrap flex-1">
             {trendingTopics.map((topic, i) => (
               <React.Fragment key={topic}>
                 <Link
                   href={`/search?q=${encodeURIComponent(topic)}`}
-                  className="hover:text-black dark:hover:text-white hover:underline transition"
+                  className="hover:text-[#6B1024] dark:hover:text-white hover:underline transition"
                 >
                   {topic}
                 </Link>
                 {i < trendingTopics.length - 1 && (
-                  <span className="text-neutral-300 dark:text-neutral-700 px-1 font-normal">|</span>
+                  <span className="text-[#E8DCCB] dark:text-neutral-700 px-1 font-normal">|</span>
                 )}
               </React.Fragment>
             ))}

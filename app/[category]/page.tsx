@@ -158,29 +158,29 @@ export default async function DynamicCategoryOrStaticPage({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(categoryJsonLd) }}
         />
-        <div className="w-full bg-white dark:bg-neutral-950 py-8 font-sans">
+        <div className="w-full bg-[#FFF8E7] dark:bg-neutral-950 py-8 font-sans">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
             {/* Category Header */}
-            <div className="pb-4 border-b-2 border-black dark:border-white">
-              <div className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 mb-1">
-                <Link href="/" className="hover:underline">
+            <div className="pb-4 border-b-2 border-[#4A0B1C] dark:border-white">
+              <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#665858] mb-1">
+                <Link href="/" className="hover:text-[#4A0B1C] hover:underline">
                   HOME
                 </Link>{" "}
                 / {category.name}
               </div>
-              <h1 className="font-serif font-black text-3xl sm:text-4xl md:text-5xl text-black dark:text-white tracking-tight uppercase">
+              <h1 className="font-serif font-black text-3xl sm:text-4xl md:text-5xl text-[#241A1A] dark:text-white tracking-tight uppercase">
                 {category.name}
               </h1>
               {category.description && (
-                <p className="mt-2 text-sm sm:text-base text-neutral-600 dark:text-neutral-400 max-w-2xl font-sans">
+                <p className="mt-2 text-sm sm:text-base text-[#665858] dark:text-neutral-400 max-w-2xl font-sans">
                   {category.description}
                 </p>
               )}
             </div>
 
             {articles.length === 0 ? (
-              <div className="py-16 text-center text-neutral-400 border border-dashed border-neutral-300 dark:border-neutral-800 rounded-xl p-8">
-                <p className="font-serif text-lg text-neutral-700 dark:text-neutral-300">
+              <div className="py-16 text-center text-[#665858] border border-dashed border-[#E8DCCB] dark:border-neutral-800 rounded-xl p-8">
+                <p className="font-serif text-lg text-[#241A1A] dark:text-neutral-300">
                   No articles currently published under {category.name}.
                 </p>
                 <p className="text-xs mt-1 font-mono">
@@ -195,7 +195,7 @@ export default async function DynamicCategoryOrStaticPage({
                   {layoutStyle === "split-hero" && (
                     <>
                       {leadStory && (
-                        <div className="pb-8 border-b border-neutral-200 dark:border-neutral-800">
+                        <div className="pb-8 border-b border-[#E8DCCB] dark:border-neutral-800">
                           <NewsCard article={leadStory} showExcerpt={true} aspectRatio="aspect-[16/9]" />
                         </div>
                       )}
@@ -222,7 +222,7 @@ export default async function DynamicCategoryOrStaticPage({
 
                   {/* STYLE 3: Editorial List */}
                   {layoutStyle === "editorial-list" && (
-                    <div className="space-y-4 divide-y divide-neutral-100 dark:divide-neutral-900">
+                    <div className="space-y-4 divide-y divide-[#E8DCCB] dark:divide-neutral-900">
                       {articles.map((story) => (
                         <div key={story.id} className="pt-4 first:pt-0">
                           <HorizontalNewsCard article={story} />
@@ -233,22 +233,22 @@ export default async function DynamicCategoryOrStaticPage({
 
                   {/* STYLE 4: Compact Headline Wire */}
                   {layoutStyle === "compact-wire" && (
-                    <div className="space-y-3 divide-y divide-neutral-100 dark:divide-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50 p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800">
+                    <div className="space-y-3 divide-y divide-[#E8DCCB] dark:divide-neutral-800 bg-[#FFFCF5] dark:bg-neutral-900/50 p-5 rounded-2xl border border-[#E8DCCB] dark:border-neutral-800">
                       {articles.map((story) => (
                         <div key={story.id} className="pt-3 first:pt-0 flex items-start justify-between gap-4">
                           <div className="space-y-1">
-                            <span className="text-[10px] font-mono uppercase font-bold text-red-600 dark:text-red-400">
+                            <span className="text-[10px] font-mono uppercase font-bold text-[#B42332] dark:text-red-400">
                               {formatTimeAgo(story.publishedAt)}
                             </span>
                             <Link
                               href={`/${slug}/${story.slug}`}
-                              className="font-serif font-bold text-base text-black dark:text-white hover:underline block"
+                              className="font-serif font-bold text-base text-[#241A1A] hover:text-[#6B1024] dark:text-white hover:underline block transition"
                             >
                               {story.title}
                             </Link>
-                            <p className="text-xs text-neutral-500 line-clamp-1">{story.excerpt}</p>
+                            <p className="text-xs text-[#665858] line-clamp-1">{story.excerpt}</p>
                           </div>
-                          <ChevronRight className="w-4 h-4 text-neutral-400 shrink-0 mt-1" />
+                          <ChevronRight className="w-4 h-4 text-[#665858] shrink-0 mt-1" />
                         </div>
                       ))}
                     </div>
@@ -278,11 +278,11 @@ export default async function DynamicCategoryOrStaticPage({
 
   if (staticPage && staticPage.status === "PUBLISHED") {
     return (
-      <div className="w-full bg-white dark:bg-neutral-950 py-12 font-sans">
+      <div className="w-full bg-[#FFF8E7] dark:bg-neutral-950 py-12 font-sans">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
           {/* Breadcrumb */}
-          <div className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 pb-2 border-b border-neutral-200 dark:border-neutral-800">
-            <Link href="/" className="hover:underline">
+          <div className="text-xs font-mono font-bold uppercase tracking-wider text-[#665858] pb-2 border-b border-[#E8DCCB] dark:border-neutral-800">
+            <Link href="/" className="hover:text-[#4A0B1C] hover:underline">
               HOME
             </Link>{" "}
             / {staticPage.title}
@@ -290,20 +290,20 @@ export default async function DynamicCategoryOrStaticPage({
 
           {/* Title Header */}
           <div className="space-y-3">
-            <span className="px-2.5 py-0.5 bg-black text-white dark:bg-white dark:text-black text-[10px] font-mono font-bold uppercase rounded">
+            <span className="px-2.5 py-0.5 bg-[#4A0B1C] text-white text-[10px] font-mono font-bold uppercase rounded">
               EDITORIAL WIRE
             </span>
-            <h1 className="font-serif font-black text-3xl sm:text-4xl md:text-5xl text-black dark:text-white tracking-tight">
+            <h1 className="font-serif font-black text-3xl sm:text-4xl md:text-5xl text-[#241A1A] dark:text-white tracking-tight">
               {staticPage.title}
             </h1>
-            <p className="text-xs font-mono text-neutral-400">
+            <p className="text-xs font-mono text-[#665858]">
               Last Updated: {new Date(staticPage.updatedAt).toLocaleDateString("en-IN", { timeZone: "Asia/Kolkata", dateStyle: "long" })}
             </p>
           </div>
 
           {/* Featured Image if present */}
           {staticPage.featuredImage && (
-            <div className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden shadow-md">
+            <div className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden shadow-none border border-[#E8DCCB]">
               <img
                 src={staticPage.featuredImage}
                 alt={staticPage.title}
@@ -314,13 +314,13 @@ export default async function DynamicCategoryOrStaticPage({
 
           {/* Rich Content Body */}
           <div
-            className="prose dark:prose-invert max-w-none text-neutral-800 dark:text-neutral-200 font-serif leading-relaxed text-base sm:text-lg border-t border-neutral-100 dark:border-neutral-800 pt-6"
+            className="prose dark:prose-invert max-w-none text-[#241A1A] dark:text-neutral-200 font-serif leading-relaxed text-base sm:text-lg border-t border-[#E8DCCB] dark:border-neutral-800 pt-6"
             dangerouslySetInnerHTML={{ __html: staticPage.content }}
           />
 
-          <div className="pt-8 border-t border-neutral-200 dark:border-neutral-800 flex items-center justify-between text-xs font-mono text-neutral-500">
+          <div className="pt-8 border-t border-[#E8DCCB] dark:border-neutral-800 flex items-center justify-between text-xs font-mono text-[#665858]">
             <span>LEADJEN MEDIA NEWSROOM</span>
-            <Link href="/" className="underline hover:text-black dark:hover:text-white">
+            <Link href="/" className="underline hover:text-[#4A0B1C] dark:hover:text-white">
               ← Return to Front Page
             </Link>
           </div>

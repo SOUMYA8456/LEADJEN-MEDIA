@@ -317,7 +317,7 @@ export default async function HomePage({
   );
 
   return (
-    <div className="w-full bg-white dark:bg-editorial-darkBg transition-colors min-h-screen">
+    <div className="w-full bg-[#FFF8E7] dark:bg-editorial-darkBg transition-colors min-h-screen">
       {isPreviewDraft && (
         <div className="sticky top-0 z-50 bg-amber-500 text-black px-4 py-1.5 text-xs font-mono font-bold flex items-center justify-between shadow-sm">
           <span>● EDITORIAL DRAFT PREVIEW MODE — Live Unsaved Sections &amp; Drafts Active</span>

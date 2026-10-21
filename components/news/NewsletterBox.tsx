@@ -51,41 +51,41 @@ export function NewsletterBox({
   };
 
   return (
-    <section className="w-full bg-black text-white rounded-2xl p-8 sm:p-12 my-8 relative overflow-hidden shadow-none border border-gray-800">
-      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-neutral-800/20 rounded-full blur-3xl pointer-events-none" />
+    <section className="w-full bg-[#4A0B1C] text-white rounded-2xl p-8 sm:p-12 my-8 relative overflow-hidden shadow-none border border-[#60152B]">
+      <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-[#60152B]/40 rounded-full blur-3xl pointer-events-none" />
       <div className="max-w-3xl mx-auto text-center relative z-10">
-        <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-neutral-400 uppercase block mb-2">
+        <span className="text-[11px] font-mono font-bold tracking-[0.2em] text-[#F4DDE3] uppercase block mb-2">
           {badge}
         </span>
         <h2 className="font-serif font-black text-2xl sm:text-3xl md:text-4xl text-white tracking-tight leading-tight uppercase">
           {title}
         </h2>
-        <p className="mt-3 text-sm sm:text-base text-gray-300 max-w-xl mx-auto font-sans leading-relaxed">
+        <p className="mt-3 text-sm sm:text-base text-[#F4DDE3]/90 max-w-xl mx-auto font-sans leading-relaxed">
           {description}
         </p>
 
         {status === "success" ? (
-          <div className="mt-6 inline-flex items-center gap-2 px-5 py-3 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm font-semibold animate-in fade-in">
+          <div className="mt-6 inline-flex items-center gap-2 px-5 py-3 bg-[#60152B] border border-[#7A2038] rounded-lg text-white text-sm font-semibold animate-in fade-in">
             <CheckCircle className="w-5 h-5 text-white" />
             <span>{message}</span>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="mt-6 flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
             <div className="relative flex-1">
-              <Mail className="w-5 h-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+              <Mail className="w-5 h-5 text-[#F4DDE3] absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={placeholder}
-                className="w-full pl-11 pr-4 py-3 bg-gray-900/90 border border-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-white text-sm"
+                className="w-full pl-11 pr-4 py-3 bg-[#60152B]/90 border border-[rgba(255,255,255,0.2)] rounded-lg text-white placeholder-[#F4DDE3]/70 focus:outline-none focus:border-white text-sm"
               />
             </div>
             <button
               type="submit"
               disabled={status === "loading"}
-              className="px-6 py-3 bg-[#1E1B1A] hover:bg-neutral-800 text-white border border-neutral-700 font-bold text-xs uppercase tracking-wider rounded-lg transition flex items-center justify-center gap-1.5 shadow-none flex-shrink-0 disabled:opacity-50"
+              className="px-6 py-3 bg-white hover:bg-[#F7EEDB] text-[#4A0B1C] font-bold text-xs uppercase tracking-wider rounded-lg transition flex items-center justify-center gap-1.5 shadow-none flex-shrink-0 disabled:opacity-50"
             >
               <span>{status === "loading" ? "Subscribing..." : buttonText}</span>
               <ArrowRight className="w-4 h-4" />
@@ -94,10 +94,10 @@ export function NewsletterBox({
         )}
 
         {status === "error" && (
-          <p className="mt-3 text-xs text-neutral-400">{message}</p>
+          <p className="mt-3 text-xs text-[#F4DDE3]">{message}</p>
         )}
 
-        <p className="mt-4 text-[11px] text-gray-400">
+        <p className="mt-4 text-[11px] text-[#F4DDE3]/80">
           {supportingText}
         </p>
       </div>

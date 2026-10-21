@@ -39,9 +39,9 @@ export function Footer() {
   const global = config.global || DEFAULT_SITE_BUILDER_CONFIG.global;
 
   return (
-    <footer className="w-full bg-neutral-950 text-neutral-300 border-t border-neutral-800 font-sans">
+    <footer className="w-full bg-[#4A0B1C] text-[#F4DDE3] border-t border-[#60152B] font-sans">
       {/* Upper Footer: Brand & Back to Top */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8 border-b border-neutral-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-8 border-b border-[#60152B]">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div>
             <Link href="/" className="inline-block mb-1">
@@ -51,7 +51,7 @@ export function Footer() {
                 className="h-10 sm:h-12 w-auto object-contain"
               />
             </Link>
-            <p className="mt-2 text-sm text-neutral-400 max-w-md font-sans leading-relaxed">
+            <p className="mt-2 text-sm text-[#F4DDE3]/85 max-w-md font-sans leading-relaxed">
               {footer.description || global.tagline || "Independent journalism. Important stories. Providing authoritative coverage on national affairs, international relations, technology, and global markets."}
             </p>
           </div>
@@ -65,7 +65,7 @@ export function Footer() {
                     href={global.socialLinks.twitter}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full bg-neutral-900 hover:bg-[#1E1B1A] text-neutral-400 hover:text-white flex items-center justify-center transition border border-neutral-800 hover:border-neutral-700"
+                    className="w-9 h-9 rounded-full bg-[#60152B] hover:bg-[#7A2038] text-white flex items-center justify-center transition border border-[rgba(255,255,255,0.16)]"
                     aria-label="Leadjen Media on X"
                   >
                     <Twitter className="w-4 h-4" />
@@ -76,7 +76,7 @@ export function Footer() {
                     href={global.socialLinks.linkedin}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full bg-neutral-900 hover:bg-[#1E1B1A] text-neutral-400 hover:text-white flex items-center justify-center transition border border-neutral-800 hover:border-neutral-700"
+                    className="w-9 h-9 rounded-full bg-[#60152B] hover:bg-[#7A2038] text-white flex items-center justify-center transition border border-[rgba(255,255,255,0.16)]"
                     aria-label="Leadjen Media on LinkedIn"
                   >
                     <Linkedin className="w-4 h-4" />
@@ -87,7 +87,7 @@ export function Footer() {
                     href={global.socialLinks.facebook}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full bg-neutral-900 hover:bg-[#1E1B1A] text-neutral-400 hover:text-white flex items-center justify-center transition border border-neutral-800 hover:border-neutral-700"
+                    className="w-9 h-9 rounded-full bg-[#60152B] hover:bg-[#7A2038] text-white flex items-center justify-center transition border border-[rgba(255,255,255,0.16)]"
                     aria-label="Leadjen Media on Facebook"
                   >
                     <Facebook className="w-4 h-4" />
@@ -98,7 +98,7 @@ export function Footer() {
                     href={global.socialLinks.youtube}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-9 h-9 rounded-full bg-neutral-900 hover:bg-[#1E1B1A] text-neutral-400 hover:text-white flex items-center justify-center transition border border-neutral-800 hover:border-neutral-700"
+                    className="w-9 h-9 rounded-full bg-[#60152B] hover:bg-[#7A2038] text-white flex items-center justify-center transition border border-[rgba(255,255,255,0.16)]"
                     aria-label="Leadjen Media on YouTube"
                   >
                     <Youtube className="w-4 h-4" />
@@ -111,7 +111,7 @@ export function Footer() {
               <button
                 type="button"
                 onClick={scrollToTop}
-                className="flex items-center gap-1.5 px-3 py-2 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 text-xs font-mono rounded border border-neutral-700 transition ml-2"
+                className="flex items-center gap-1.5 px-3 py-2 bg-[#60152B] hover:bg-[#7A2038] text-white text-xs font-mono rounded border border-[rgba(255,255,255,0.16)] transition ml-2"
               >
                 <ArrowUp className="w-3.5 h-3.5" />
                 <span>Back to Top</span>
@@ -140,12 +140,12 @@ export function Footer() {
                             href={link.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="hover:text-white text-neutral-400 transition"
+                            className="hover:text-white text-[#F4DDE3]/80 transition"
                           >
                             {link.label}
                           </a>
                         ) : (
-                          <Link href={link.url} className="hover:text-white text-neutral-400 transition">
+                          <Link href={link.url} className="hover:text-white text-[#F4DDE3]/80 transition">
                             {link.label}
                           </Link>
                         )}
@@ -159,10 +159,10 @@ export function Footer() {
             <div>
               <h4 className="font-mono text-[11px] font-bold tracking-widest text-white uppercase mb-4">News</h4>
               <ul className="space-y-2.5">
-                <li><Link href="/india" className="hover:text-white text-neutral-400">India</Link></li>
-                <li><Link href="/world" className="hover:text-white text-neutral-400">World</Link></li>
-                <li><Link href="/politics" className="hover:text-white text-neutral-400">Politics</Link></li>
-                <li><Link href="/business" className="hover:text-white text-neutral-400">Business</Link></li>
+                <li><Link href="/india" className="hover:text-white text-[#F4DDE3]/80">India</Link></li>
+                <li><Link href="/world" className="hover:text-white text-[#F4DDE3]/80">World</Link></li>
+                <li><Link href="/politics" className="hover:text-white text-[#F4DDE3]/80">Politics</Link></li>
+                <li><Link href="/business" className="hover:text-white text-[#F4DDE3]/80">Business</Link></li>
               </ul>
             </div>
           )}
@@ -170,7 +170,7 @@ export function Footer() {
       </div>
 
       {/* Bottom Copyright & Branding Strip */}
-      <div className="border-t border-neutral-900 bg-black/80 py-8">
+      <div className="border-t border-[#60152B] bg-[#3B0816] py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center text-center space-y-4">
           {/* Centered Transparent Brand Logo */}
           <Link href="/" className="inline-block group focus:outline-none select-none transition-transform hover:scale-[1.03] duration-200">
@@ -183,10 +183,10 @@ export function Footer() {
 
           {/* Centered Copyright & Registration Details */}
           <div className="space-y-1.5 max-w-2xl px-2">
-            <p className="text-xs sm:text-sm text-neutral-300 font-mono font-medium tracking-wide">
+            <p className="text-xs sm:text-sm text-white/90 font-mono font-medium tracking-wide">
               © {new Date().getFullYear()} LEADJEN MEDIA. All rights reserved. Registered Digital News Publisher.
             </p>
-            <p className="text-[11px] sm:text-xs text-neutral-500 font-mono tracking-wider">
+            <p className="text-[11px] sm:text-xs text-[#F4DDE3]/60 font-mono tracking-wider">
               Designed with Editorial Precision &amp; Fast Next.js Architecture.
             </p>
           </div>

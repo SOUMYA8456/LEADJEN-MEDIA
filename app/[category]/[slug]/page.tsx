@@ -277,7 +277,7 @@ export default async function ArticleDetailPage({
       {/* Sticky Top Reading Progress Bar */}
       {articleConfig.showReadingProgressBar !== false && <ReadingProgressBar />}
 
-      <article className="w-full bg-white dark:bg-neutral-950 py-8 font-sans">
+      <article className="w-full bg-[#FFF8E7] dark:bg-neutral-950 py-8 font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Top Leaderboard Ad if enabled */}
           {topAd && (
@@ -292,14 +292,14 @@ export default async function ArticleDetailPage({
               {/* Breadcrumb & Follow Category */}
               {articleConfig.showBreadcrumbs !== false && (
                 <div className="flex items-center justify-between gap-2 mb-3">
-                  <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-neutral-500">
-                    <Link href="/" className="hover:text-black dark:hover:text-white">
+                  <div className="flex items-center gap-2 text-xs font-mono font-bold uppercase tracking-wider text-[#665858]">
+                    <Link href="/" className="hover:text-[#4A0B1C] dark:hover:text-white transition">
                       HOME
                     </Link>
                     <span>/</span>
                     <Link
                       href={`/${article.category?.slug || params.category}`}
-                      className="text-black dark:text-white hover:text-neutral-600 dark:hover:text-neutral-300 hover:underline"
+                      className="text-[#4A0B1C] hover:text-[#6B1024] dark:text-white hover:underline transition"
                     >
                       {article.category?.name || "News"}
                     </Link>
@@ -314,19 +314,19 @@ export default async function ArticleDetailPage({
               )}
 
               {/* Main Headline */}
-              <h1 className="font-serif font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-black dark:text-white tracking-tight leading-[1.15]">
+              <h1 className="font-serif font-black text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-[#241A1A] dark:text-white tracking-tight leading-[1.15]">
                 {article.title}
               </h1>
 
               {/* Subtitle */}
               {article.subtitle && (
-                <p className="mt-3 text-base sm:text-xl text-neutral-600 dark:text-neutral-300 font-serif leading-relaxed">
+                <p className="mt-3 text-base sm:text-xl text-[#665858] dark:text-neutral-300 font-serif leading-relaxed">
                   {article.subtitle}
                 </p>
               )}
 
               {/* Author, Date, Reading Time Bar */}
-              <div className="mt-5 py-4 border-y border-neutral-200 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="mt-5 py-4 border-y border-[#E8DCCB] dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
                   {article.author ? (
                     <>
@@ -335,38 +335,38 @@ export default async function ArticleDetailPage({
                           <img
                             src={article.author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=120&q=80"}
                             alt={article.author.name}
-                            className="w-10 h-10 rounded-full object-cover bg-neutral-100"
+                            className="w-10 h-10 rounded-full object-cover bg-[#F7EEDB]"
                           />
                         </Link>
                       )}
                       <div>
                         <Link
                           href={`/author/${article.author.slug}`}
-                          className="font-serif font-bold text-sm text-black dark:text-white hover:text-neutral-600 dark:hover:text-neutral-300 block"
+                          className="font-serif font-bold text-sm text-[#241A1A] dark:text-white hover:text-[#6B1024] dark:hover:text-neutral-300 block transition"
                         >
                           {article.author.name}
                         </Link>
-                        <span className="text-[11px] text-neutral-500 font-mono block">
+                        <span className="text-[11px] text-[#665858] font-mono block">
                           {article.author.designation || "Editorial Correspondent"}
                         </span>
                       </div>
                     </>
                   ) : (
                     <div>
-                      <span className="font-serif font-bold text-sm text-black dark:text-white block">
+                      <span className="font-serif font-bold text-sm text-[#241A1A] dark:text-white block">
                         Leadjen Editorial Desk
                       </span>
-                      <span className="text-[11px] text-neutral-500 font-mono block">
+                      <span className="text-[11px] text-[#665858] font-mono block">
                         Editorial Correspondent
                       </span>
                     </div>
                   )}
                 </div>
 
-                <div className="text-xs text-neutral-500 dark:text-neutral-400 font-mono space-y-0.5 sm:text-right">
+                <div className="text-xs text-[#665858] dark:text-neutral-400 font-mono space-y-0.5 sm:text-right">
                   <div>Published: {formatArticleDate(article.publishedAt)}</div>
                   {articleConfig.showReadingTimeBadge !== false && (
-                    <div className="text-[11px] text-neutral-400">
+                    <div className="text-[11px] text-[#665858]">
                       {article.readingTime || 4} min read • Updated {formatTimeAgo(article.updatedAt)}
                     </div>
                   )}
@@ -402,22 +402,22 @@ export default async function ArticleDetailPage({
 
               {/* Author Bio Box */}
               {articleConfig.showAuthorBio !== false && article.author && (
-                <div className="my-8 p-5 bg-neutral-50 dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 flex items-start gap-4">
+                <div className="my-8 p-5 bg-[#FFFCF5] dark:bg-neutral-900 rounded-xl border border-[#E8DCCB] dark:border-neutral-800 flex items-start gap-4">
                   <img
                     src={article.author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=150&q=80"}
                     alt={article.author.name}
-                    className="w-14 h-14 rounded-full object-cover shrink-0"
+                    className="w-14 h-14 rounded-full object-cover shrink-0 bg-[#F7EEDB]"
                   />
                   <div>
-                    <h4 className="font-serif font-bold text-base text-black dark:text-white">
+                    <h4 className="font-serif font-bold text-base text-[#241A1A] dark:text-white">
                       Written by {article.author.name}
                     </h4>
-                    <p className="text-xs text-neutral-600 dark:text-neutral-300 font-sans mt-1 leading-relaxed">
+                    <p className="text-xs text-[#665858] dark:text-neutral-300 font-sans mt-1 leading-relaxed">
                       {article.author.bio || "Senior journalist for Leadjen Media covering critical national and international developments."}
                     </p>
                     <Link
                       href={`/author/${article.author.slug || "editorial-desk"}`}
-                      className="inline-block mt-2 text-xs font-bold text-black dark:text-white hover:underline"
+                      className="inline-block mt-2 text-xs font-bold text-[#4A0B1C] hover:text-[#6B1024] dark:text-white hover:underline transition"
                     >
                       View all stories by {article.author.name} →
                     </Link>
@@ -427,8 +427,8 @@ export default async function ArticleDetailPage({
 
               {/* Related Stories Grid */}
               {articleConfig.showRelatedStories !== false && relatedArticles.length > 0 && (
-                <div className="my-10 pt-8 border-t-2 border-black dark:border-white">
-                  <h3 className="font-serif font-black text-xl text-black dark:text-white uppercase tracking-tight mb-6">
+                <div className="my-10 pt-8 border-t-2 border-[#4A0B1C] dark:border-white">
+                  <h3 className="font-serif font-black text-xl text-[#241A1A] dark:text-white uppercase tracking-tight mb-6">
                     RELATED STORIES IN {article.category?.name || "THIS TOPIC"}
                   </h3>
                   <div className={`grid grid-cols-1 ${relatedLimit === 4 ? "sm:grid-cols-2 lg:grid-cols-4" : relatedLimit === 6 ? "sm:grid-cols-2 lg:grid-cols-3" : "sm:grid-cols-3"} gap-5`}>

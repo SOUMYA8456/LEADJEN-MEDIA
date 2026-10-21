@@ -109,26 +109,26 @@ export default async function AuthorProfilePage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(authorJsonLd) }}
       />
-      <div className="w-full bg-white dark:bg-editorial-darkBg py-10 min-h-screen">
+      <div className="w-full bg-[#FFF8E7] dark:bg-editorial-darkBg py-10 min-h-screen text-[#241A1A]">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         {/* Author Bio Header Card */}
-        <div className="p-8 bg-gray-50 dark:bg-editorial-darkCard rounded-2xl border border-gray-200 dark:border-gray-800 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left shadow-none">
+        <div className="p-8 bg-[#FFFCF5] dark:bg-editorial-darkCard rounded-2xl border border-[#E8DCCB] dark:border-gray-800 flex flex-col sm:flex-row items-center sm:items-start gap-6 text-center sm:text-left shadow-none">
           <img
             src={author.avatar || "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&w=200&q=80"}
             alt={author.name}
-            className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-none bg-gray-200 flex-shrink-0"
+            className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover shadow-none bg-[#F7EEDB] flex-shrink-0"
           />
           <div className="space-y-2 flex-1">
-            <span className="text-xs font-mono font-bold uppercase tracking-wider text-neutral-500 dark:text-neutral-400">
+            <span className="text-xs font-mono font-bold uppercase tracking-wider text-[#6B1024] dark:text-neutral-400">
               LEADJEN EDITORIAL CORRESPONDENT
             </span>
-            <h1 className="font-serif font-black text-2xl sm:text-3xl text-gray-950 dark:text-white">
+            <h1 className="font-serif font-black text-2xl sm:text-3xl text-[#241A1A] dark:text-white">
               {author.name}
             </h1>
-            <p className="text-xs font-mono text-gray-500 font-semibold">
+            <p className="text-xs font-mono text-[#B42332] font-semibold">
               {author.designation || "Senior Journalist"}
             </p>
-            <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed font-sans max-w-2xl">
+            <p className="text-sm text-[#665858] dark:text-gray-300 leading-relaxed font-sans max-w-2xl">
               {author.bio || "Staff correspondent for Leadjen Media covering national and international affairs."}
             </p>
 
@@ -139,7 +139,7 @@ export default async function AuthorProfilePage({
                   href={author.twitter}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-1.5 bg-gray-200 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  className="p-1.5 bg-[#F7EEDB] dark:bg-gray-800 rounded-full text-[#4A0B1C] dark:text-gray-300 hover:text-[#6B1024] hover:bg-[#E8DCCB]"
                 >
                   <Twitter className="w-4 h-4" />
                 </a>
@@ -149,7 +149,7 @@ export default async function AuthorProfilePage({
                   href={author.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-1.5 bg-gray-200 dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 hover:text-black dark:hover:text-white"
+                  className="p-1.5 bg-[#F7EEDB] dark:bg-gray-800 rounded-full text-[#4A0B1C] dark:text-gray-300 hover:text-[#6B1024] hover:bg-[#E8DCCB]"
                 >
                   <Linkedin className="w-4 h-4" />
                 </a>
@@ -160,8 +160,8 @@ export default async function AuthorProfilePage({
 
         {/* Articles by Author */}
         <div className="space-y-6">
-          <div className="pb-3 border-b-2 border-gray-950 dark:border-white flex items-center justify-between">
-            <h2 className="font-serif font-black text-xl text-gray-950 dark:text-white uppercase tracking-tight">
+          <div className="pb-3 border-b-2 border-[#4A0B1C] dark:border-white flex items-center justify-between">
+            <h2 className="font-serif font-black text-xl text-[#241A1A] dark:text-white uppercase tracking-tight">
               ARTICLES BY {author.name} ({author.articles.length})
             </h2>
           </div>

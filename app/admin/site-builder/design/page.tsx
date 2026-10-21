@@ -14,6 +14,9 @@ import {
   Check,
   RotateCcw,
   Sparkles,
+  History,
+  Clock,
+  Loader2,
 } from "lucide-react";
 import { SiteBuilderNav } from "@/components/admin/SiteBuilderNav";
 import {
@@ -43,12 +46,49 @@ const FONT_BODY_OPTIONS = [
 
 const PRESET_PALETTES = [
   {
+    name: "Leadjen Cream & Maroon (Official)",
+    desc: "Premium newspaper cream background (#FFF8E7) with deep maroon editorial accents (#4A0B1C)",
+    colors: {
+      primary: "#4A0B1C",
+      secondary: "#6B1024",
+      accentRed: "#B42332",
+      deepMaroon: "#4A0B1C",
+      maroonAccent: "#6B1024",
+      breakingRed: "#B42332",
+      background: "#FFF8E7",
+      surface: "#F7EEDB",
+      card: "#FFFCF5",
+      textPrimary: "#241A1A",
+      textSecondary: "#665858",
+      mutedText: "#665858",
+      borderColor: "#E8DCCB",
+      sidebarBackground: "#4A0B1C",
+      sidebarSecondary: "#60152B",
+      sidebarActive: "#7A2038",
+      sidebarText: "#FFFFFF",
+      sidebarTextSecondary: "#F4DDE3",
+      sidebarDivider: "rgba(255, 255, 255, 0.16)",
+      navBackground: "#4A0B1C",
+      navText: "#FFFFFF",
+      navActive: "#F4DDE3",
+      darkBackground: "#0a0a0a",
+      darkSurface: "#141414",
+      darkCard: "#18181b",
+      darkTextPrimary: "#f4f4f5",
+      darkTextSecondary: "#a1a1aa",
+      darkBorderColor: "#27272a",
+    },
+  },
+  {
     name: "Leadjen Classic (#1E1B1A)",
     desc: "Authoritative deep charcoal & bold red wire accents",
     colors: {
       primary: "#1E1B1A",
       secondary: "#2d2726",
       accentRed: "#cc0000",
+      deepMaroon: "#1E1B1A",
+      maroonAccent: "#2d2726",
+      breakingRed: "#cc0000",
       background: "#ffffff",
       surface: "#f8f9fa",
       card: "#ffffff",
@@ -56,6 +96,15 @@ const PRESET_PALETTES = [
       textSecondary: "#52525b",
       mutedText: "#71717a",
       borderColor: "#e4e4e7",
+      sidebarBackground: "#1E1B1A",
+      sidebarSecondary: "#2d2726",
+      sidebarActive: "#3a3433",
+      sidebarText: "#FFFFFF",
+      sidebarTextSecondary: "#a1a1aa",
+      sidebarDivider: "rgba(255, 255, 255, 0.16)",
+      navBackground: "#1E1B1A",
+      navText: "#FFFFFF",
+      navActive: "#cc0000",
       darkBackground: "#0a0a0a",
       darkSurface: "#141414",
       darkCard: "#18181b",
@@ -71,6 +120,9 @@ const PRESET_PALETTES = [
       primary: "#0f0f0f",
       secondary: "#262626",
       accentRed: "#dc2626",
+      deepMaroon: "#0f0f0f",
+      maroonAccent: "#262626",
+      breakingRed: "#dc2626",
       background: "#ffffff",
       surface: "#f5f5f5",
       card: "#ffffff",
@@ -78,6 +130,15 @@ const PRESET_PALETTES = [
       textSecondary: "#525252",
       mutedText: "#737373",
       borderColor: "#e5e5e5",
+      sidebarBackground: "#0f0f0f",
+      sidebarSecondary: "#262626",
+      sidebarActive: "#333333",
+      sidebarText: "#FFFFFF",
+      sidebarTextSecondary: "#a3a3a3",
+      sidebarDivider: "rgba(255, 255, 255, 0.16)",
+      navBackground: "#0f0f0f",
+      navText: "#FFFFFF",
+      navActive: "#dc2626",
       darkBackground: "#050505",
       darkSurface: "#121212",
       darkCard: "#1a1a1a",
@@ -93,6 +154,9 @@ const PRESET_PALETTES = [
       primary: "#1c1917",
       secondary: "#292524",
       accentRed: "#b91c1c",
+      deepMaroon: "#1c1917",
+      maroonAccent: "#292524",
+      breakingRed: "#b91c1c",
       background: "#ffffff",
       surface: "#fafaf9",
       card: "#ffffff",
@@ -100,6 +164,15 @@ const PRESET_PALETTES = [
       textSecondary: "#57534e",
       mutedText: "#78716c",
       borderColor: "#e7e5e4",
+      sidebarBackground: "#1c1917",
+      sidebarSecondary: "#292524",
+      sidebarActive: "#3d3835",
+      sidebarText: "#FFFFFF",
+      sidebarTextSecondary: "#d6d3d1",
+      sidebarDivider: "rgba(255, 255, 255, 0.16)",
+      navBackground: "#1c1917",
+      navText: "#FFFFFF",
+      navActive: "#b91c1c",
       darkBackground: "#0c0a09",
       darkSurface: "#1c1917",
       darkCard: "#292524",
@@ -117,6 +190,22 @@ export default function DesignTypographyBuilder() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [deviceTab, setDeviceTab] = useState<"desktop" | "tablet" | "mobile">("desktop");
   const [previewTheme, setPreviewTheme] = useState<"light" | "dark">("light");
+  const [versions, setVersions] = useState<any[]>([]);
+  const [loadingVersions, setLoadingVersions] = useState(false);
+  const [restoringId, setRestoringId] = useState<string | null>(null);
+
+  const fetchVersions = async () => {
+    try {
+      setLoadingVersions(true);
+      const res = await fetch("/api/site-builder/versions");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.versions) setVersions(data.versions);
+      }
+    } catch {} finally {
+      setLoadingVersions(false);
+    }
+  };
 
   useEffect(() => {
     fetch("/api/site-builder?draft=true")
@@ -150,6 +239,8 @@ export default function DesignTypographyBuilder() {
         }
       })
       .finally(() => setLoading(false));
+
+    fetchVersions();
   }, []);
 
   const handleSave = async (isPublish = false) => {
@@ -167,6 +258,7 @@ export default function DesignTypographyBuilder() {
             : "✓ Design system tokens saved as draft."
         );
         setTimeout(() => setStatusMessage(null), 3500);
+        fetchVersions();
       }
     } catch {
       alert("Failed to save design tokens.");
@@ -227,12 +319,45 @@ export default function DesignTypographyBuilder() {
     });
   };
 
-  const applyPalette = (paletteColors: DesignColorsConfig) => {
+  const handleRestoreVersion = async (versionId: string) => {
+    if (!confirm("Are you sure you want to restore this version snapshot? This will rollback the site design and layout settings.")) return;
+    try {
+      setRestoringId(versionId);
+      const res = await fetch("/api/site-builder/versions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ versionId }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        if (data.config) {
+          setConfig({
+            ...DEFAULT_SITE_BUILDER_CONFIG,
+            ...data.config,
+          });
+        }
+        setStatusMessage(`✓ ${data.message}`);
+        setTimeout(() => setStatusMessage(null), 4000);
+        fetchVersions();
+      } else {
+        alert(data.error || "Failed to restore version snapshot.");
+      }
+    } catch {
+      alert("Network error restoring version snapshot.");
+    } finally {
+      setRestoringId(null);
+    }
+  };
+
+  const applyPalette = (paletteColors: Partial<DesignColorsConfig>) => {
     setConfig({
       ...config,
       design: {
         ...config.design,
-        colors: { ...paletteColors },
+        colors: {
+          ...config.design.colors,
+          ...paletteColors,
+        },
       },
     });
   };
@@ -733,16 +858,76 @@ export default function DesignTypographyBuilder() {
         <div className="flex items-center gap-2">
           <Palette className="w-4 h-4 text-black dark:text-white" />
           <h3 className="font-serif font-black text-lg text-black dark:text-white">
-            Granular Color Tokens (Light &amp; Dark Theme)
+            Editorial Color System &amp; Component Tokens
           </h3>
         </div>
 
-        {/* Light Theme Colors */}
+        {/* Maroon & Brand Accents */}
         <div className="space-y-3">
-          <h4 className="text-xs font-mono font-bold uppercase text-neutral-500">Light Theme Tokens</h4>
+          <h4 className="text-xs font-mono font-bold uppercase text-neutral-500">Editorial Brand &amp; Maroon Tokens</h4>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Primary Brand Accent</label>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Deep Maroon (#4A0B1C)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.deepMaroon || "#4A0B1C"}
+                  onChange={(e) => updateColors("deepMaroon", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.deepMaroon || "#4A0B1C"}
+                  onChange={(e) => updateColors("deepMaroon", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Maroon Accent (#6B1024)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.maroonAccent || "#6B1024"}
+                  onChange={(e) => updateColors("maroonAccent", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.maroonAccent || "#6B1024"}
+                  onChange={(e) => updateColors("maroonAccent", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Breaking News Red (#B42332)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.breakingRed || colors.accentRed || "#B42332"}
+                  onChange={(e) => {
+                    updateColors("breakingRed", e.target.value);
+                    updateColors("accentRed", e.target.value);
+                  }}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.breakingRed || colors.accentRed || "#B42332"}
+                  onChange={(e) => {
+                    updateColors("breakingRed", e.target.value);
+                    updateColors("accentRed", e.target.value);
+                  }}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Primary Brand Color</label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
@@ -758,27 +943,15 @@ export default function DesignTypographyBuilder() {
                 />
               </div>
             </div>
+          </div>
+        </div>
 
+        {/* Newspaper Canvas & Surfaces */}
+        <div className="space-y-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+          <h4 className="text-xs font-mono font-bold uppercase text-neutral-500">Newspaper Canvas &amp; Cream Surfaces</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
-              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Accent Red (Live / Breaking)</label>
-              <div className="flex items-center gap-2">
-                <input
-                  type="color"
-                  value={colors.accentRed}
-                  onChange={(e) => updateColors("accentRed", e.target.value)}
-                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
-                />
-                <input
-                  type="text"
-                  value={colors.accentRed}
-                  onChange={(e) => updateColors("accentRed", e.target.value)}
-                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Canvas Background</label>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Canvas Background (#FFF8E7)</label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
@@ -796,7 +969,43 @@ export default function DesignTypographyBuilder() {
             </div>
 
             <div>
-              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Border Color</label>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Secondary Cream (#F7EEDB)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.surface}
+                  onChange={(e) => updateColors("surface", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.surface}
+                  onChange={(e) => updateColors("surface", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Card Background (#FFFCF5)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.card || "#FFFCF5"}
+                  onChange={(e) => updateColors("card", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.card || "#FFFCF5"}
+                  onChange={(e) => updateColors("card", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Border Color (#E8DCCB)</label>
               <div className="flex items-center gap-2">
                 <input
                   type="color"
@@ -808,6 +1017,222 @@ export default function DesignTypographyBuilder() {
                   type="text"
                   value={colors.borderColor}
                   onChange={(e) => updateColors("borderColor", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Primary Ink & Text */}
+        <div className="space-y-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+          <h4 className="text-xs font-mono font-bold uppercase text-neutral-500">Editorial Ink &amp; Typography</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Primary Text (#241A1A)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.textPrimary}
+                  onChange={(e) => updateColors("textPrimary", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.textPrimary}
+                  onChange={(e) => updateColors("textPrimary", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Secondary Text (#665858)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.textSecondary}
+                  onChange={(e) => updateColors("textSecondary", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.textSecondary}
+                  onChange={(e) => updateColors("textSecondary", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Muted Metadata (#665858)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.mutedText}
+                  onChange={(e) => updateColors("mutedText", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.mutedText}
+                  onChange={(e) => updateColors("mutedText", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Drawer Tokens */}
+        <div className="space-y-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+          <h4 className="text-xs font-mono font-bold uppercase text-neutral-500">Mobile Navigation Drawer (Deep Maroon)</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Sidebar BG (#4A0B1C)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.sidebarBackground || "#4A0B1C"}
+                  onChange={(e) => updateColors("sidebarBackground", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.sidebarBackground || "#4A0B1C"}
+                  onChange={(e) => updateColors("sidebarBackground", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Sidebar Search / Card (#60152B)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.sidebarSecondary || "#60152B"}
+                  onChange={(e) => updateColors("sidebarSecondary", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.sidebarSecondary || "#60152B"}
+                  onChange={(e) => updateColors("sidebarSecondary", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Active Menu Item (#7A2038)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.sidebarActive || "#7A2038"}
+                  onChange={(e) => updateColors("sidebarActive", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.sidebarActive || "#7A2038"}
+                  onChange={(e) => updateColors("sidebarActive", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Sidebar Text (#FFFFFF)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.sidebarText || "#FFFFFF"}
+                  onChange={(e) => updateColors("sidebarText", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.sidebarText || "#FFFFFF"}
+                  onChange={(e) => updateColors("sidebarText", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Sidebar Headings (#F4DDE3)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.sidebarTextSecondary || "#F4DDE3"}
+                  onChange={(e) => updateColors("sidebarTextSecondary", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.sidebarTextSecondary || "#F4DDE3"}
+                  onChange={(e) => updateColors("sidebarTextSecondary", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop Navigation Bar Tokens */}
+        <div className="space-y-3 pt-4 border-t border-neutral-100 dark:border-neutral-800">
+          <h4 className="text-xs font-mono font-bold uppercase text-neutral-500">Desktop Navigation Bar</h4>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Navbar Background (#4A0B1C)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.navBackground || "#4A0B1C"}
+                  onChange={(e) => updateColors("navBackground", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.navBackground || "#4A0B1C"}
+                  onChange={(e) => updateColors("navBackground", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Navbar Link Text (#FFFFFF)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.navText || "#FFFFFF"}
+                  onChange={(e) => updateColors("navText", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.navText || "#FFFFFF"}
+                  onChange={(e) => updateColors("navText", e.target.value)}
+                  className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[11px] font-mono text-neutral-500 mb-1">Navbar Active Link (#F4DDE3)</label>
+              <div className="flex items-center gap-2">
+                <input
+                  type="color"
+                  value={colors.navActive || "#F4DDE3"}
+                  onChange={(e) => updateColors("navActive", e.target.value)}
+                  className="w-8 h-8 rounded border border-neutral-300 cursor-pointer p-0 bg-transparent"
+                />
+                <input
+                  type="text"
+                  value={colors.navActive || "#F4DDE3"}
+                  onChange={(e) => updateColors("navActive", e.target.value)}
                   className="w-full px-2.5 py-1.5 bg-neutral-50 dark:bg-neutral-950 border border-neutral-300 dark:border-neutral-700 rounded-lg text-xs font-mono"
                 />
               </div>
@@ -951,6 +1376,89 @@ export default function DesignTypographyBuilder() {
             </select>
           </div>
         </div>
+      </div>
+
+      {/* Version Snapshot History & Rollback System */}
+      <div className="p-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-2xl shadow-xs space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <History className="w-4 h-4 text-black dark:text-white" />
+            <h3 className="font-serif font-black text-lg text-black dark:text-white">
+              Design Version Snapshots &amp; Rollback
+            </h3>
+          </div>
+          <button
+            type="button"
+            onClick={fetchVersions}
+            disabled={loadingVersions}
+            className="flex items-center gap-1 text-xs font-mono text-neutral-500 hover:text-black dark:hover:text-white"
+          >
+            <RotateCcw className={`w-3.5 h-3.5 ${loadingVersions ? "animate-spin" : ""}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
+        <p className="text-xs text-neutral-500 font-sans">
+          Every time you publish or update site builder configurations, a full snapshot is saved. You can roll back to any previous version with 1 click.
+        </p>
+
+        {loadingVersions && versions.length === 0 ? (
+          <div className="py-6 text-center text-xs font-mono text-neutral-400 flex items-center justify-center gap-2">
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Loading snapshots...</span>
+          </div>
+        ) : versions.length === 0 ? (
+          <div className="py-8 text-center text-xs font-mono text-neutral-400 border border-dashed border-neutral-200 dark:border-neutral-800 rounded-xl">
+            No version snapshots saved yet. Click &quot;Publish Live&quot; to create the first version.
+          </div>
+        ) : (
+          <div className="divide-y divide-neutral-100 dark:divide-neutral-800 border border-neutral-200 dark:border-neutral-800 rounded-xl overflow-hidden">
+            {versions.map((ver) => (
+              <div
+                key={ver.id}
+                className="p-3.5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-neutral-50/50 dark:bg-neutral-950 hover:bg-neutral-100/50 dark:hover:bg-neutral-900 transition"
+              >
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-bold text-xs text-black dark:text-white">
+                      {ver.versionName}
+                    </span>
+                    <span className="text-[10px] font-mono text-neutral-400">
+                      by {ver.publishedBy || "System"}
+                    </span>
+                  </div>
+                  {ver.description && (
+                    <p className="text-[11px] text-neutral-500 font-sans">
+                      {ver.description}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-1 text-[10px] font-mono text-neutral-400">
+                    <Clock className="w-3 h-3" />
+                    <span>{new Date(ver.createdAt).toLocaleString("en-IN", { timeZone: "Asia/Kolkata" })} IST</span>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => handleRestoreVersion(ver.id)}
+                  disabled={restoringId === ver.id}
+                  className="px-3 py-1.5 rounded-lg bg-neutral-200 dark:bg-neutral-800 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black text-neutral-800 dark:text-neutral-200 text-xs font-mono font-bold uppercase tracking-wider transition flex items-center gap-1.5 disabled:opacity-50 shrink-0"
+                >
+                  {restoringId === ver.id ? (
+                    <>
+                      <Loader2 className="w-3 h-3 animate-spin" />
+                      <span>Restoring...</span>
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="w-3 h-3" />
+                      <span>Rollback Here</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
